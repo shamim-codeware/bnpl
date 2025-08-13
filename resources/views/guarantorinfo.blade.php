@@ -30,6 +30,14 @@
     p {
         line-height: 20px;
     }
+    .second_guarantor {
+        border-top: 1.7px solid #00b050;
+        padding-top: 5px;
+        margin-top: 5px;
+    }
+    .first_guarantor{
+            margin-top:3px;
+    }
 
     @media print {
         @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
@@ -74,6 +82,14 @@
         img {
             -webkit-print-color-adjust: exact;
         }
+        .second_guarantor {
+            border-top: 1.7px solid #00b050;
+            padding-top: 5px;
+            margin-top: 5px;
+        }
+        .first_guarantor{
+            margin-top:3px;
+        }
     }
 </style>
 <br>
@@ -93,22 +109,26 @@
             </tr>
             <tr>
                 @foreach($guarantor as $key=>$guaran)
-                <table style="width:100%;" cellspacing="0">
+                <table style="width:100%;" cellspacing="0" class= @if($key==1) second_guarantor @else first_guarantor @endif>
                     <tr>
-                        <td style="padding-top:10px;">
+                        <td style="padding-top:10px;width:79%;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="width:40%;">১)@if($key==1) ২য়@else ১ম@endif প্রস্তাবিত নিশ্চয়তা প্রদানকারীর নাম- মিঃ/মিসেস/মিস : </td>
+                                    <td style="width:51%;">১)@if($key==1) ২য়@else ১ম@endif প্রস্তাবিত নিশ্চয়তা প্রদানকারীর নাম- মিঃ/মিসেস/মিস : </td>
                                     <td style="border-bottom: 2px dotted #000;">{{ $guaran->guarater_name }}</td>
                                 </tr>
                             </table>
+                        </td>
+                        <td rowspan="4" style="font-size:9px !important;border:1px solid #000;vertical-align:middle;width:160px;height:160px;text-align:center">
+                            {{-- <img src="https://i.postimg.cc/Kz0Kp8yX/blank.png" alt="guarantor photo" style="width: 160px;height: 160px;object-fit: cover;margin-left:7px;"> --}}
+                            ছবি
                         </td>
                     </tr>
                     <tr>
                         <td style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="width:16%;">২)পিতা/স্বামী/স্ত্রীর নাম:</td>
+                                    <td style="width:20%;">২)পিতা/স্বামী/স্ত্রীর নাম:</td>
                                     <td style="border-bottom: 2px dotted #000;">{{ $guaran->guarater_relation_name}}</td>
                                 </tr>
                             </table>
@@ -118,7 +138,7 @@
                         <td style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="width:21%;">৩)ক. বর্তমান আবাসিক ঠিকানা:</td>
+                                    <td style="width:27%;">৩)ক. বর্তমান আবাসিক ঠিকানা:</td>
                                     <td style="border-bottom: 2px dotted #000;">{{ $guaran->guarater_address_present }}</td>
                                 </tr>
                             </table>
@@ -128,15 +148,15 @@
                         <td style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="border-bottom: 2px dotted #000;width: 51%;"></td>
-                                    <td style="width:18%;">খ. টেলিফোন/মোবাইল নং:</td>
+                                    <td style="border-bottom: 2px dotted #000;width: 46%;"></td>
+                                    <td style="width:23%;">খ. টেলিফোন/মোবাইল নং:</td>
                                     <td style="border-bottom: 2px dotted #000;">{{ $guaran->guarater_phone }}</td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width: 18%;">গ.বর্তমান ঠিকানায় কতদিন বসবাস করছেন?</td>
@@ -151,7 +171,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width:11%;">
@@ -163,7 +183,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width:8%;">
@@ -183,7 +203,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width: 8%;">৬)ক.পেশা</td>
@@ -199,7 +219,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width:11%;">
@@ -213,7 +233,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width:29%;">
@@ -225,7 +245,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width:34%;">
@@ -239,7 +259,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width: 4%;">মূল্য:</td>
@@ -254,7 +274,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;">
+                        <td colspan="2" style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="padding-right: 10px;">
@@ -320,7 +340,7 @@
                 </td>
             </tr>
             <tr>
-                <td style="padding-top: 7px;">
+                <td  style="padding-top: 7px;">
                     <table style="width:100%;" cellspacing="0">
                         <tr>
                             <td style="padding-right: 10px;">

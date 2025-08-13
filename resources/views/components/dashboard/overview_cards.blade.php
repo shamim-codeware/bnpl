@@ -1,4 +1,59 @@
 <div class="col-xxl-12">
+    <div class="row g-4 mb-3">
+        <!-- Total Bookings -->
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="d-flex align-items-center gap-3 p-3 border border-primary-subtle rounded-3 bg-blue-50 border border-blue-200">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-blue-100 text-blue-600" style="width:40px; height:40px;">
+                    <i class="far fa-calendar-check fs-5"></i>
+                </div>
+                <div>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Bookings</p>
+                    <p class="mb-0 fs-5 fw-bold text-blue-600">120</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmed -->
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="d-flex align-items-center gap-3 p-3 border border-success-subtle rounded-3 bg-green-50 border border-green-200">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-green-100 text-green-600" style="width:40px; height:40px;">
+                    <i class="fa fa-check fs-5"></i>
+                </div>
+                <div>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Confirmed</p>
+                    <p class="mb-0 fs-5 fw-bold text-green-600">95</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Awaiting -->
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="d-flex align-items-center gap-3 p-3 border border-warning-subtle rounded-3 bg-yellow-50 border border-yellow-200">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-yellow-100 text-yellow-600" style="width:40px; height:40px;">
+                    <i class="far fa-clock fs-5"></i>
+                </div>
+                <div>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Awaiting</p>
+                    <p class="mb-0 fs-5 fw-bold text-warning">15</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canceled -->
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="d-flex align-items-center gap-3 p-3 border border-danger-subtle rounded-3 bg-red-50 border border-red-200">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-red-100 text-red-600" style="width:40px; height:40px;">
+                    <i class="fa fa-times fs-5"></i>
+                </div>
+                <div>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Canceled</p>
+                    <p class="mb-0 fs-5 fw-bold text-danger">7</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="row gx-2">
         <div class="col-lg-4 mb-3">
             <a href="#">

@@ -94,7 +94,6 @@
 
             }
 
-
             var marquetext = "this is test ";
             $.post('{{ url('/todays-followup') }}', {
                 _token: '{{ csrf_token() }}'

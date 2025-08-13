@@ -30,9 +30,11 @@
             </div>
         </li> --}}
     </div>
-
-    {{-- <div class="navbar-middle top-heading d-lg-block d-none">
-        Healine 
+    <div class="offer_text mx-auto">
+        <h1> Buy Now Pay later</h1>
+    </div>
+    <div class="navbar-middle top-heading d-lg-block d-none">
+        {{-- Healine  --}}
         <div class="container-fluid">
             <div class="row">
                 <div class="dashboard_marque">
@@ -40,11 +42,14 @@
                 </div>
             </div>
         </div>
-        Healine 
-    </div> --}}
-    <div class="offer_text">
-        <h1> Buy Now Pay later</h1>
+        {{-- Healine  --}}
     </div>
+    {{-- <div class="dashboard_marque ms-auto">
+        <marquee id="marque-text_st" behavior="scroll" direction="left">
+            Md. Salah Uddin Todays Follow Up Time 12:00:00 PM ** Sohrab Hossain Todays Follow Up Time 12:00:00 PM ** Khurshid Alam Todays Follow Up Time 12:00:00 PM ** ...
+        </marquee>
+    </div> --}}
+
     <div class="navbar-right ms-auto">
         <ul class="navbar-right__menu">
             {{-- <div class="date-time">
