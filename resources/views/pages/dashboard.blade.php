@@ -95,11 +95,11 @@
             }
 
             var marquetext = "this is test ";
-            $.post('{{ url('/todays-followup') }}', {
+            $.post('{{ url('/marquee-notifications') }}', {
                 _token: '{{ csrf_token() }}'
             }, function(data) {
 
-                $("#marque-text").html(data);
+                $("#marque-text_st").html(data);
             });
 
             EnquiryStatistics()

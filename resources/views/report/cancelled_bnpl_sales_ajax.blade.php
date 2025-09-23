@@ -96,23 +96,23 @@
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? number_format(floatval($purchase->purchase_product->hire_price), 2) : '0.00' }}</div>
+                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? (float)(floatval($purchase->purchase_product->hire_price)) : '0.00' }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->approval_date ? \App\Helpers\Helper::formatDateStandard($purchase->approval_date) : '' }}
+                            {{ @$purchase->approval_date ? \Carbon\Carbon::parse($purchase->approval_date)->format('d F Y')  : '' }}
                         </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ $next_due_date ? \App\Helpers\Helper::formatDateStandard($next_due_date) : 'N/A' }}
+                            {{ $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A' }}
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? number_format(floatval($purchase->purchase_product->total_paid), 2) : '0.00' }}</div>
+                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? (float)(floatval($purchase->purchase_product->total_paid)) : '0.00' }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ number_format(floatval($outstanding_balance), 2) }}</div>
+                        <div class="userDatatable-content">{{ (float)(floatval($outstanding_balance)) }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->pr_phone }}</div>

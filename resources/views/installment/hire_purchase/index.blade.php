@@ -150,7 +150,7 @@
             }
             $('.btn-submit').prop('disabled', true);
 
-            var custome = "{{ url('hire-purchase-export?page=') }}" + page + "&" + paramStrings.join('&');
+            var custome = "{{ url('all-bnpl-list-export?page=') }}" + page + "&" + paramStrings.join('&');
             const anchor = $(
                     '<a class="mx-2 fw-bold excel-btn" href="">Export Excel<i class="px-2 far fa-file-excel"></i></a>')
                 .attr('href', custome)

@@ -96,10 +96,19 @@ class DashboardController extends Controller
         //count
         $counttodaysales = HirePurchase::whereDate('created_at', $today)->where('status', 3);
         $todays_collection = Transaction::whereDate('updated_at', $today)->where('status', 1);
-        $overdue = Installment::where('loan_start_date', '<', Carbon::now())->where('status', 0);
+        $overdue = Installment::whereDate('loan_end_date', '<', now()->toDateString())
+            ->where('status', 0)
+            ->whereHas('hire_purchase', function ($q) {
+                $q->where('status', 3) // Only approved hire purchases
+                    ->where('is_paid', 0); // Only unpaid hire purchases
+            });
         $current_month_forcast = Installment::where('status', 0)->whereBetween('loan_start_date', [$startOfMonth, $endOfMonth]);
         //last 5 transaction
         $query = Transaction::with(['hire_purchase:id,name,pr_phone,showroom_id', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room']);
+
+        // Base query for dashboard statistics
+        $statsQuery = HirePurchase::query(); // Approved status
+
         if ($request->zone) {
             $zone_id = $request->zone;
             $showroom_credit = $showroom_credit->where('zone_id', $zone_id);
@@ -130,6 +139,11 @@ class DashboardController extends Controller
             });
 
             $counttodaysales->whereHas('show_room', function ($q) use ($zone_id) {
+                $q->where('zone_id', $zone_id);
+            });
+
+            // Apply zone filter to stats query
+            $statsQuery->whereHas('show_room', function ($q) use ($zone_id) {
                 $q->where('zone_id', $zone_id);
             });
         }
@@ -169,6 +183,8 @@ class DashboardController extends Controller
 
 
             $counttodaysales->where('showroom_id',  $showroom_id);
+            // Apply showroom filter to stats query
+            $statsQuery->where('showroom_id', $showroom_id);
         }
 
 
@@ -205,6 +221,11 @@ class DashboardController extends Controller
             });
 
             $counttodaysales->whereHas('show_room', function ($q) use ($zone_id) {
+                $q->where('zone_id', $zone_id);
+            });
+
+            // Apply zone filter to stats query
+            $statsQuery->whereHas('show_room', function ($q) use ($zone_id) {
                 $q->where('zone_id', $zone_id);
             });
         } elseif (Auth::user()->role_id == User::MANAGER) {
@@ -244,6 +265,9 @@ class DashboardController extends Controller
             $current_month_forcast->whereHas('hire_purchase', function ($q) use ($showroom_id) {
                 $q->where('showroom_id',  $showroom_id);
             });
+
+            // Apply showroom filter to stats query
+            $statsQuery->where('showroom_id', $showroom_id);
         } elseif (Auth::user()->role_id == User::RETAIL) {
             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
             $showroom_credit = $showroom_credit->whereIn('zone_id', $permission);
@@ -288,7 +312,31 @@ class DashboardController extends Controller
             $todays_collection->whereHas('hire_purchase.show_room', function ($q) use ($permission) {
                 $q->whereIn('zone_id', $permission);
             });
+
+            // Apply zone permission filter to stats query
+            $statsQuery->whereHas('show_room', function ($q) use ($permission) {
+                $q->whereIn('zone_id', $permission);
+            });
         }
+
+        // $totalSale = (clone $statsQuery)->count();
+        // $fullPaid = (clone $statsQuery)->where('is_paid', 1)->count();
+        // $customerWithDue = (clone $statsQuery)->where('is_paid', 0)->count();
+        // $notApproved = HirePurchase::where('status', '!=', 3)->count(); // Same as totalSale since we're filtering by status=3
+
+        // Dashboard stats
+        $totalSale = (clone $statsQuery)->where('status', 3)->count(); // Approved
+        $fullPaid = (clone $statsQuery)->where('status', 3)->where('is_paid', 1)->count();
+        $customerWithDue = (clone $statsQuery)->where('status', 3)->where('is_paid', 0)->count();
+        $pending = (clone $statsQuery)->where('status', '0')->count();
+
+        // Add to data array
+        $data['dashboard_stats'] = [
+            'total_sale' => $totalSale,
+            'full_paid' => $fullPaid,
+            'customer_with_due' => $customerWithDue,
+            'pending' => $pending
+        ];
 
         $lastfiveenquiry = Enquery::orderBy('id', 'DESC');
         $counttpreviousenquery = Enquery::whereDate('created_at', $previousDate);
@@ -424,82 +472,82 @@ class DashboardController extends Controller
         return json_encode($showrooms);
     }
 
-//     public function getCollectionChartData(Request $request)
-// {
-//     $from_date = $request->input('from_date', date('1-m-Y'));
-//     $to_date = $request->input('to_date', date('t-m-Y'));
+    //     public function getCollectionChartData(Request $request)
+    // {
+    //     $from_date = $request->input('from_date', date('1-m-Y'));
+    //     $to_date = $request->input('to_date', date('t-m-Y'));
 
-//     // Convert to Y-m-d format for database queries
-//     $from_date_formatted = date('Y-m-d', strtotime($from_date));
-//     $to_date_formatted = date('Y-m-d', strtotime($to_date));
+    //     // Convert to Y-m-d format for database queries
+    //     $from_date_formatted = date('Y-m-d', strtotime($from_date));
+    //     $to_date_formatted = date('Y-m-d', strtotime($to_date));
 
-//     $start_date_obj = new DateTime($from_date_formatted);
-//     $end_date_obj = new DateTime($to_date_formatted);
-//     $end_date_obj->modify('+1 day'); // Include the end date
+    //     $start_date_obj = new DateTime($from_date_formatted);
+    //     $end_date_obj = new DateTime($to_date_formatted);
+    //     $end_date_obj->modify('+1 day'); // Include the end date
 
-//     $interval = new DateInterval('P1D');
-//     $date_range = new DatePeriod($start_date_obj, $interval, $end_date_obj);
+    //     $interval = new DateInterval('P1D');
+    //     $date_range = new DatePeriod($start_date_obj, $interval, $end_date_obj);
 
-//     $alldate = [];
-//     $categories = [];
-//     foreach ($date_range as $date) {
-//         $alldate[] = $date->format('Y-m-d');
-//         $categories[] = $date->format('j');
-//     }
+    //     $alldate = [];
+    //     $categories = [];
+    //     foreach ($date_range as $date) {
+    //         $alldate[] = $date->format('Y-m-d');
+    //         $categories[] = $date->format('j');
+    //     }
 
-//     $couttodaycollection = [];
-//     foreach ($alldate as $source) {
-//         $collectioncount = Transaction::whereDate('created_at', $source)->where('status', 1);
+    //     $couttodaycollection = [];
+    //     foreach ($alldate as $source) {
+    //         $collectioncount = Transaction::whereDate('created_at', $source)->where('status', 1);
 
-//         // Apply the same filters as in the main index method
-//         if ($request->zone) {
-//             $zone_id = $request->zone;
-//             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($zone_id) {
-//                 $hirepurchase->whereHas('show_room', function ($showroom) use ($zone_id) {
-//                     $showroom->where('zone_id', $zone_id);
-//                 });
-//             });
-//         }
-//         if ($request->Showroom) {
-//             $showroom_id = $request->Showroom;
-//             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($showroom_id) {
-//                 $hirepurchase->where('showroom_id', $showroom_id);
-//             });
-//         }
-//         if (Auth::user()->role_id == User::ZONE) {
-//             $zone_id = Auth::user()->zone_id;
-//             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($zone_id) {
-//                 $hirepurchase->whereHas('show_room', function ($showroom) use ($zone_id) {
-//                     $showroom->where('zone_id', $zone_id);
-//                 });
-//             });
-//         } elseif (Auth::user()->role_id == User::MANAGER) {
-//             $showroom_id = Auth::user()->showroom_id;
-//             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($showroom_id) {
-//                 $hirepurchase->where('showroom_id', $showroom_id);
-//             });
-//         } elseif (Auth::user()->role_id == User::RETAIL) {
-//             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
-//             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($permission) {
-//                 $hirepurchase->whereHas('show_room', function ($showroom) use ($permission) {
-//                     $showroom->whereIn('zone_id', $permission);
-//                 });
-//             });
-//         }
-//         $couttodaycollection[] = $collectioncount->sum('amount');
-//     }
+    //         // Apply the same filters as in the main index method
+    //         if ($request->zone) {
+    //             $zone_id = $request->zone;
+    //             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($zone_id) {
+    //                 $hirepurchase->whereHas('show_room', function ($showroom) use ($zone_id) {
+    //                     $showroom->where('zone_id', $zone_id);
+    //                 });
+    //             });
+    //         }
+    //         if ($request->Showroom) {
+    //             $showroom_id = $request->Showroom;
+    //             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($showroom_id) {
+    //                 $hirepurchase->where('showroom_id', $showroom_id);
+    //             });
+    //         }
+    //         if (Auth::user()->role_id == User::ZONE) {
+    //             $zone_id = Auth::user()->zone_id;
+    //             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($zone_id) {
+    //                 $hirepurchase->whereHas('show_room', function ($showroom) use ($zone_id) {
+    //                     $showroom->where('zone_id', $zone_id);
+    //                 });
+    //             });
+    //         } elseif (Auth::user()->role_id == User::MANAGER) {
+    //             $showroom_id = Auth::user()->showroom_id;
+    //             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($showroom_id) {
+    //                 $hirepurchase->where('showroom_id', $showroom_id);
+    //             });
+    //         } elseif (Auth::user()->role_id == User::RETAIL) {
+    //             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
+    //             $collectioncount->whereHas('hire_purchase', function ($hirepurchase) use ($permission) {
+    //                 $hirepurchase->whereHas('show_room', function ($showroom) use ($permission) {
+    //                     $showroom->whereIn('zone_id', $permission);
+    //                 });
+    //             });
+    //         }
+    //         $couttodaycollection[] = $collectioncount->sum('amount');
+    //     }
 
-//     // Format the month name for display
-//     $startMonth = date('F Y', strtotime($from_date_formatted));
-//     $endMonth = date('F Y', strtotime($to_date_formatted));
-//     $monthName = ($startMonth === $endMonth) ? $startMonth : "$startMonth - $endMonth";
+    //     // Format the month name for display
+    //     $startMonth = date('F Y', strtotime($from_date_formatted));
+    //     $endMonth = date('F Y', strtotime($to_date_formatted));
+    //     $monthName = ($startMonth === $endMonth) ? $startMonth : "$startMonth - $endMonth";
 
-//     return response()->json([
-//         'data' => $couttodaycollection,
-//         'categories' => $categories,
-//         'month_name' => $monthName
-//     ]);
-// }
+    //     return response()->json([
+    //         'data' => $couttodaycollection,
+    //         'categories' => $categories,
+    //         'month_name' => $monthName
+    //     ]);
+    // }
 
     public function EnquiryStatistics(Request $request)
     {
@@ -588,40 +636,115 @@ class DashboardController extends Controller
         return view('components.dashboard.sourcewisecount', compact('enquiry_sources', 'endOfMonth', 'startOfMonth', 'pending_status', 'enquiry_status', 'new_close_status'));
     }
 
-    public function TodaysfollowUp(Request $request)
+    // public function getHirePurchaseApprovals(Request $request)
+    // {
+
+    //     date_default_timezone_set('Asia/Dhaka');
+    //     $today = now()->format('Y-m-d');
+    //     $user = Auth::user();
+    //     $userId = $user->id;
+    //     $showroomId = $user->showroom_id;
+    //     $userRole = $user->role_id;
+
+    //     $str = '';
+
+    //     // Get today's created hire purchases (not yet approved)
+    //     $created = HirePurchase::with(['show_room'])
+    //         ->whereDate('created_at', $today)
+    //         ->where('status', '!=', 3) // Not approved yet
+    //         ->where('is_paid', 0); // Not fully paid
+
+    //     // Apply role-based filters
+    //     if ($userRole == User::ZONE) {
+    //         $zoneId = $user->zone_id;
+    //         $created->whereHas('show_room', function ($q) use ($zoneId) {
+    //             $q->where('zone_id', $zoneId);
+    //         });
+    //     } elseif ($userRole == User::MANAGER) {
+    //         $created->where('showroom_id', $showroomId);
+    //     } elseif (($userRole == User::RETAIL) || ($userRole == 7) || ($userRole == 8)) {
+    //         $permission = ZonePermission::where('user_id', $userId)->pluck('zone_id')->toArray();
+    //         $created->whereHas('show_room', function ($q) use ($permission) {
+    //             $q->whereIn('zone_id', $permission);
+    //         });
+    //     }
+
+    //     $createdData = $created->get();
+
+    //     // Add created notifications
+    //     foreach ($createdData as $row) {
+    //         $str .= "New BNPL Purchase Created: {$row->name} - {$row->show_room->name} ** ";
+    //     }
+
+    //     // Get today's approved hire purchases where loan has started
+    //     $approvals = HirePurchase::with(['show_room'])
+    //         ->whereDate('approval_date', $today)
+    //         ->where('status', 3) // Status for approved loans
+    //         ->where('is_paid', 0); // Not fully paid
+
+    //     // Apply role-based filters (same as above)
+    //     if ($userRole == User::ZONE) {
+    //         $zoneId = $user->zone_id;
+    //         $approvals->whereHas('show_room', function ($q) use ($zoneId) {
+    //             $q->where('zone_id', $zoneId);
+    //         });
+    //     } elseif ($userRole == User::MANAGER) {
+    //         $approvals->where('showroom_id', $showroomId);
+    //     } elseif (($userRole == User::RETAIL) || ($userRole == 7) || ($userRole == 8)) {
+    //         $permission = ZonePermission::where('user_id', $userId)->pluck('zone_id')->toArray();
+    //         $approvals->whereHas('show_room', function ($q) use ($permission) {
+    //             $q->whereIn('zone_id', $permission);
+    //         });
+    //     }
+
+    //     $approvalData = $approvals->get();
+
+    //     // Add approval notifications
+    //     foreach ($approvalData as $row) {
+    //         $str .= "New BNPL Purchase Approved: {$row->name} - {$row->show_room->name} ** ";
+    //     }
+
+    //     return $str;
+    // }
+
+    public function getTransactionMarquee(Request $request)
     {
-
         date_default_timezone_set('Asia/Dhaka');
-        $today = now()->format('Y-m-d');
-        $executive_id = Auth::user()->id;
-        $showroom_id = Auth::user()->showroom_id;
-        $todays_followup = FollowUp::with(['enquiry' => function ($enquiry) {
-            $enquiry->with(['users', 'showroom']);
-        }])->whereBetween("next_follow_up_date",  [now()->format('Y-m-d H:i:00'), now()->format('Y-m-d 23:59:00')])->where('status', 0);
+        $user = Auth::user();
+        $userId = $user->id;
+        $userRole = $user->role_id;
+        $today = now()->format('Y-m-d'); // Today
 
-        if (Auth::user()->role_id == User::ZONE) {
-            $todays_followup->whereHas('enquiry', function ($enquiry) use ($executive_id) {
-                $enquiry->where('assign', $executive_id)->select('name');
-            });
-        } elseif (Auth::user()->role_id == User::MANAGER) {
-            $todays_followup->whereHas('enquiry', function ($enquiry) use ($showroom_id) {
-                $enquiry->where('showroom_id', $showroom_id)->select('name');
-            });
-        } else if ((Auth::user()->role_id == User::RETAIL) || (Auth::user()->role_id == 7) || (Auth::user()->role_id == 8)) {
+        $str = '';
 
-            $todays_followup->whereHas('enquiry', function ($enquiry) use ($showroom_id) {
-                $enquiry->where('created_by', Auth::user()->id)->select('name');
-            });
+        // Base query: today's transactions
+        $query = Transaction::with([
+            'hire_purchase:id,order_no,name,pr_phone,showroom_id',
+            'hire_purchase.show_room',
+            'users:id,name'
+        ])
+            ->where('status', 1)
+            ->whereDate('created_at', $today);
+
+        // Role-based filters
+        if ($userRole == 2) { // Zone
+            $zoneId = $user->zone_id;
+            $query->whereHas('hire_purchase.show_room', fn($q) => $q->where('zone_id', $zoneId));
+        } elseif ($userRole == 3) { // Manager
+            $showroomId = $user->showroom_id;
+            $query->whereHas('hire_purchase', fn($q) => $q->where('showroom_id', $showroomId));
+        } elseif (in_array($userRole, [6, 7, 8])) { // Retail / permissions
+            $permission = ZonePermission::where('user_id', $userId)->pluck('zone_id')->toArray();
+            $query->whereHas('hire_purchase.show_room', fn($q) => $q->whereIn('zone_id', $permission));
         }
-        $data =  $todays_followup->get();
-        $str  = '  ';
-        foreach ($data  as $row) {
 
-            $str .= $row->enquiry->name . '  Todays Follow Up Time  ' . date('h:i:s A', strtotime($row->next_follow_up_date));
-            if (Auth::user()->role_id == 1) {
-                $str .= '(' . $row->enquiry->showroom->name . ')';
-            }
-            $str .= '  **      ';
+        $transactions = $query->latest()->get();
+        // dd($transactions);
+
+        // Build marquee string
+        foreach ($transactions as $t) {
+            $typeText = ucfirst($t->transaction_type); // e.g., Installment / Full_payment
+            $str .= "New {$typeText} Paid ({$t->amount} TK): {$t->hire_purchase->name} - {$t->hire_purchase->show_room->name} ** ";
         }
 
         return $str;

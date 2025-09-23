@@ -129,20 +129,20 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="font-weight: 600;">Customer Name : 
-                                            {{ $hirepurchase->name }}                                        
+                                        <td style="font-weight: 600;">Customer Name :
+                                            {{ $hirepurchase->name }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="font-weight: 600;">Customer Phone : 
-                                            {{ $hirepurchase->pr_phone }}                                        
+                                        <td style="font-weight: 600;">Customer Phone :
+                                            {{ $hirepurchase->pr_phone }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="font-weight: 600;">Peresent Address :
-                                            {{ $hirepurchase->pr_house_no }}, 
+                                            {{ $hirepurchase->pr_house_no }},
                                             {{ $hirepurchase->pr_road_no }},
-                                            {{ $hirepurchase->districtpr->en_name }}                                       
+                                            {{ $hirepurchase->districtpr->en_name }}
                                         </td>
                                     </tr>
                                 </table>
@@ -210,7 +210,7 @@
                                 </td>
                                 <td>
                                     <div class="userDatatable-content">
-                                        @if($key==1) Down Payment @else Installment @endif 
+                                        @if($key==1) Down Payment @else Installment @endif
                                     </div>
                                 </td>
                                  <td>
@@ -230,7 +230,7 @@
                                 </td>
                                 <td>
                                     <div class="userDatatable-content">
-                                        {{    date('d/m/Y', strtotime($item->loan_start_date)), }}
+                                        {{    date('d/m/Y', strtotime($item->loan_end_date)), }}
                                     </div>
                                 </td>
                             </tr>
@@ -274,7 +274,7 @@
                               <tr>
                                   <td colspan="6">
                                     <div class="userDatatable-content">
-                                       Due 
+                                       Due
                                     </div>
                                 </td>
                                 <td colspan="6">

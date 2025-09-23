@@ -2,55 +2,93 @@
     <div class="row g-4 mb-3">
         <!-- Total Bookings -->
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <div class="d-flex align-items-center gap-3 p-3 border border-primary-subtle rounded-3 bg-blue-50 border border-blue-200">
-                <div class="d-flex align-items-center justify-content-center rounded-circle bg-blue-100 text-blue-600" style="width:40px; height:40px;">
+            <div
+                class="d-flex align-items-center gap-3 p-3 border border-primary-subtle rounded-3 bg-blue-50 border border-blue-200">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-blue-100 text-blue-600"
+                    style="width:40px; height:40px;">
                     <i class="far fa-calendar-check fs-5"></i>
                 </div>
                 <div>
-                    <p class="mb-0 fs-6 text-gray-600 fw-600">Bookings</p>
-                    <p class="mb-0 fs-5 fw-bold text-blue-600">120</p>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Total Sale</p>
+                    <p class="mb-0 fs-5 fw-bold text-blue-600">{{ $data['dashboard_stats']['total_sale'] }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Confirmed -->
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <div class="d-flex align-items-center gap-3 p-3 border border-success-subtle rounded-3 bg-green-50 border border-green-200">
-                <div class="d-flex align-items-center justify-content-center rounded-circle bg-green-100 text-green-600" style="width:40px; height:40px;">
+            <div
+                class="d-flex align-items-center gap-3 p-3 border border-success-subtle rounded-3 bg-green-50 border border-green-200">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-green-100 text-green-600"
+                    style="width:40px; height:40px;">
                     <i class="fa fa-check fs-5"></i>
                 </div>
                 <div>
-                    <p class="mb-0 fs-6 text-gray-600 fw-600">Confirmed</p>
-                    <p class="mb-0 fs-5 fw-bold text-green-600">95</p>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Full Paid Customers</p>
+                    <p class="mb-0 fs-5 fw-bold text-green-600">{{ $data['dashboard_stats']['full_paid'] }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Awaiting -->
         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <div class="d-flex align-items-center gap-3 p-3 border border-warning-subtle rounded-3 bg-yellow-50 border border-yellow-200">
-                <div class="d-flex align-items-center justify-content-center rounded-circle bg-yellow-100 text-yellow-600" style="width:40px; height:40px;">
+            <div
+                class="d-flex align-items-center gap-3 p-3 border border-warning-subtle rounded-3 bg-yellow-50 border border-yellow-200">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-yellow-100 text-yellow-600"
+                    style="width:40px; height:40px;">
                     <i class="far fa-clock fs-5"></i>
                 </div>
                 <div>
-                    <p class="mb-0 fs-6 text-gray-600 fw-600">Awaiting</p>
-                    <p class="mb-0 fs-5 fw-bold text-warning">15</p>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Customer With Due</p>
+                    <p class="mb-0 fs-5 fw-bold text-warning">{{ $data['dashboard_stats']['customer_with_due'] }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Canceled -->
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        {{-- <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="d-flex align-items-center gap-3 p-3 border border-danger-subtle rounded-3 bg-red-50 border border-red-200">
                 <div class="d-flex align-items-center justify-content-center rounded-circle bg-red-100 text-red-600" style="width:40px; height:40px;">
                     <i class="fa fa-times fs-5"></i>
                 </div>
                 <div>
-                    <p class="mb-0 fs-6 text-gray-600 fw-600">Canceled</p>
-                    <p class="mb-0 fs-5 fw-bold text-danger">7</p>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Pending</p>
+                    <p class="mb-0 fs-5 fw-bold text-danger">{{ $data['dashboard_stats']['pending'] }}</p>
+                </div>
+            </div>
+        </div> --}}
+
+        {{-- <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div
+                class="d-flex align-items-center gap-3 p-3 border border-primary-subtle rounded-3 bg-blue-50 border border-blue-200">
+                <div class="d-flex align-items-center justify-content-center rounded-circle bg-blue-100 text-blue-600"
+                    style="width:40px; height:40px;">
+                    <i class="far fa-clock fs-5"></i>
+                </div>
+                <div>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Pending Customers</p>
+                    <p class="mb-0 fs-5 fw-bold text-blue-600">{{ $data['dashboard_stats']['pending'] }}</p>
+                </div>
+            </div>
+        </div> --}}
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                style="background-color: #f3e8ff; border: 1px solid #d8b4fe;">
+                <div class="d-flex align-items-center justify-content-center rounded-circle"
+                    style="width:40px; height:40px; background-color:#e9d5ff; color:#7c3aed;">
+                    <i class="far fa-clock fs-5"></i>
+                </div>
+                <div>
+                    <p class="mb-0 fs-6 text-gray-600 fw-600">Pending Approval</p>
+                    <p class="mb-0 fs-5 fw-bold" style="color:#7c3aed;">
+                        {{ $data['dashboard_stats']['pending'] }}
+                    </p>
                 </div>
             </div>
         </div>
+
+
     </div>
 
 
@@ -103,16 +141,32 @@
                 </a>
             </div>
         </div>
-        <div class="col-lg-3  col-md-6">
-            <div class="card mb-3">
-                <a href="{{ url('pending-sales') }}"
-                    class="d-flex p-1 gap-3 align-items-center order-bg-opacity-info rounded_10">
-                    <div class="ap-po-details__icon-area color-info"><i class="uil uil-star"></i>
-                    </div>
-                    <p class="m-0 fw-600">Pending Sales</p>
-                </a>
+        @if (Auth::user()->role_id == 1)
+            <div class="col-lg-3  col-md-6">
+                <div class="card mb-3">
+                    <a href="{{ url('pending-sales') }}"
+                        class="d-flex p-1 gap-3 align-items-center order-bg-opacity-info rounded_10">
+                        <div class="ap-po-details__icon-area color-info"><i class="uil uil-star"></i>
+                        </div>
+                        <p class="m-0 fw-600">Pending Sales</p>
+                    </a>
+                </div>
             </div>
-        </div>
+        @endif
+
+        @if (Auth::user()->role_id == 2 || Auth::user()->role_id == 3 || Auth::user()->role_id == 6)
+            <div class="col-lg-3  col-md-6">
+                <div class="card mb-3">
+                    <a href="{{ url('all-purchase') }}"
+                        class="d-flex p-1 gap-3 align-items-center order-bg-opacity-info rounded_10">
+                        <div class="ap-po-details__icon-area color-info"><i class="uil uil-star"></i>
+                        </div>
+                        <p class="m-0 fw-600">Sales List</p>
+                    </a>
+                </div>
+            </div>
+        @endif
+
         <div class="col-lg-3  col-md-6">
             <div class="card mb-3">
                 <a href="{{ url('payment/colllection') }}"
@@ -256,7 +310,7 @@
                     <h6>Monthly Collection status</h6>
                     <div id="month-name" style="font-size: 18px;"></div>
                 </div>
-{{--
+                {{--
                 <div class="col-sm-6 month_select-x">
                     <div class="select-style2">
                         <div class="d-flex gap-2 dm-select enquiry_status_dm-select">
@@ -730,112 +784,114 @@
     });
 </script>
 
-// <script>
-//     // Define these variables globally so they can be accessed anywhere
-//     let barChart = null;
-//     let updateCollectionChart;
+//
+<script>
+    //     // Define these variables globally so they can be accessed anywhere
+    //     let barChart = null;
+    //     let updateCollectionChart;
 
-//     $(document).ready(function() {
-//         // Initialize datepickers
-//         $('.datepicker').datepicker({
-//             format: 'dd-mm-yyyy',
-//             autoclose: true,
-//             todayHighlight: true
-//         });
+    //     $(document).ready(function() {
+    //         // Initialize datepickers
+    //         $('.datepicker').datepicker({
+    //             format: 'dd-mm-yyyy',
+    //             autoclose: true,
+    //             todayHighlight: true
+    //         });
 
-//         // Define the updateCollectionChart function
-//         updateCollectionChart = function() {
-//             const fromDate = $('#collection_from_date').val();
-//             const toDate = $('#collection_to_date').val();
+    //         // Define the updateCollectionChart function
+    //         updateCollectionChart = function() {
+    //             const fromDate = $('#collection_from_date').val();
+    //             const toDate = $('#collection_to_date').val();
 
-//             // Get current filter values from the URL parameters
-//             const urlParams = new URLSearchParams(window.location.search);
-//             const zone = urlParams.get('zone') || '';
-//             const showroom = urlParams.get('Showroom') || '';
+    //             // Get current filter values from the URL parameters
+    //             const urlParams = new URLSearchParams(window.location.search);
+    //             const zone = urlParams.get('zone') || '';
+    //             const showroom = urlParams.get('Showroom') || '';
 
-//             // Make AJAX request
-//             $.ajax({
-//                 url: '{{ url("collection-chart-data") }}',
-//                 type: 'GET',
-//                 data: {
-//                     from_date: fromDate,
-//                     to_date: toDate,
-//                     zone: zone,
-//                     Showroom: showroom
-//                 },
-//                 success: function(response) {
-//                     // Update the month name
-//                     $('#month-name').text(response.month_name);
+    //             // Make AJAX request
+    //             $.ajax({
+    //                 url: '{{ url('collection-chart-data') }}',
+    //                 type: 'GET',
+    //                 data: {
+    //                     from_date: fromDate,
+    //                     to_date: toDate,
+    //                     zone: zone,
+    //                     Showroom: showroom
+    //                 },
+    //                 success: function(response) {
+    //                     // Update the month name
+    //                     $('#month-name').text(response.month_name);
 
-//                     // Destroy existing chart if it exists
-//                     if (barChart) {
-//                         barChart.destroy();
-//                         barChart = null;
-//                     }
+    //                     // Destroy existing chart if it exists
+    //                     if (barChart) {
+    //                         barChart.destroy();
+    //                         barChart = null;
+    //                     }
 
-//                     // Create new chart with updated data
-//                     const options = {
-//                         series: [{
-//                             data: response.data,
-//                         }],
-//                         colors: ['#006666'],
-//                         chart: {
-//                             width: '100%',
-//                             height: 280,
-//                             type: 'bar',
-//                         },
-//                         legend: {
-//                             show: false
-//                         },
-//                         plotOptions: {
-//                             bar: {
-//                                 borderRadius: 4,
-//                                 horizontal: false,
-//                             }
-//                         },
-//                         dataLabels: {
-//                             enabled: false
-//                         },
-//                         xaxis: {
-//                             categories: response.categories,
-//                         },
-//                         yaxis: {
-//                             labels: {
-//                                 formatter: function(val) {
-//                                     return val.toFixed(2); // show 2 decimal places
-//                                 }
-//                             }
-//                         },
-//                         tooltip: {
-//                             y: {
-//                                 formatter: function(val) {
-//                                     return val.toFixed(2); // tooltip formatting
-//                                 }
-//                             }
-//                         },
-//                     };
+    //                     // Create new chart with updated data
+    //                     const options = {
+    //                         series: [{
+    //                             data: response.data,
+    //                         }],
+    //                         colors: ['#006666'],
+    //                         chart: {
+    //                             width: '100%',
+    //                             height: 280,
+    //                             type: 'bar',
+    //                         },
+    //                         legend: {
+    //                             show: false
+    //                         },
+    //                         plotOptions: {
+    //                             bar: {
+    //                                 borderRadius: 4,
+    //                                 horizontal: false,
+    //                             }
+    //                         },
+    //                         dataLabels: {
+    //                             enabled: false
+    //                         },
+    //                         xaxis: {
+    //                             categories: response.categories,
+    //                         },
+    //                         yaxis: {
+    //                             labels: {
+    //                                 formatter: function(val) {
+    //                                     return val.toFixed(2); // show 2 decimal places
+    //                                 }
+    //                             }
+    //                         },
+    //                         tooltip: {
+    //                             y: {
+    //                                 formatter: function(val) {
+    //                                     return val.toFixed(2); // tooltip formatting
+    //                                 }
+    //                             }
+    //                         },
+    //                     };
 
-//                     // Create and render the chart
-//                     barChart = new ApexCharts(document.querySelector("#barChart"), options);
-//                     barChart.render();
-//                 },
-//                 error: function(xhr, status, error) {
-//                     console.error('Error fetching collection chart data:', error);
-//                     $('#barChart').html('<div class="text-center py-5 text-danger">Error loading chart data. Please try again.</div>');
-//                 }
-//             });
-//         };
+    //                     // Create and render the chart
+    //                     barChart = new ApexCharts(document.querySelector("#barChart"), options);
+    //                     barChart.render();
+    //                 },
+    //                 error: function(xhr, status, error) {
+    //                     console.error('Error fetching collection chart data:', error);
+    //                     $('#barChart').html('<div class="text-center py-5 text-danger">Error loading chart data. Please try again.</div>');
+    //                 }
+    //             });
+    //         };
 
-//         // Initialize the chart with default data on page load
-//         updateCollectionChart();
+    //         // Initialize the chart with default data on page load
+    //         updateCollectionChart();
 
-//         // Set up event listeners for date inputs using jQuery instead of onchange attributes
-//         $('#collection_from_date').on('changeDate', function() {
-//             updateCollectionChart();
-//         });
+    //         // Set up event listeners for date inputs using jQuery instead of onchange attributes
+    //         $('#collection_from_date').on('changeDate', function() {
+    //             updateCollectionChart();
+    //         });
 
-//         $('#collection_to_date').on('changeDate', function() {
-//             updateCollectionChart();
-//         });
-//     });
-// </script>
+    //         $('#collection_to_date').on('changeDate', function() {
+    //             updateCollectionChart();
+    //         });
+    //     });
+    //
+</script>

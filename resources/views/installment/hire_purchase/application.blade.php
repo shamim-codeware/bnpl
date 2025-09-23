@@ -30,7 +30,7 @@
                                             <div class="col-md-6 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
-                                                        <input required  name="name" id="name" class="input"
+                                                        <input required name="name" id="name" class="input"
                                                             type="text" value="{{ old('name') }}" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Applicant's full name (With Surename)<span
@@ -43,7 +43,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="fathers_name" id="name" class="input"
-                                                            type="text" placeholder=" " />
+                                                            type="text" value="{{ old('fathers_name') }}"
+                                                            placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Father's Name<span
                                                                     class="text-danger">*</span></p>
@@ -55,7 +56,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input name="mothers_name" id="name" class="input"
-                                                            type="text" placeholder=" " />
+                                                            type="text" value="{{ old('mothers_name') }}"
+                                                            placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Mother's Name</p>
                                                         </div>
@@ -66,7 +68,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input name="spouse_name" id="name" class="input"
-                                                            type="text" placeholder=" " />
+                                                            type="text" value="{{ old('spouse_name') }}"
+                                                            placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Spouse Name</p>
                                                         </div>
@@ -97,9 +100,10 @@
                                                     <div class="col-md-7 pe-0">
                                                         <div class="holder">
                                                             <div class="input-holder">
-                                                                <input required name="nid" id="nid"
-                                                                    class="input rounded-r-0" type="number"
-                                                                    placeholder=" " />
+                                                                <input name="nid" id="nid"
+                                                                    class="input rounded-r-0 @error('nid') is-invalid @enderror"
+                                                                    type="number" value="{{ old('nid') }}"
+                                                                    placeholder="Enter 17 digit National ID Number" />
                                                                 <div class="placeholder">
                                                                     <p class="m-0">National ID No:<span
                                                                             class="text-danger">*</span></p>
@@ -120,6 +124,10 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    @error('nid')
+                                                        <span
+                                                            class="invalid-feedback d-block text-danger"><strong>{{ $message }}</strong></span>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-25 d-flex align-items-center">
@@ -134,7 +142,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="pr_house_no" id="pr_village" class="input"
-                                                            type="text" placeholder=" " />
+                                                            type="text" value="{{ old('pr_house_no') }}"
+                                                            placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">House No and Village<span
                                                                     class="text-danger">*</span></p>
@@ -146,7 +155,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="pr_road_no" id="pr_postoffice"
-                                                            class="input" type="text" placeholder=" " />
+                                                            class="input" type="text"
+                                                            value="{{ old('pr_road_no') }}" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Road No and Postoffice<span
                                                                     class="text-danger">*</span></p>
@@ -174,7 +184,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="pr_phone" id="pr_mobile" class="input"
-                                                            type="number" placeholder="Enter 11 digit Mobile Number" />
+                                                            type="number" value="{{ old('pr_phone') }}"
+                                                            placeholder="Enter 11 digit Mobile Number" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Mobile No:<span class="text-danger">*</span>
                                                             </p>
@@ -194,7 +205,9 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="pr_duration_staying" id="d_staying"
-                                                            class="input" type="text" placeholder="Months/Years" />
+                                                            class="input" type="text"
+                                                            value="{{ old('pr_duration_staying') }}"
+                                                            placeholder="Months/Years" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Duration of staying:<span
                                                                     class="text-danger">*</span></p>
@@ -219,7 +232,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input name="pa_house_no" id="pa_village" class="input"
-                                                            type="text" placeholder=" " />
+                                                            type="text" value="{{ old('pa_house_no') }}"
+                                                            placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">House No and Village<span
                                                                     class="text-danger">*</span></p>
@@ -231,7 +245,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input name="pa_road_no" id="pr_postoffice" class="input"
-                                                            type="text" placeholder=" " />
+                                                            type="text" value="{{ old('pa_road_no') }}"
+                                                            placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Road No and Postoffice<span
                                                                     class="text-danger">*</span></p>
@@ -258,7 +273,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input name="pa_phone" id="pa_mobile" class="input"
-                                                            type="number" placeholder="Enter 11 digit Mobile Number" />
+                                                            type="number" value="{{ old('pa_phone') }}"
+                                                            placeholder="Enter 11 digit Mobile Number" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Mobile No:<span class="text-danger">*</span>
                                                             </p>
@@ -286,7 +302,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="designation" id="designation"
-                                                            class="input" type="text" placeholder="" />
+                                                            class="input" value="{{ old('designation') }}"
+                                                            type="text" placeholder="" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Designation<span
                                                                     class="text-danger">*</span></p>
@@ -298,7 +315,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="duration_current_profe" id="current_prof"
-                                                            class="input" type="text" placeholder="" />
+                                                            class="input" value="{{ old('duration_current_profe') }}"
+                                                            type="text" placeholder="" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Duration of Current Profession
                                                                 (Months/Years)<span class="text-danger">*</span></p>
@@ -310,7 +328,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="organization_name" id="organization"
-                                                            class="input" type="text" placeholder="" />
+                                                            class="input" value="{{ old('organization_name') }}"
+                                                            type="text" placeholder="" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Organization Name<span
                                                                     class="text-danger">*</span></p>
@@ -322,7 +341,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="organization_short_desc" id="job_desc"
-                                                            class="input" type="text" placeholder=" " />
+                                                            class="input" value="{{ old('organization_short_desc') }}"
+                                                            type="text" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Organization Short Description:<span
                                                                     class="text-danger">*</span></p>
@@ -334,7 +354,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="org_house_no" id="org_village"
-                                                            class="input" type="text" placeholder=" " />
+                                                            class="input" type="text"
+                                                            value="{{ old('org_house_no') }}" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">House No and Village<span
                                                                     class="text-danger">*</span></p>
@@ -346,7 +367,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="org_road_no" id="org_postoffice"
-                                                            class="input" type="text" placeholder=" " />
+                                                            class="input" type="text"
+                                                            value="{{ old('org_road_no') }}" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Road No and Postoffice<span
                                                                     class="text-danger">*</span></p>
@@ -375,7 +397,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="org_phone" id="org_mobile" class="input"
-                                                            type="number" placeholder="Enter 11 digit Mobile Number" />
+                                                            type="number" value="{{ old('org_phone') }}"
+                                                            placeholder="Enter 11 digit Mobile Number" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Mobile No:<span class="text-danger">*</span>
                                                             </p>
@@ -387,7 +410,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="month_income" id="month_income"
-                                                            class="input" type="number" placeholder=" " />
+                                                            class="input" value="{{ old('month_income') }}"
+                                                            type="number" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Monthly Income (BDT):<span
                                                                     class="text-danger">*</span></p>
@@ -395,9 +419,46 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-4 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <input name="facebook_url" id="fb_url" class="input"
+                                                            type="text" value="{{ old('facebook_url') }}"
+                                                            placeholder=" " />
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Facebook Profile URL:</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <input name="whatsapp_number" id="whatsapp" class="input"
+                                                            type="number" value="{{ old('whatsapp_number') }}"
+                                                            placeholder=" " />
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Whatsapp Number:</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <input name="email" id="mail" class="input"
+                                                            type="email" value="{{ old('email') }}" required
+                                                            placeholder=" " />
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Email <span class="text-danger">*</span>:
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </fieldset>
-                                    <fieldset class="mt-4">
+                                    {{-- <fieldset class="mt-4">
                                         <legend>Others:</legend>
                                         <div class="row">
                                             <div class="col-md-4 mb-25">
@@ -435,7 +496,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </fieldset>
+                                    </fieldset> --}}
                                     <fieldset class="mt-4">
                                         <legend>Family Details:</legend>
                                         <div class="row">
@@ -443,7 +504,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input required name="other_family_member" id="other_pets"
-                                                            class="input" type="number" placeholder="" />
+                                                            class="input" value="{{ old('other_family_member') }}"
+                                                            type="number" placeholder="" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Other Family Members:<span
                                                                     class="text-danger">*</span></p>
@@ -455,7 +517,8 @@
                                                 <div class="holder">
                                                     <div class="input-holder" id="number_ofChilder_showing">
                                                         <input name="number_of_children" id="children_num" class="input"
-                                                            type="number" placeholder="" />
+                                                            type="number" value="{{ old('number_of_children') }}"
+                                                            placeholder="" />
                                                         <div class="placeholder">
                                                             <p class="m-0">Number of children:
                                                                 <span class="text-danger">*</span>
@@ -471,16 +534,20 @@
                                                         <div class="col-md-3">
                                                             <div class="holder">
                                                                 <div class="input-holder">
-                                                                    <input name="mem_name[]" id="name[]" class="input" type="text" placeholder="" />
+                                                                    <input name="mem_name[]" id="name[]"
+                                                                        class="input" type="text" placeholder="" />
                                                                     <div class="placeholder">
-                                                                        <p class="m-0">Name:<span class="text-danger">*</span></p>
+                                                                        <p class="m-0">Name:<span
+                                                                                class="text-danger">*</span></p>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3">
-                                                            <select name="mem_relation[]" id="relation[]" class="form-control relation_select">
-                                                                <option class="rel_option" value="">Relation * </option>
+                                                            <select name="mem_relation[]" id="relation[]"
+                                                                class="form-control relation_select">
+                                                                <option class="rel_option" value="">Relation *
+                                                                </option>
                                                                 <option value="husband">Husband</option>
                                                                 <option value="wife">Wife</option>
                                                                 <option value="children">Children</option>
@@ -489,15 +556,18 @@
                                                         <div class="col-md-3">
                                                             <div class="holder">
                                                                 <div class="input-holder">
-                                                                    <input name="mem_age[]" id="age[]" class="input" type="text" placeholder="" />
+                                                                    <input name="mem_age[]" id="age[]" class="input"
+                                                                        type="text" placeholder="" />
                                                                     <div class="placeholder">
-                                                                        <p class="m-0">Age:<span class="text-danger">*</span></p>
+                                                                        <p class="m-0">Age:<span
+                                                                                class="text-danger">*</span></p>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-3">
-                                                            <button type="button" class="btn btn-primary w-30 add-row">Add more</button>
+                                                            <button type="button"
+                                                                class="btn btn-primary w-30 add-row">Add more</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -670,14 +740,14 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-5">
+                                              <div class="col-md-5">
                                                     <div class="row align-items-center">
                                                         <div class="col-md-7 pe-0">
                                                             <div class="holder">
                                                                 <div class="input-holder">
-                                                                    <input required name="guarater_nid[]" id="nid"
+                                                                    <input name="guarater_nid[]" id="nid"
                                                                         class="input rounded-r-0" type="number"
-                                                                        placeholder=" " />
+                                                                        placeholder="Enter 17 digit National ID Number" />
                                                                     <div class="placeholder">
                                                                         <p class="m-0">National ID No:<span
                                                                                 class="text-danger">*</span>
@@ -690,15 +760,19 @@
                                                             <div class="holder">
                                                                 <div
                                                                     class="input-holder input border-start-0 rounded-l-0 upload_holder">
-                                                                    <input type="file" name="file" id="file2"
+                                                                    <input type="file" name="file" id="file3"
                                                                         class="inputfile"
                                                                         data-multiple-caption="{count} files selected"
                                                                         multiple />
-                                                                    <label for="file2"><span><i
+                                                                    <label for="file3"><span><i
                                                                                 class="uil uil-upload"></i></span></label>
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        @error('guarater_nid.0')
+                                                            <span
+                                                                class="text-danger"><strong>{{ $message }}</strong></span>
+                                                        @enderror
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4 d-flex align-items-center">
@@ -775,14 +849,14 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-5">
+                                                   <div class="col-md-5">
                                                     <div class="row align-items-center">
                                                         <div class="col-md-7 pe-0">
                                                             <div class="holder">
                                                                 <div class="input-holder">
-                                                                    <input required name="guarater_nid[]" id="nid"
+                                                                    <input name="guarater_nid[]" id="nid"
                                                                         class="input rounded-r-0" type="number"
-                                                                        placeholder=" " />
+                                                                        placeholder="Enter 17 digit National ID Number" />
                                                                     <div class="placeholder">
                                                                         <p class="m-0">National ID No:<span
                                                                                 class="text-danger">*</span>
@@ -804,6 +878,10 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        @error('guarater_nid.1')
+                                                            <span
+                                                                class="text-danger"><strong>{{ $message }}</strong></span>
+                                                        @enderror
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4 d-flex align-items-center">
@@ -833,22 +911,21 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
 
-                                                        <select name="bank_id" id="bank_name"
-                                                        class="form-control">
-                                                        <option value="">Bank </option>
-                                                        @foreach ($banks as $key => $item)
-                                                            <option value="{{ $item->id }}">{{ $item->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
+                                                        <select name="bank_id" id="bank_name" class="form-control">
+                                                            <option value="">Bank </option>
+                                                            @foreach ($banks as $key => $item)
+                                                                <option value="{{ $item->id }}">{{ $item->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-3 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
-                                                        <input name="bank_account_number" id="bank_account_number" class="input"
-                                                            type="number" placeholder=" " />
+                                                        <input name="bank_account_number" id="bank_account_number"
+                                                            class="input" type="number" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Bank Account Number:</p>
                                                         </div>
@@ -890,11 +967,12 @@
                                         <legend>Office Use Only:</legend>
                                         <div class="row">
                                             <div class="col-md-3">
-                                                <select required name="delivery_showroom_id"
-                                                        id="delivery_showroom_id" class="form-control">
+                                                <select required name="delivery_showroom_id" id="delivery_showroom_id"
+                                                    class="form-control">
                                                     <option value="">Select Show Room</option>
                                                     @foreach ($showrooms as $key => $item)
-                                                        <option @if(Auth::user()->showroom_id == $item->id) selected @endif  value="{{ $item->id }}">{{ $item->name }}</option>
+                                                        <option @if (Auth::user()->showroom_id == $item->id) selected @endif
+                                                            value="{{ $item->id }}">{{ $item->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -935,11 +1013,9 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-3">
-{{--                                                <select required name="product_size_id" id="product_size_id"--}}
-{{--                                                    class="form-control">--}}
-{{--                                                </select>--}}
 
-                                                <input type="text" name="product_size_id" id="product_size" class="form-control" placeholder="Product Size">
+                                                <input type="text" name="product_size_id" id="product_size"
+                                                    class="form-control" placeholder="Product Size">
 
                                             </div>
 
@@ -955,19 +1031,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            {{-- <div class="col-md-3 mb-25">
-                                                <div class="holder">
-                                                    <div class="input-holder">
-                                                        <input required name="invoice_no" id="name"
-                                                            class="input" type="number" placeholder=" " />
-                                                        <div class="placeholder">
-                                                            <p class="m-0">Invoice No:<span
-                                                                    class="text-danger">*</span></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> --}}
                                             <div class="col-md-3 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
@@ -984,19 +1047,16 @@
                                             <div class="col-md-3 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
-                                                        <select required onchange="calculate()" name="down_payment_parcentage"
-                                                        id="down_payment_parcentage" class="form-control">
-                                                        {{-- <option value="">Down Payment Percentage</option> --}}
-                                                        @foreach ($down_payment_parcentage as $key => $item)
-                                                            <option @if ($item->payment_percentage == 40)
-                                                                @selected(true)
-                                                            @endif value="{{ $item->payment_percentage }}">
-                                                                {{ $item->payment_percentage }}</option>
-                                                        @endforeach
-                                                        {{-- @for ($i = 3; $i < 13; $i += 3)
-                                                            <option value="{{ $i }}">{{ $i }}</option>
-                                                            @endfor  --}}
-                                                    </select>
+                                                        <select required onchange="calculate()"
+                                                            name="down_payment_parcentage" id="down_payment_parcentage"
+                                                            class="form-control">
+                                                            @foreach ($down_payment_parcentage as $key => $item)
+                                                                <option
+                                                                    @if ($item->payment_percentage == 40) @selected(true) @endif
+                                                                    value="{{ $item->payment_percentage }}">
+                                                                    {{ $item->payment_percentage }}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1004,15 +1064,6 @@
                                             <div class="col-md-3 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
-                                                        {{-- <input required name="installment_month"
-                                                            id="installment_month" onkeyup="calculate()" class="input" type="text"
-                                                            placeholder=" " /> --}}
-                                                        {{-- <select name="installment_month" class="form-control" required id="" onchange="calculate()">
-                                                                <option value="">Select Month</option>
-                                                                @for ($i = 3; $i < 13; $i += 3)
-                                                                <option value="{{ $i }}">{{ $i }}</option>
-                                                                @endfor
-                                                            </select> --}}
                                                         @foreach ($interestrate as $key => $interest_hid)
                                                             <input type="hidden"
                                                                 id="interest_rate_{{ $interest_hid->month }}"
@@ -1025,9 +1076,6 @@
                                                                 <option value="{{ $interest->month }}">
                                                                     {{ $interest->month }}</option>
                                                             @endforeach
-                                                            {{-- @for ($i = 3; $i < 13; $i += 3)
-                                                                <option value="{{ $i }}">{{ $i }}</option>
-                                                                @endfor  --}}
                                                         </select>
                                                     </div>
                                                 </div>
@@ -1035,9 +1083,8 @@
                                             <div class="col-md-3 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
-                                                        <input required name="hire_price"
-                                                            id="hire_price" class="input" readonly type="text"
-                                                            placeholder=" " />
+                                                        <input required name="hire_price" id="hire_price" class="input"
+                                                            readonly type="text" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Hire Price:<span
                                                                     class="text-danger">*</span></p>
@@ -1049,13 +1096,12 @@
                                                 <div class="holder">
                                                     <div class="input-holder">
                                                         <input readonly required name="down_payment" id="down_payment"
-                                                            class="input"  type="text"
-                                                            placeholder=" " />
+                                                            class="input" type="text" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Down Payment:<span
                                                                     class="text-danger">*</span></p>
                                                         </div>
-                                                        <span id="alert_downpayment"  class="text-danger"></span>
+                                                        <span id="alert_downpayment" class="text-danger"></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1067,7 +1113,7 @@
                                                             placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Monthly Inst. Tk:<span
-                                                               class="text-danger">*</span></p>
+                                                                    class="text-danger">*</span></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1077,10 +1123,11 @@
                                 </div>
                             </div>
                         </div>
-                            <div class="row">
+                        <div class="row">
                             <div class="col-md-6">
                                 <div id="capable_action" class="mb-3 alert alert-danger" style="display: none">
-                                    <strong>Sorry!</strong> Monthly Installment must be at least 3000 Taka for you to be eligible.
+                                    <strong>Sorry!</strong> Monthly Installment must be at least 3000 Taka for you to be
+                                    eligible.
                                 </div>
 
                                 <span id="credit_validation" style="color: red"></span>
@@ -1096,103 +1143,459 @@
         </div>
     </div>
 
+
     <script>
-       @php
-            $down_payment = App\Models\DownPaymentSetting::orderBy('id','ASC')->first();
+        // Enhanced version that syncs with server
+        class FormDraftManagerWithSync extends FormDraftManager {
+            syncDraftToServer() {
+                if (this.isOnline && this.isDirty) {
+                    const formData = this.serializeForm();
+
+                    fetch('/api/save-draft', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            },
+                            body: JSON.stringify({
+                                form_data: formData
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Draft synced to server');
+                            this.showSaveStatus('Draft synced to server', 'success');
+                        })
+                        .catch(error => {
+                            console.error('Server sync failed:', error);
+                        });
+                }
+            }
+
+            saveDraft() {
+                super.saveDraft(); // Save locally first
+                this.syncDraftToServer(); // Then sync to server if online
+            }
+        }
+    </script>
+
+    <script>
+        // Auto-draft save system for hire purchase form
+        class FormDraftManager {
+            constructor(formSelector, options = {}) {
+                this.form = document.querySelector(formSelector);
+                this.draftKey = options.draftKey || 'hire_purchase_draft';
+                this.saveInterval = options.saveInterval || 300; // 30 seconds
+                this.isOnline = navigator.onLine;
+                this.saveTimer = null;
+                this.isDirty = false;
+
+                this.init();
+            }
+
+            init() {
+                if (!this.form) {
+                    console.error('Form not found');
+                    return;
+                }
+
+                this.setupEventListeners();
+                this.loadDraft();
+                this.startAutoSave();
+                this.showDraftNotification();
+            }
+
+            setupEventListeners() {
+                // Monitor form changes
+                this.form.addEventListener('input', () => {
+                    this.isDirty = true;
+                    this.debouncedSave();
+                });
+
+                this.form.addEventListener('change', () => {
+                    this.isDirty = true;
+                    this.debouncedSave();
+                });
+
+                // Monitor connection status
+                window.addEventListener('online', () => {
+                    this.isOnline = true;
+                    this.showConnectionStatus('online');
+                    this.saveDraft(); // Save when back online
+                });
+
+                window.addEventListener('offline', () => {
+                    this.isOnline = false;
+                    this.showConnectionStatus('offline');
+                    this.saveDraft(); // Save immediately when going offline
+                });
+
+                // Save before page unload
+                window.addEventListener('beforeunload', (e) => {
+                    if (this.isDirty) {
+                        this.saveDraft();
+                        // Optional: Show confirmation dialog
+                        // e.preventDefault();
+                        // e.returnValue = '';
+                    }
+                });
+
+                // Handle form submission
+                this.form.addEventListener('submit', () => {
+                    this.clearDraft(); // Clear draft on successful submission
+                });
+            }
+
+            debouncedSave() {
+                clearTimeout(this.saveTimer);
+                this.saveTimer = setTimeout(() => {
+                    this.saveDraft();
+                }, 2000); // Save 2 seconds after user stops typing
+            }
+
+            startAutoSave() {
+                setInterval(() => {
+                    if (this.isDirty) {
+                        this.saveDraft();
+                    }
+                }, this.saveInterval);
+            }
+
+            saveDraft() {
+                try {
+                    const formData = this.serializeForm();
+                    const draftData = {
+                        data: formData,
+                        timestamp: new Date().toISOString(),
+                        url: window.location.href,
+                        connectionStatus: this.isOnline ? 'online' : 'offline'
+                    };
+
+                    localStorage.setItem(this.draftKey, JSON.stringify(draftData));
+                    this.isDirty = false;
+                    this.showSaveStatus('Draft saved automatically');
+
+                    console.log('Draft saved:', draftData);
+                } catch (error) {
+                    console.error('Error saving draft:', error);
+                    this.showSaveStatus('Error saving draft', 'error');
+                }
+            }
+
+            loadDraft() {
+                try {
+                    const savedDraft = localStorage.getItem(this.draftKey);
+                    if (savedDraft) {
+                        const draftData = JSON.parse(savedDraft);
+
+                        // Check if draft is recent (within 24 hours)
+                        const draftAge = Date.now() - new Date(draftData.timestamp).getTime();
+                        const maxAge = 7 * 24 * 60 * 60 * 1000; // ৭ দিন
+                        if (draftAge < maxAge) {
+                            this.showDraftRestorePrompt(draftData);
+                        } else {
+                            this.clearDraft(); // Clear old drafts
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading draft:', error);
+                }
+            }
+
+            restoreDraft(draftData) {
+                try {
+                    Object.keys(draftData.data).forEach(name => {
+                        const value = draftData.data[name];
+                        const elements = this.form.querySelectorAll(`[name="${name}"], [name="${name}[]"]`);
+
+                        if (Array.isArray(value)) {
+                            elements.forEach((el, index) => {
+                                if (el.type === 'checkbox' || el.type === 'radio') {
+                                    el.checked = value.includes(el.value);
+                                } else {
+                                    el.value = value[index] || '';
+                                }
+                                el.dispatchEvent(new Event('change', {
+                                    bubbles: true
+                                }));
+                            });
+                        } else {
+                            elements.forEach(el => {
+                                if (el.type === 'checkbox' || el.type === 'radio') {
+                                    el.checked = el.value === value;
+                                } else {
+                                    el.value = value;
+                                }
+                                el.dispatchEvent(new Event('change', {
+                                    bubbles: true
+                                }));
+                            });
+                        }
+                    });
+
+                    this.showSaveStatus('Draft restored successfully', 'success');
+                } catch (error) {
+                    console.error('Error restoring draft:', error);
+                    this.showSaveStatus('Error restoring draft', 'error');
+                }
+            }
+
+
+            serializeForm() {
+                const formData = {};
+                const elements = this.form.querySelectorAll('input, select, textarea');
+
+                elements.forEach(element => {
+                    if (element.name) {
+                        if (element.type === 'checkbox' || element.type === 'radio') {
+                            if (element.checked) {
+                                const name = element.name.replace('[]', '');
+                                if (!formData[name]) formData[name] = [];
+                                formData[name].push(element.value);
+                            }
+                        } else {
+                            let name = element.name;
+                            if (name.includes('[]')) {
+                                name = name.replace('[]', '');
+                                if (!formData[name]) formData[name] = [];
+                                formData[name].push(element.value || '');
+                            } else {
+                                formData[name] = element.value || '';
+                            }
+                        }
+                    }
+                });
+
+                return formData;
+            }
+
+            clearDraft() {
+                localStorage.removeItem(this.draftKey);
+                this.isDirty = false;
+            }
+
+            showDraftRestorePrompt(draftData) {
+                const draftDate = new Date(draftData.timestamp).toLocaleString();
+                const message = `A draft was found from ${draftDate}. Would you like to restore it?`;
+
+                if (confirm(message)) {
+                    this.restoreDraft(draftData);
+                } else {
+                    this.clearDraft();
+                }
+            }
+
+            showConnectionStatus(status) {
+                // Remove existing status elements
+                const existing = document.querySelector('.connection-status');
+                if (existing) existing.remove();
+
+                const statusEl = document.createElement('div');
+                statusEl.className =
+                    `alert connection-status ${status === 'online' ? 'alert-success' : 'alert-warning'}`;
+                statusEl.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 200px;
+            animation: slideIn 0.3s ease;
+        `;
+
+                statusEl.innerHTML = `
+            <strong>${status === 'online' ? '✓ Back Online' : '⚠ Connection Lost'}</strong>
+            <br><small>${status === 'online' ? 'Form data synced' : 'Draft saved locally'}</small>
+        `;
+
+                document.body.appendChild(statusEl);
+
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    if (statusEl.parentNode) {
+                        statusEl.remove();
+                    }
+                }, 3000);
+            }
+
+            showSaveStatus(message, type = 'info') {
+                const existing = document.querySelector('.save-status');
+                if (existing) existing.remove();
+
+                const statusEl = document.createElement('div');
+                statusEl.className =
+                    `save-status text-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'muted'}`;
+                statusEl.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 12px;
+            z-index: 1000;
+        `;
+                statusEl.textContent = message;
+
+                document.body.appendChild(statusEl);
+
+                setTimeout(() => {
+                    if (statusEl.parentNode) {
+                        statusEl.remove();
+                    }
+                }, 2000);
+            }
+
+            showDraftNotification() {
+                const draftExists = localStorage.getItem(this.draftKey);
+                if (draftExists) {
+                    const notification = document.createElement('div');
+                    notification.className = 'alert alert-info';
+                    notification.innerHTML = `
+                <strong>Draft Available:</strong> A previous draft was found.
+                <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="draftManager.loadDraft()">
+                    Load Draft
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-1" onclick="draftManager.clearDraft(); this.parentElement.remove()">
+                    Discard
+                </button>
+            `;
+
+                    // Insert at the top of the form
+                    this.form.insertBefore(notification, this.form.firstChild);
+                }
+            }
+        }
+
+        // Initialize the draft manager
+        document.addEventListener('DOMContentLoaded', function() {
+            window.draftManager = new FormDraftManager('.parent-assign', {
+                draftKey: 'hire_purchase_form_draft',
+                saveInterval: 30000 // Save every 30 seconds
+            });
+        });
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+`;
+        document.head.appendChild(style);
+    </script>
+
+
+
+    <script>
+        @php
+            $down_payment = App\Models\DownPaymentSetting::orderBy('id', 'ASC')->first();
         @endphp
 
 
-function calculateMonthlyInstallment() {
-  var installment_month = $("#installment_month").val();
-  var hire_price = parseFloat($("#hire_price").val()) || 0;
-  var down_payment = parseFloat($("#down_payment").val()) || 0;
+        function calculateMonthlyInstallment() {
+            var installment_month = $("#installment_month").val();
+            var hire_price = parseFloat($("#hire_price").val()) || 0;
+            var down_payment = parseFloat($("#down_payment").val()) || 0;
 
-  if (installment_month == 0) {
-    $("#down_payment").val(0);
-    return;
-  }
+            if (installment_month == 0) {
+                $("#down_payment").val(0);
+                return;
+            }
 
-  var test = parseFloat($("#down_payment_parcentage").val()) || 0;
-  var payment = (hire_price * test / 100);
+            var test = parseFloat($("#down_payment_parcentage").val()) || 0;
+            var payment = (hire_price * test / 100);
 
-  // Calculate monthly installment with proper decimal formatting
-  var monthly_install = 0;
-  if (installment_month > 1) {
-    monthly_install = (hire_price - down_payment) / (installment_month - 1);
-    // Format to 2 decimal places
-    monthly_install = monthly_install.toFixed(2);
-  }
+            // Calculate monthly installment with proper decimal formatting
+            var monthly_install = 0;
+            if (installment_month > 1) {
+                monthly_install = (hire_price - down_payment) / (installment_month - 1);
+                // Format to 2 decimal places
+                monthly_install = monthly_install.toFixed(2);
+            }
 
-  // Display down payment alert if necessary
-//   if (payment > down_payment) {
-//     var alert_message = "You Must be need to pay " + test + "% bdt " + payment.toFixed(2);
-//     $("#alert_downpayment").html(alert_message);
-//     $("#save_button").css({
-//       'display': 'none'
-//     });
-//   } else {
-//     $("#alert_downpayment").html('');
-//     $("#save_button").css({
-//       'display': 'block'
-//     });
-//   }
+            // Display down payment alert if necessary
+            //   if (payment > down_payment) {
+            //     var alert_message = "You Must be need to pay " + test + "% bdt " + payment.toFixed(2);
+            //     $("#alert_downpayment").html(alert_message);
+            //     $("#save_button").css({
+            //       'display': 'none'
+            //     });
+            //   } else {
+            //     $("#alert_downpayment").html('');
+            //     $("#save_button").css({
+            //       'display': 'block'
+            //     });
+            //   }
 
-  // Check if monthly installment is less than minimum required
-  if (parseFloat(monthly_install) < 3000) {
-    $("#capable_action").css({
-      'display': 'block'
-    });
-    $("#save_button").prop('disabled', true).css({
-      'display': 'none'
-    });
-  } else {
-    $("#capable_action").css({
-      'display': 'none'
-    });
-    $("#save_button").prop('disabled', false).css({
-      'display': 'block'
-    });
-  }
+            // Check if monthly installment is less than minimum required
+            if (parseFloat(monthly_install) < 3000) {
+                $("#capable_action").css({
+                    'display': 'block'
+                });
+                $("#save_button").prop('disabled', true).css({
+                    'display': 'none'
+                });
+            } else {
+                $("#capable_action").css({
+                    'display': 'none'
+                });
+                $("#save_button").prop('disabled', false).css({
+                    'display': 'block'
+                });
+            }
 
-  $("#monthly_inst").val(monthly_install);
+            $("#monthly_inst").val(monthly_install);
 
-  calculateCreditScoreWithHirePrice();
-}
-function calculateDownPayment() {
-    var installment_month = $("#installment_month").val();
-    var hire_price = parseFloat($("#hire_price").val()) || 0;
+            calculateCreditScoreWithHirePrice();
+        }
 
-    // Get selected down payment percentage
-    var selectedPercentage = parseFloat($("#down_payment_parcentage").val()) || 0;
-    var payment = (hire_price * selectedPercentage / 100);
+        function calculateDownPayment() {
+            var installment_month = $("#installment_month").val();
+            var hire_price = parseFloat($("#hire_price").val()) || 0;
 
-    var monthly_install = parseFloat($("#monthly_inst").val()) || 0;
-    var down_payment = (hire_price - (monthly_install * (installment_month - 1)));
-    $("#down_payment").val(down_payment.toFixed(2));
+            // Get selected down payment percentage
+            var selectedPercentage = parseFloat($("#down_payment_parcentage").val()) || 0;
+            var payment = (hire_price * selectedPercentage / 100);
 
-    if(payment >= down_payment){
-        var alert_message = "You must pay at least " + selectedPercentage + "% down payment: " + payment.toFixed(2) + " BDT";
-        $("#alert_downpayment").html(alert_message);
-        $("#save_button").css({
-            'display' : 'none'
+            var monthly_install = parseFloat($("#monthly_inst").val()) || 0;
+            var down_payment = (hire_price - (monthly_install * (installment_month - 1)));
+            $("#down_payment").val(down_payment.toFixed(2));
+
+            if (payment >= down_payment) {
+                var alert_message = "You must pay at least " + selectedPercentage + "% down payment: " + payment.toFixed(
+                    2) + " BDT";
+                $("#alert_downpayment").html(alert_message);
+                $("#save_button").css({
+                    'display': 'none'
+                });
+            } else {
+                $("#alert_downpayment").html('');
+                $("#save_button").css({
+                    'display': 'block'
+                });
+            }
+
+            calculateCreditScoreWithHirePrice();
+        }
+
+        // Event listeners
+        $("#down_payment").on("input", calculateMonthlyInstallment);
+        $("#monthly_inst").on("input", calculateDownPayment);
+        $("#down_payment_parcentage").on("change", function() {
+            // Recalculate when percentage changes
+            calculate();
         });
-    } else {
-        $("#alert_downpayment").html('');
-        $("#save_button").css({
-            'display' : 'block'
-        });
-    }
 
-    calculateCreditScoreWithHirePrice();
-}
-
-// Event listeners
-$("#down_payment").on("input", calculateMonthlyInstallment);
-$("#monthly_inst").on("input", calculateDownPayment);
-$("#down_payment_parcentage").on("change", function() {
-    // Recalculate when percentage changes
-    calculate();
-});        function calculateCreditScoreWithHirePrice() {
+        function calculateCreditScoreWithHirePrice() {
             var downPayment = parseFloat($('#down_payment').val());
             var hirePrice = parseFloat($('#hire_price').val());
 
@@ -1319,23 +1722,24 @@ $("#down_payment_parcentage").on("change", function() {
 
             // Check if monthly installment is less than minimum required
             if (parseFloat(monthly_install) < 3000) {
-                    $("#capable_action").css({
+                $("#capable_action").css({
                     'display': 'block'
-                    });
-                    $("#save_button").prop('disabled', true).css({
+                });
+                $("#save_button").prop('disabled', true).css({
                     'display': 'none'
-                    });
-                } else {
-                    $("#capable_action").css({
+                });
+            } else {
+                $("#capable_action").css({
                     'display': 'none'
-                    });
-                    $("#save_button").prop('disabled', false).css({
+                });
+                $("#save_button").prop('disabled', false).css({
                     'display': 'block'
-                    });
-                }
+                });
+            }
 
 
-            console.log("payment"+payment.toFixed(2)+" down_payment"+down_payment.toFixed(2)+" selectedPercentage"+selectedPercentage);
+            console.log("payment" + payment.toFixed(2) + " down_payment" + down_payment.toFixed(2) + " selectedPercentage" +
+                selectedPercentage);
 
             // Check down payment validity
             // if (payment.toFixed(2) >= down_payment.toFixed(2)) {
@@ -1377,7 +1781,7 @@ $("#down_payment_parcentage").on("change", function() {
                 id: product
             }, function(data) {
                 $("#cash_price").val(data.price);
-                   $("#product_size").val(data.size);
+                $("#product_size").val(data.size);
                 calculate();
 
             });
@@ -1413,6 +1817,19 @@ $("#down_payment_parcentage").on("change", function() {
 
                 $("#number_ofChilder_showing").hide();
                 $("#number_of_children").hide();
+            }
+        }
+
+        function guaraterMaritalStatusChange() {
+            var marital_status = $("#guarater_marital_status").val();
+            if (marital_status == 'married') {
+
+                $("#guarater_number_ofChilder_showing").show();
+                $("#guarater_number_of_children").show();
+            } else {
+
+                $("#guarater_number_ofChilder_showing").hide();
+                $("#guarater_number_of_children").hide();
             }
         }
         // function FindDistrictPar(){
@@ -1453,52 +1870,58 @@ $("#down_payment_parcentage").on("change", function() {
         }
 
 
-$(document).ready(function() {
-    // Add Row
-    $(document).on('click', '.add-row', function() {
-        var newChildDiv = $('#number_of_children').first().clone(); // Clone the entire number_of_children div
-        newChildDiv.find('.add-row').remove(); // Remove "Add more" button from the cloned div
-        newChildDiv.find('input').val(''); // Clear input values
-        var deleteBtn = $('<i/>', {
-            class: 'text-danger delete-row fa fa-trash-alt dlt_more',
-            text: ''
-        });
-        deleteBtn.click(function() {
-            $(this).closest('.row').remove(); // Remove the div when delete button is clicked
-        });
-        newChildDiv.find('.col-md-3:last-child').empty().append(deleteBtn); // Append delete button
-        $('#number_of_children_container').append(newChildDiv); // Append the new div to the container
-    });
+        $(document).ready(function() {
+            // Add Row
+            $(document).on('click', '.add-row', function() {
+                var newChildDiv = $('#number_of_children').first()
+                    .clone(); // Clone the entire number_of_children div
+                newChildDiv.find('.add-row').remove(); // Remove "Add more" button from the cloned div
+                newChildDiv.find('input').val(''); // Clear input values
+                var deleteBtn = $('<i/>', {
+                    class: 'text-danger delete-row fa fa-trash-alt dlt_more',
+                    text: ''
+                });
+                deleteBtn.click(function() {
+                    $(this).closest('.row')
+                        .remove(); // Remove the div when delete button is clicked
+                });
+                newChildDiv.find('.col-md-3:last-child').empty().append(deleteBtn); // Append delete button
+                $('#number_of_children_container').append(
+                    newChildDiv); // Append the new div to the container
+            });
 
-    // Delete Row
-    $(document).on('click', '.delete-row', function() {
-        $(this).closest('.row').remove();
-    });
+            // Delete Row
+            $(document).on('click', '.delete-row', function() {
+                $(this).closest('.row').remove();
+            });
 
-    // previously bought rangs products
-    $('.previously_bought').hide();
-    // Show/hide previously_bought section based on radio button selection
-    $('input[name="previously_purchased"]').change(function() {
-        if ($(this).val() == '1') {
-            $('.previously_bought').show();
-        } else {
+            // previously bought rangs products
             $('.previously_bought').hide();
-        }
-    });
+            // Show/hide previously_bought section based on radio button selection
+            $('input[name="previously_purchased"]').change(function() {
+                if ($(this).val() == '1') {
+                    $('.previously_bought').show();
+                } else {
+                    $('.previously_bought').hide();
+                }
+            });
 
-    if ($('#same_p_addrs').is(':checked')) {
-        $('.permanent_adrs_row').hide();
-    }
+            if ($('#same_p_addrs').is(':checked')) {
+                $('.permanent_adrs_row').hide();
+            }
 
-    // Show/hide permanent_adrs_row based on checkbox selection
-    $('#same_p_addrs').change(function() {
-        if ($(this).is(':checked')) {
-            $('.permanent_adrs_row').hide();
-        } else {
-            $('.permanent_adrs_row').show();
-        }
-    });
-});
-
+            // Show/hide permanent_adrs_row based on checkbox selection
+            $('#same_p_addrs').change(function() {
+                if ($(this).is(':checked')) {
+                    $('.permanent_adrs_row').hide();
+                } else {
+                    $('.permanent_adrs_row').show();
+                }
+            });
+        });
     </script>
+
+
+
+
 @endsection

@@ -87,14 +87,14 @@
                         <div class="userDatatable-content">{{ @$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00' }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $firstLoanStartDate ? \App\Helpers\Helper::formatDateStandard($firstLoanStartDate) : 'N/A' }}
+                        <div class="userDatatable-content">{{ $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : 'N/A' }}
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $lastLoanEndDate ? \App\Helpers\Helper::formatDateStandard($lastLoanEndDate) : 'N/A' }}</div>
+                        <div class="userDatatable-content">{{ $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y') : 'N/A' }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $last_payment ? \App\Helpers\Helper::formatDateTimeStandard($last_payment) : 'N/A' }}</div>
+                        <div class="userDatatable-content">{{ $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A' }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ number_format($last_paid_amount, 2) }}</div>

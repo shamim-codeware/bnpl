@@ -74,11 +74,11 @@ class DefaulterCustomersExport implements FromCollection, WithHeadings, WithMapp
             $customer->order_no,
             $customer->name,
             $customer->pr_phone,
-            $customer->purchase_product ? number_format($customer->purchase_product->hire_price, 2) : '0.00',
-            number_format($outstanding_balance, 2),
-            $last_payment ? Helper::formatDateTimeStandard($last_payment) : 'N/A',
+            $customer->purchase_product ? (float)($customer->purchase_product->hire_price) : '0.00',
+            (float)($outstanding_balance),
+            $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A',
             $customer->days_overdue ?? 0,
-            $next_due_date ? Helper::formatDateStandard($next_due_date) : 'N/A',
+            $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A',
             $customer->show_room ? $customer->show_room->name : 'N/A',
             $customer->show_room && $customer->show_room->zone ? $customer->show_room->zone->name : 'N/A'
         ];

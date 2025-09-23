@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
-use App\Models\Zone;
+use Exception;
 use App\Models\User;
+use App\Models\Zone;
 use App\Models\ShowRoom;
 use App\Models\Installment;
 use App\Models\Transaction;
+use App\Service\ApiService;
 use App\Models\HirePurchase;
 use Illuminate\Http\Request;
 use App\Models\ZonePermission;
 use Illuminate\Support\Facades\DB;
 use App\Models\HirePurchaseProduct;
-use App\Service\ApiService;
-Use App\Models\PaymentErpHistory;
-Use Carbon\Carbon;
+use App\Models\PaymentErpHistory;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -44,7 +45,7 @@ class PaymentCollectionController extends Controller
             $monthsOverdue = $loanStartDate->diffInMonths($currentDate);
             // Add fine only if overdue
             if ($monthsOverdue > 1) {
-                $totalFine += ($monthsOverdue - 1 )* $lateFinePerMonth;
+                $totalFine += ($monthsOverdue - 1) * $lateFinePerMonth;
             }
         }
         // Calculate the total amount (monthly installment + fine)
@@ -82,7 +83,7 @@ class PaymentCollectionController extends Controller
     public function LoanDetails($id)
     {
         $hirepurchase = HirePurchase::with(['purchase_product', 'purchase_product.brand', 'purchase_product.product', 'show_room'])->where('order_no', $id)->first();
-        
+
         if ($hirepurchase) {
             // Check if manager is trying to access BNPL from different CTP/showroom
             if (Auth::user()->role_id == User::MANAGER) { // Manager role
@@ -93,7 +94,7 @@ class PaymentCollectionController extends Controller
                     ]);
                 }
             }
-            
+
             $installment_due_check = Installment::where('hire_purchase_id', $hirepurchase->id)->where('status', 0)->count();
             return view('installment.payment.details', compact("hirepurchase", "installment_due_check"));
         } else {
@@ -104,25 +105,26 @@ class PaymentCollectionController extends Controller
         }
     }
 
-    public function PaymentCollection(Request $request,ApiService $ApiService)
+    public function PaymentCollection(Request $request, ApiService $ApiService)
     {
+        // dd($request->all());
         date_default_timezone_set('Asia/Dhaka');
         $data = $request->all();
         $data['transaction_type'] = "Installment ";
         $data['created_by'] = Auth::user()->id;
         $advance_payment = 0;
 
-        $number_of_installment = $request->number_of_instllment;
+        $number_of_installment = (int) $request->number_of_instllment;
         DB::beginTransaction();
         try {
-//            if ($request->number_of_instllment == 0) {
-                $amount = $request->amount;
-                $monthly_installment = $request->monthly_installment;
-                $number_of_installment = floor($amount / $monthly_installment);
-                $total_pay_amount = $monthly_installment * $number_of_installment;
-                $advance_payment = $request->amount - $total_pay_amount;
-                $data['number_of_instllment'] = $number_of_installment;
-//            }
+            //            if ($request->number_of_instllment == 0) {
+            $amount = (float) $request->amount;
+            $monthly_installment = (float) $request->monthly_installment;
+            $number_of_installment = floor($amount / $monthly_installment);
+            $total_pay_amount = $monthly_installment * $number_of_installment;
+            $advance_payment = (float) $request->amount - $total_pay_amount;
+            $data['number_of_instllment'] = $number_of_installment;
+            //            }
             // If no Installment records have status 0, update HirePurchase
             $hirepurchase = HirePurchase::find($request->hire_purchase_id);
 
@@ -134,13 +136,14 @@ class PaymentCollectionController extends Controller
             $transaction->fill($data)->save();
             $transaction_id = $transaction->id;
             $HirePurchaseProduct = HirePurchaseProduct::where('hire_purchase_id', $request->hire_purchase_id)->first();
-            $HirePurchaseProduct->total_paid += $request->amount;
+            $HirePurchaseProduct->total_paid += (float) $request->amount;
             $HirePurchaseProduct->advance_pay += $advance_payment;
             $HirePurchaseProduct->save();
-            $Installment = Installment::where('hire_purchase_id',$request->hire_purchase_id)->where('status', 0)->orderby('id', "ASC")->take($number_of_installment)->get();
+            $Installment = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 0)->orderby('id', "ASC")->take($number_of_installment)->get();
             foreach ($Installment as $key => $install) {
                 $installment_number = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 1)->count();
                 $response =    $ApiService->CollectionApi($hirepurchase->order_no,$installment_number);
+
                 if($response->error == 1){
                     $sent = 0;
                 }else{
@@ -153,7 +156,7 @@ class PaymentCollectionController extends Controller
                 $data = [
                     'tracking_id' => $hirepurchase->order_no,
                     'ins_no' => $installment_number,
-                    'payment_ref'=>"Cash",
+                    'payment_ref' => "Cash",
                     'response'=> $response,
                     'erp_status' => $sent,
                     'transaction_id' => $transaction_id,
@@ -166,10 +169,10 @@ class PaymentCollectionController extends Controller
             }
 
             //if fine  then execute this code
-            $installmentCount = Installment::where('hire_purchase_id',$request->hire_purchase_id)->where('status', 0)->count();
+            $installmentCount = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 0)->count();
 
-            $ShowRoom = ShowRoom::where('id',$hirepurchase->showroom_id)->first();
-            $ShowRoom->remaining_credit = $ShowRoom->remaining_credit + $request->amount;
+            $ShowRoom = ShowRoom::where('id', $hirepurchase->showroom_id)->first();
+            $ShowRoom->remaining_credit = $ShowRoom->remaining_credit + (float) $request->amount;
             $ShowRoom->save();
 
             if ($installmentCount == 0) {
@@ -185,8 +188,7 @@ class PaymentCollectionController extends Controller
             //    $erp_log->sent = 1;
             }
             DB::commit();
-            return redirect()->back()->with('success','Success! Installment');
-
+            return redirect()->back()->with('success', 'Success! Installment');
         } catch (Exception $e) {
             DB::rollback();
             return redirect('')->with('error', $e->getMessage());
@@ -263,7 +265,6 @@ class PaymentCollectionController extends Controller
             $query->whereHas('hire_purchase', function ($q) use ($showroom_id) {
                 $q->where('showroom_id', $showroom_id);
             });
-
         } elseif (Auth::user()->role_id == 6) {
             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
             $query->whereHas('hire_purchase.show_room', function ($q) use ($permission) {
@@ -339,5 +340,4 @@ class PaymentCollectionController extends Controller
         $filename = 'transaction-list-report-' . \App\Helpers\Helper::formatDateTimeFilename() . '.xlsx';
         return Excel::download(new \App\Exports\TransactionExport($transactions), $filename);
     }
-
 }

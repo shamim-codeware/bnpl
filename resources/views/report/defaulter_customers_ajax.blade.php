@@ -81,10 +81,10 @@
                         <div class="userDatatable-content">{{ $customer->pr_phone }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$customer->purchase_product ? number_format($customer->purchase_product->hire_price, 2) : '0.00' }}</div>
+                        <div class="userDatatable-content">{{ @$customer->purchase_product ? (float)($customer->purchase_product->hire_price) : '0.00' }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ number_format($outstanding_balance, 2) }}</div>
+                        <div class="userDatatable-content">{{ (float)($outstanding_balance) }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
@@ -95,7 +95,7 @@
                                     $last_payment = $last_transaction->created_at;
                                 }
                             @endphp
-                            {{ $last_payment ? \App\Helpers\Helper::formatDateStandard($last_payment) : 'N/A' }}
+                            {{ $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y')  : 'N/A' }}
                         </div>
                     </td>
                     <td>
@@ -103,7 +103,7 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ $next_due_date ? \App\Helpers\Helper::formatDateStandard($next_due_date) : 'N/A' }}
+                            {{ $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A' }}
                         </div>
                     </td>
                     <td>

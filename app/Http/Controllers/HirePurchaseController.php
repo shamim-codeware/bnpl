@@ -1,14 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\ErpLog;
-use App\Models\NotificationSeen;
-use DB;
-use Auth;
-use Session;
+
+use Carbon\Carbon;
 use App\Models\Bank;
+use App\Models\User;
 use App\Models\Zone;
 use App\Models\Brand;
+use App\Models\ErpLog;
 use App\Models\Product;
 use App\Models\Upazila;
 use App\Models\Customer;
@@ -17,6 +16,7 @@ use App\Models\ShowRoom;
 use App\Models\Installment;
 use App\Models\ProductType;
 use App\Models\Transaction;
+use App\Service\ApiService;
 use App\Models\HirePurchase;
 use App\Models\InterestRate;
 use App\Models\Notification;
@@ -25,39 +25,40 @@ use Illuminate\Http\Request;
 use App\Models\GuaranterInfo;
 use App\Models\EnquiryProduct;
 use App\Models\ZonePermission;
+use App\Models\NotificationSeen;
 use App\Models\CustomerProfession;
-use App\Models\HirePurchaseProduct;
-use App\Service\ApiService;
-use Carbon\Carbon;
 use App\Models\DownPaymentSetting;
-use App\Models\User;
-
+use Illuminate\Support\Facades\DB;
+use App\Models\HirePurchaseProduct;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Session;
 
 class HirePurchaseController extends Controller
 {
 
 
-    public function apiMarge(){
+    public function apiMarge()
+    {
 
-        $showroom = ShowRoom::orderBy('name','asc')->get();
+        $showroom = ShowRoom::orderBy('name', 'asc')->get();
 
         $i = 0;
         foreach ($showroom as $showroom) {
-            $shops = DB::table('shops')->where('ctp_name', 'LIKE', '%'.$showroom->name.'%')->first();
+            $shops = DB::table('shops')->where('ctp_name', 'LIKE', '%' . $showroom->name . '%')->first();
             echo "<br>";
 
-            if(!empty($shops)){
-                $i +=1;
-                echo $showroom->name ." =    ". $shops->ctp_name."<br> <br>";
+            if (!empty($shops)) {
+                $i += 1;
+                echo $showroom->name . " =    " . $shops->ctp_name . "<br> <br>";
                 $showroom->ctp_name = $shops->ctp_name;
                 $showroom->save();
             }
-//            print_r($shops);
+            //            print_r($shops);
         }
 
         dd($i);
-
-
     }
     /**
      * Display a listing of the resource.
@@ -70,12 +71,12 @@ class HirePurchaseController extends Controller
         $districts = DB::table('districts')->orderBy('id', 'DESC')->where('status', 1)->get();
         $product_type = ProductType::latest()->get();
         $brands = Brand::latest()->get();
-        $customers_professions = CustomerProfession::orderBy('id','DESC')->where('status', 1)->get();
+        $customers_professions = CustomerProfession::orderBy('id', 'DESC')->where('status', 1)->get();
         $products = Product::latest()->get();
         $showrooms = ShowRoom::latest()->get();
         $banks = Bank::latest()->get();
 
-        $showroom_credit = ShowRoom::where('id',auth()->user()->showroom_id)->first();
+        $showroom_credit = ShowRoom::where('id', auth()->user()->showroom_id)->first();
         $showroomusers = ShowRoomUser::where('showroom_id', Auth::user()->showroom_id)->latest()->get();
         $interestrate = InterestRate::latest()->get();
         $down_payment_parcentage = DownPaymentSetting::latest()->get();
@@ -96,7 +97,8 @@ class HirePurchaseController extends Controller
         ));
     }
 
-    public function SalePending(){
+    public function SalePending()
+    {
         $title = "Hire Purchase";
         $description = "Some description for the page";
         if (Auth::user()->role_id == User::RETAIL) {
@@ -160,84 +162,86 @@ class HirePurchaseController extends Controller
             return redirect()->back()->with('error', 'You have exceeded your credit limitation. Your current available credit is ' . $availableCredit);
         }
         DB::beginTransaction();
-//        try {
-            // Update hire purchase product
-            $hirePurchaseProduct->product_group_id = $request->product_group_id;
-            $hirePurchaseProduct->product_category_id = $request->product_category_id;
-            $hirePurchaseProduct->product_brand_id = $request->product_brand_id;
-            $hirePurchaseProduct->product_model_id = $request->product_model_id;
-            $hirePurchaseProduct->product_size_id = $request->product_size_id;
-            $hirePurchaseProduct->serial_no = $request->serial_no;
-            $hirePurchaseProduct->cash_price = $request->cash_price;
-            $hirePurchaseProduct->hire_price = $request->hire_price;
-            $hirePurchaseProduct->down_payment = $request->down_payment;
-            $hirePurchaseProduct->installment_month = $request->installment_month;
-            $hirePurchaseProduct->monthly_installment = $request->monthly_installment;
-            $hirePurchaseProduct->save();
+        //        try {
+        // Update hire purchase product
+        $hirePurchaseProduct->product_group_id = $request->product_group_id;
+        $hirePurchaseProduct->product_category_id = $request->product_category_id;
+        $hirePurchaseProduct->product_brand_id = $request->product_brand_id;
+        $hirePurchaseProduct->product_model_id = $request->product_model_id;
+        $hirePurchaseProduct->product_size_id = $request->product_size_id;
+        $hirePurchaseProduct->serial_no = $request->serial_no;
+        $hirePurchaseProduct->cash_price = $request->cash_price;
+        $hirePurchaseProduct->hire_price = $request->hire_price;
+        $hirePurchaseProduct->down_payment = $request->down_payment;
+        $hirePurchaseProduct->installment_month = $request->installment_month;
+        $hirePurchaseProduct->monthly_installment = $request->monthly_installment;
+        $hirePurchaseProduct->save();
 
-            // Update showroom credit
-            $showroom->remaining_credit = $availableCredit - $newDue;
-            $showroom->save();
+        // Update showroom credit
+        $showroom->remaining_credit = $availableCredit - $newDue;
+        $showroom->save();
 
-            // Update installments if the monthly amount or period has changed
-            if ($hirePurchaseProduct->monthly_installment != $request->monthly_installment ||
-                $hirePurchaseProduct->installment_month != $request->installment_month) {
-                // Keep the down payment installment
-                $firstInstallment = Installment::where('hire_purchase_id', $id)
-                    ->orderBy('id', 'asc')
-                    ->first();
+        // Update installments if the monthly amount or period has changed
+        if (
+            $hirePurchaseProduct->monthly_installment != $request->monthly_installment ||
+            $hirePurchaseProduct->installment_month != $request->installment_month
+        ) {
+            // Keep the down payment installment
+            $firstInstallment = Installment::where('hire_purchase_id', $id)
+                ->orderBy('id', 'asc')
+                ->first();
 
-                $firstInstallment->amount = $request->down_payment;
-                $firstInstallment->loan_start_date = date('Y-m-d H:i:00');
-                $firstInstallment->loan_end_date = date('Y-m-d H:i:00');
-                $firstInstallment->status = 1;
-                $firstInstallment->save();
-                // Delete all other installments
-                Installment::where('hire_purchase_id', $id)
-                    ->where('id', '!=', $firstInstallment->id)
-                    ->delete();
-                // Create new installments
-                for ($i = 1; $i < $request->installment_month; $i++) {
-                    $installmentData = [
-                        'hire_purchase_id' => $id,
-                        'amount' => $request->monthly_installment,
-                        'loan_start_date' => date('Y-m-d H:i:00', strtotime("+$i month")),
-                        'loan_end_date' => date('Y-m-d H:i:00', strtotime("+" . ($i + 1) . " month")),
-                        'status' => 0
-                    ];
-                    Installment::create($installmentData);
-                }
+            $firstInstallment->amount = $request->down_payment;
+            $firstInstallment->loan_start_date = date('Y-m-d H:i:00');
+            $firstInstallment->loan_end_date = date('Y-m-d H:i:00');
+            $firstInstallment->status = 1;
+            $firstInstallment->save();
+            // Delete all other installments
+            Installment::where('hire_purchase_id', $id)
+                ->where('id', '!=', $firstInstallment->id)
+                ->delete();
+            // Create new installments
+            for ($i = 1; $i < $request->installment_month; $i++) {
+                $installmentData = [
+                    'hire_purchase_id' => $id,
+                    'amount' => $request->monthly_installment,
+                    'loan_start_date' => date('Y-m-d H:i:00', strtotime("+$i month")),
+                    'loan_end_date' => date('Y-m-d H:i:00', strtotime("+" . ($i + 1) . " month")),
+                    'status' => 0
+                ];
+                Installment::create($installmentData);
             }
-            // Update transaction
-            $transaction = Transaction::where('hire_purchase_id', $id)->first();
-            $transaction->amount = $request->down_payment;
-            $transaction->transaction_type = "Down Payment";
-            $transaction->payment_type = 1;
-            $transaction->created_by = Auth::user()->id;
-            $transaction->status = 0;
-            $transaction->save();
-            // Update ERP log
-            $erp_log = ErpLog::where('tracking_number', $id)->first();
+        }
+        // Update transaction
+        $transaction = Transaction::where('hire_purchase_id', $id)->first();
+        $transaction->amount = $request->down_payment;
+        $transaction->transaction_type = "Down Payment";
+        $transaction->payment_type = 1;
+        $transaction->created_by = Auth::user()->id;
+        $transaction->status = 0;
+        $transaction->save();
+        // Update ERP log
+        $erp_log = ErpLog::where('tracking_number', $id)->first();
 
         // Prepare order info
         $orderInfo = array_filter([
             "eorder_no" => $hirePurchase->order_no,
             "entry_date" => now()->toDateTimeString(),
             "down_payment" => $request->down_payment,
-            'instalments_rate'=>$request->monthly_installment,
-            "no_instalments" => (int)$request->installment_month -1,
+            'instalments_rate' => $request->monthly_installment,
+            "no_instalments" => (int)$request->installment_month - 1,
             "sales_from" => "$showroom->name",
             "delivery_from" => "$showroom->name",
             "delivery_fee" => 0,
             "note" => $request->organization_short_desc,
         ]);
 
-        $product_model = Product::where('id',$request->product_model_id)->first()->product_model;
+        $product_model = Product::where('id', $request->product_model_id)->first()->product_model;
         // Prepare order details array
         $orderDetails = [
             [
                 "item_model"     => "$product_model",
-                "item_qty"       =>1,
+                "item_qty"       => 1,
                 "unit_rate"      => $request->hire_price,
                 "unit_wise_disc" => 0
             ]
@@ -246,20 +250,20 @@ class HirePurchaseController extends Controller
         $orderJsonDetails = json_encode($orderDetails);
         $orderJsonInfo = json_encode($orderInfo);
         $erpLogData = [
-            'order_details' =>$orderJsonDetails,
-            'order_info'    =>$orderJsonInfo,
-            'tracking_number'=>$hirePurchase->id,
-            'sent'           =>0,
+            'order_details' => $orderJsonDetails,
+            'order_info'    => $orderJsonInfo,
+            'tracking_number' => $hirePurchase->id,
+            'sent'           => 0,
             // 'response'      => $response
         ];
         $erp_log->fill($erpLogData)->save();
 
-            DB::commit();
-            return redirect()->back()->with('success', 'Product updated successfully.');
-//        } catch (\Throwable $e) {
-//            DB::rollback();
-//            return redirect()->back()->with('error', 'Something went wrong! Please try again.');
-//        }
+        DB::commit();
+        return redirect()->back()->with('success', 'Product updated successfully.');
+        //        } catch (\Throwable $e) {
+        //            DB::rollback();
+        //            return redirect()->back()->with('error', 'Something went wrong! Please try again.');
+        //        }
     }
 
 
@@ -291,7 +295,6 @@ class HirePurchaseController extends Controller
             });
         } elseif (Auth::user()->role_id == User::MANAGER) {
             $query->where('showroom_id', Auth::user()->showroom_id);
-
         } elseif (Auth::user()->role_id == User::RETAIL) {
 
             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
@@ -331,7 +334,6 @@ class HirePurchaseController extends Controller
             });
         } elseif (Auth::user()->role_id == User::MANAGER) {
             $query->where('showroom_id', Auth::user()->showroom_id);
-
         } elseif (Auth::user()->role_id == User::RETAIL) {
 
             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
@@ -344,9 +346,9 @@ class HirePurchaseController extends Controller
         $hirepurchase = $query->latest()->get();
 
         return view('installment.hire_purchase.hire_purchase_pending_ajax_view', compact("hirepurchase"));
-
     }
-  public function ApproveSale($id,ApiService $ApiService){
+    public function ApproveSale($id, ApiService $ApiService)
+    {
         date_default_timezone_set('Asia/Dhaka');
         $HirePurchase = HirePurchase::with(['purchase_product'])->findOrFail($id);
         if (Auth::user()->role_id == User::RETAIL) {
@@ -376,13 +378,13 @@ class HirePurchaseController extends Controller
             $Transaction->status = 1;
             $Transaction->save();
             $remaining_amount = $HirePurchase->purchase_product->hire_price - $HirePurchase->purchase_product->down_payment;
-            $ShowRoom = ShowRoom::where('id',$HirePurchase->showroom_id)->first();
+            $ShowRoom = ShowRoom::where('id', $HirePurchase->showroom_id)->first();
             $ShowRoom->remaining_credit = $ShowRoom->remaining_credit - $remaining_amount;
             $ShowRoom->save();
 
-            $erp_log = ErpLog::where('tracking_number',$id)->first();
+            $erp_log = ErpLog::where('tracking_number', $id)->first();
 
-            if(!empty($erp_log)){
+            if (!empty($erp_log)) {
                 $requestData = [
                     "update_flag" => 0,
                     "cancel_flag" => 0,
@@ -392,16 +394,15 @@ class HirePurchaseController extends Controller
                 ];
 
                 $response =    $ApiService->SendToErp($requestData);
-                if($response['error'] == 1){
+                Log::info('ERP Response: ', ['response' => $response]);
+                if ($response['error'] == 1) {
                     $erp_log->sent = 0;
-                }else{
+                } else {
                     $erp_log->sent = 1;
                 }
                 $erp_log->response = $response;
                 $erp_log->save();
             }
-
-
         } elseif (Auth::user()->role_id == User::MANAGER) {
             $Installment = Installment::where('hire_purchase_id', $id)->get();
             foreach ($Installment as $key => $instal) {
@@ -415,13 +416,13 @@ class HirePurchaseController extends Controller
             $Transaction->status = 1;
             $Transaction->save();
             $remaining_amount = $HirePurchase->purchase_product->hire_price - $HirePurchase->purchase_product->down_payment;
-            $ShowRoom = ShowRoom::where('id',$HirePurchase->showroom_id)->first();
+            $ShowRoom = ShowRoom::where('id', $HirePurchase->showroom_id)->first();
             $ShowRoom->remaining_credit = $ShowRoom->remaining_credit - $remaining_amount;
             $ShowRoom->save();
 
-            $erp_log = ErpLog::where('tracking_number',$id)->first();
+            $erp_log = ErpLog::where('tracking_number', $id)->first();
 
-            if(!empty($erp_log)){
+            if (!empty($erp_log)) {
                 $requestData = [
                     "update_flag" => 0,
                     "cancel_flag" => 0,
@@ -431,9 +432,9 @@ class HirePurchaseController extends Controller
                 ];
 
                 $response =    $ApiService->SendToErp($requestData);
-                if($response['error'] == 1){
+                if ($response['error'] == 1) {
                     $erp_log->sent = 0;
-                }else{
+                } else {
                     $erp_log->sent = 1;
                 }
                 $erp_log->response = $response;
@@ -441,7 +442,7 @@ class HirePurchaseController extends Controller
             }
         }
         $HirePurchase->save();
-        return redirect()->back()->with('success','Approve Successfully ');
+        return redirect()->back()->with('success', 'Approve Successfully ');
     }
 
     public function ProductDetails($id)
@@ -459,7 +460,7 @@ class HirePurchaseController extends Controller
         // $notificationSeen->save();
         $title = "Product Details";
         $description = "Some description for the page";
-        $product_details = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'transaction', 'installment','erplog'])->findOrFail($id);
+        $product_details = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'transaction', 'installment', 'erplog'])->findOrFail($id);
         $installments = Transaction::with(['hire_purchase:id,name,pr_phone', 'users', 'hire_purchase.purchase_product.product'])->where('hire_purchase_id', $id)->get();
         $installment_date = Installment::where('hire_purchase_id', $id)->orderBy('id', 'DESC')->first();
         $out_standing_amount = Installment::where('hire_purchase_id', $id)->where('status', 0)->sum('amount');
@@ -467,10 +468,10 @@ class HirePurchaseController extends Controller
         $total_installment_paid = Installment::where('hire_purchase_id', $id)->where('status', 1)->sum('amount');
         // $total_payment = Transaction::where('hire_purchase_id',$id)->sum('amount');
         // $due_amount  = Transaction::where('hire_purchase_id',$id)->sum('amount');
-        return view('installment.hire_purchase.product_details', compact("title", "description","product_details",'installments', 'installment_date','out_standing_amount','total_installment_paid'));
+        return view('installment.hire_purchase.product_details', compact("title", "description", "product_details", 'installments', 'installment_date', 'out_standing_amount', 'total_installment_paid'));
     }
 
-public function AllPurchase()
+    public function AllPurchase()
     {
         $title = "Hire Purchase";
         $description = "Some description for the page";
@@ -478,7 +479,6 @@ public function AllPurchase()
             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
             $zones = Zone::selectRaw('id, name')->whereIn('id', $permission)->orderBy('id', 'ASC')->where('status', 1)->get();
             $showrooms = ShowRoom::selectRaw('id, name')->whereIn('zone_id', $permission)->where('status', 1)->get();
-
         } elseif (Auth::user()->role_id == User::ZONE) {
 
             $showrooms = ShowRoom::selectRaw('id, name')->where('zone_id', Auth::user()->zone_id)->where('status', 1)->get();
@@ -499,12 +499,12 @@ public function AllPurchase()
             'show_room',
             'show_room_user',
             'users'
-        ])->where('status',3);
+        ])->where('status', 3);
 
         // Filter for overdue installments
         if ($request->over_dues) {
             $query->whereHas('installment', function ($q) {
-                $q->where('loan_start_date', '<', now())->where('status', 0);
+                $q->where('loan_end_date', '<', now())->where('status', 0);
             });
         } elseif ($request->order_no) {
             // If order number is provided, skip date filtering and focus on order search
@@ -560,20 +560,30 @@ public function AllPurchase()
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request,ApiService $ApiService)
+    public function store(Request $request, ApiService $ApiService)
     {
+        // dd($request->all());
+        $request->validate([
+            'nid'             => 'required|digits:17',
+            'guarater_nid.*'  => 'required|digits:17',
+        ], [
+            'nid.digits'              => 'National ID must be exactly 17 digits.',
+            'guarater_nid.*.required' => 'Guarantor NID is required.',
+            'guarater_nid.*.digits'   => 'Guarantor NID must be exactly 17 digits.',
+        ]);
+
         date_default_timezone_set('Asia/Dhaka');
         // calculate CreditScore With HirePrice
         $hire_price = $request->hire_price;
         $down_payment = $request->down_payment;
         $showroom = ShowRoom::findOrFail(auth()->user()->showroom_id);
-        $delivery_showroom = ShowRoom::where('id',$request->delivery_showroom_id)->first();
+        $delivery_showroom = ShowRoom::where('id', $request->delivery_showroom_id)->first();
         $showroom_credit = $showroom->remaining_credit;
         $due = $hire_price - $down_payment;
 
         $remaining_credit = $showroom_credit - $due;
         if ($due > $showroom_credit) {
-            return redirect()->back()->with('error','You have exceeded your credit limitation. Your current credit is ' . $showroom_credit);
+            return redirect()->back()->with('error', 'You have exceeded your credit limitation. Your current credit is ' . $showroom_credit);
         }
         DB::beginTransaction();
         try {
@@ -653,11 +663,11 @@ public function AllPurchase()
                 $imagePath = 'nid_image/' . $imageName;
                 $personal_info['nid_image'] = $imagePath;
             }
-        //guarantor info
+            //guarantor info
             $HirePurchase = new HirePurchase;
             $HirePurchase->fill($personal_info)->save();
             //Erp Service
-            $erp_order = $ApiService->OrderCreate($request->all(),$showroom,$HirePurchase->order_no,$HirePurchase->id,$delivery_showroom);
+            // $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
             //guarantor info
             $GuaranterInfo = new GuaranterInfo;
             foreach ($request->guarater_name as $key => $name) {
@@ -690,7 +700,7 @@ public function AllPurchase()
             $HirePurchaseProduct = new HirePurchaseProduct;
             $HirePurchaseProduct->fill($hirePurchase_productdata)->save();
 
-            ///transaction and installment
+           // transaction and installment
 
             $Installment = new Installment;
 
@@ -736,14 +746,11 @@ public function AllPurchase()
 
             DB::commit();
             return redirect('guarantor/' . $HirePurchase->id)->with('success', 'Success!');
-
         } catch (\Throwable $e) {
             DB::rollback();
             throw $e;
             return redirect()->back()->with('error', 'Something want wrong ! Please Try Again');
         }
-
-
     }
 
 
@@ -761,7 +768,6 @@ public function AllPurchase()
         $installments = Installment::where('hire_purchase_id', $id)->get();
 
         return view('installment_list', compact("hirepurchase", 'installments', 'total_installment_amount', 'advance_amount', 'due'));
-
     }
 
     /**
@@ -780,7 +786,8 @@ public function AllPurchase()
      * Show the form for editing the specified resource.
      */
 
-    public function Product_edit($id){
+    public function Product_edit($id)
+    {
 
         $title = "Product Edit";
         $description = "Description";
@@ -896,7 +903,7 @@ public function AllPurchase()
     /**
      * Update the specified resource in storage.
      */
-    public function HirepurchaseUpdate(Request $request, HirePurchase $hirePurchase,ApiService $ApiService)
+    public function HirepurchaseUpdate(Request $request, HirePurchase $hirePurchase, ApiService $ApiService)
     {
         $h_id = $request->hirepurchase_id;
         $customer_data = $request->only([
@@ -994,9 +1001,6 @@ public function AllPurchase()
         } else {
             return redirect()->back()->with('error', "Hirepurchase Not Found");
         }
-
-
-
     }
 
     /**
@@ -1054,10 +1058,28 @@ public function AllPurchase()
             }
 
             return redirect()->back()->with('success', 'Sale Rejected Successfully');
-
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error rejecting sale: ' . $e->getMessage());
         }
     }
 
+    public function saveDraft(Request $request)
+    {
+        $draftData = [
+            'user_id' => Auth::id(),
+            'form_data' => $request->input('form_data'),
+            'timestamp' => now(),
+        ];
+
+        // Save to database or cache
+        Cache::put("hire_purchase_draft_" . Auth::id(), $draftData, now()->addDays(7));
+
+        return response()->json(['status' => 'success']);
+    }
+
+    public function loadDraft()
+    {
+        $draft = Cache::get("hire_purchase_draft_" . Auth::id());
+        return response()->json($draft);
+    }
 }

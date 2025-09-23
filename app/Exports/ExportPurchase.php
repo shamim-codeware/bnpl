@@ -12,11 +12,11 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use DB;
 
-class ExportPurchase implements  FromCollection, WithMapping, WithHeadings, WithEvents
+class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithEvents
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     protected $filter_data;
     public function __construct($data)
     {
@@ -25,10 +25,9 @@ class ExportPurchase implements  FromCollection, WithMapping, WithHeadings, With
 
     public function collection()
     {
-       return $this->filter_data;
-
+        return $this->filter_data;
     }
-        public function map($filter_data): array
+    public function map($filter_data): array
     {
         $firstLoanStartDate = null;
         $lastLoanEndDate = null;
@@ -49,17 +48,19 @@ class ExportPurchase implements  FromCollection, WithMapping, WithHeadings, With
         }
 
         $outstanding_balance = $filter_data->purchase_product ? ($filter_data->purchase_product->hire_price - $filter_data->purchase_product->total_paid) : 0;
-        $next_installment_date = Installment::where('hire_purchase_id',$filter_data->id)->where('status', 0)->orderby('id', "ASC")->first();
+        $next_installment_date = Installment::where('hire_purchase_id', $filter_data->id)->where('status', 0)->orderby('id', "ASC")->first();
         return [
             @$filter_data->show_room->name,
             $filter_data->order_no,
-            $firstLoanStartDate,
-            $lastLoanEndDate,
+            // $firstLoanStartDate,
+            // $lastLoanEndDate,
+            $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : '',
+            $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y') : '',
             @$filter_data->purchase_product->brand->name,
             @$filter_data->purchase_product->product->product_model,
             // @$filter_data->purchase_product->product_size->name,
             @$filter_data->purchase_product->product_size_id,
-            @$filter_data->purchase_product->hire_price ? number_format($filter_data->purchase_product->hire_price, 2) : '0.00',
+            @$filter_data->purchase_product->hire_price ? (float) ($filter_data->purchase_product->hire_price) : '0.00',
             @$filter_data->purchase_product->down_payment,
             @$filter_data->purchase_product->monthly_installment,
             @$filter_data->purchase_product->total_paid,
@@ -68,8 +69,13 @@ class ExportPurchase implements  FromCollection, WithMapping, WithHeadings, With
             @$filter_data->installment->where('status', 1)->count(),
             @$filter_data->installment->where('status', 0)->count(),
             $last_paid_amount,
-            $last_payment,
-            @$next_installment_date->loan_start_date,
+            // $last_payment,
+            // @$next_installment_date->loan_start_date,
+            $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : '',
+
+            @$next_installment_date?->loan_start_date
+                ? \Carbon\Carbon::parse($next_installment_date->loan_start_date)->format('d F Y')
+                : '',
             $filter_data->name,
             $filter_data->pr_phone,
             @$filter_data->show_room_user->name,
@@ -105,15 +111,14 @@ class ExportPurchase implements  FromCollection, WithMapping, WithHeadings, With
             "Phone Number",
             "Sales Representative",
             "Created By	",
-//            "Zone"
-            ];
-
+            //            "Zone"
+        ];
     }
 
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $event->sheet->getDelegate()->getColumnDimension('A')->setWidth(25);
                 $event->sheet->getDelegate()->getColumnDimension('B')->setWidth(25);
                 $event->sheet->getDelegate()->getColumnDimension('C')->setWidth(15);
@@ -129,7 +134,6 @@ class ExportPurchase implements  FromCollection, WithMapping, WithHeadings, With
                 $event->sheet->getDelegate()->getColumnDimension('L')->setWidth(20);
                 $event->sheet->getDelegate()->getColumnDimension('M')->setWidth(20);
                 $event->sheet->getDelegate()->getColumnDimension('N')->setWidth(20);
-
             },
         ];
     }

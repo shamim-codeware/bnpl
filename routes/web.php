@@ -1,49 +1,50 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EnquiryController;
-use App\Http\Controllers\EnquiryTypeController;
-use App\Http\Controllers\EnquirySourceController;
-use App\Http\Controllers\CustomerTypeController;
-use App\Http\Controllers\PurchaseModeController;
-use App\Http\Controllers\EnquiryStatusController;
-use App\Http\Controllers\FollowUpMethodController;
-use App\Http\Controllers\ZoneController;
-use App\Http\Controllers\ShowRoomController;
-use App\Http\Controllers\EnqueryController;
-use App\Http\Controllers\FollowUpController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\NotificationsController;
-use App\Http\Controllers\CustomerProfessionController;
-use App\Http\Controllers\DueEnquiryController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\UpazillaController;
-use App\Http\Controllers\ProductTypeController;
-use App\Http\Controllers\ProductCategoryController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\BackupController;
-use App\Http\Controllers\MenuController;
-use App\Http\Controllers\CreditScorController;
-use App\Http\Controllers\CustomerInfoController;
-use App\Http\Controllers\HirePurchaseController;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\SizeController;
-use App\Http\Controllers\GuaranterInfoController;
-use App\Http\Controllers\ShowRoomUserController;
-use App\Http\Controllers\DownPaymentSettingController;
-use App\Http\Controllers\InterestRateController;
-use App\Http\Controllers\PaymentCollectionController;
-use App\Http\Controllers\ExportHirepurchaseController;
-use App\Http\Controllers\BankController;
-use App\Http\Controllers\EmiController;
-use App\Http\Controllers\PenaltyController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ErpController;
 use App\Service\ApiService;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EmiController;
+use App\Http\Controllers\ErpController;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BankController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SizeController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ZoneController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\EnqueryController;
+use App\Http\Controllers\EnquiryController;
+use App\Http\Controllers\PenaltyController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\FollowUpController;
+use App\Http\Controllers\ShowRoomController;
+use App\Http\Controllers\UpazillaController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CreditScorController;
+use App\Http\Controllers\DueEnquiryController;
+use App\Http\Controllers\EnquiryTypeController;
+use App\Http\Controllers\ProductTypeController;
+use App\Http\Controllers\CustomerInfoController;
+use App\Http\Controllers\CustomerTypeController;
+use App\Http\Controllers\HirePurchaseController;
+use App\Http\Controllers\InterestRateController;
+use App\Http\Controllers\PurchaseModeController;
+use App\Http\Controllers\ShowRoomUserController;
+use App\Http\Controllers\EnquirySourceController;
+use App\Http\Controllers\EnquiryStatusController;
+use App\Http\Controllers\GuaranterInfoController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ExternalReportController;
+use App\Http\Controllers\FollowUpMethodController;
+use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\PaymentCollectionController;
+use App\Http\Controllers\CustomerProfessionController;
+use App\Http\Controllers\DownPaymentSettingController;
+use App\Http\Controllers\ExportHirepurchaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +127,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     //Route::get('/due-enquery',[DueEnquiryController::class]);
     Route::get('home', [DashboardController::class, 'index'])->name('home');
+    Route::match(['get', 'post'], 'marquee-notifications', [DashboardController::class, 'getTransactionMarquee'])
+    ->name('home-notifications');
     //  Route::get('enquiry', [EnquiryController::class, 'index'])->name('enquiry');
     Route::get('notifications', [NotificationsController::class, 'notifications'])->name('notifications');
     Route::get('clear-all', [NotificationsController::class, 'ClearAll'])->name('clearAll');
@@ -184,6 +187,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('resend-erp', [ErpController::class, 'ResendErp']);
     //Hire Purchase Export
     Route::get('hire-purchase-export', [ExportHirepurchaseController::class, 'export'])->name('hire-purchase.export');
+    Route::get('all-bnpl-list-export', [ExportHirepurchaseController::class, 'Allexport'])->name('all-bnpl-purchase.export');
     Route::get('current-outstanding-export', [ExportHirepurchaseController::class, 'currentOutstandingExport'])->name('current-outstanding.export');
     Route::get('due-on-next-month-export', [ExportHirepurchaseController::class, 'dueOnNextMonthExport'])->name('due-on-next-month.export');
 
@@ -292,7 +296,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('due-on-next-month-get-data', [ReportController::class, 'DueOnNextmonthGetData']);
     Route::get('zone-overview-get-data', [ReportController::class, 'zoneOverviewGetData']);
 
-    //Emi Calculator
+    //Emi Calculatorcredit-score
     Route::get('emi-calculator', [EmiController::class, 'index']);
     Route::get('calculate-data/{id}', [EmiController::class, 'Calculation']);
 
@@ -369,3 +373,6 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::get('/lang/{lang}', [LanguageController::class, 'switchLang'])->name('switch_lang');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+Route::post('/api/save-draft', [HirePurchaseController::class, 'saveDraft'])->name('save-draft');
+Route::get('/api/load-draft', [HirePurchaseController::class, 'loadDraft'])->name('load-draft');

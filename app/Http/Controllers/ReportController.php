@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Exports\DueOnNextMonthExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\Helper;
+use App\Models\User;
 
 use function PHPUnit\Framework\returnArgument;
 
@@ -228,41 +229,109 @@ class ReportController extends Controller
         return view('report.zone_overview', $data);
     }
 
+    // public function zoneOverviewGetData(Request $request)
+    // {
+    //     $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
+    //     $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
+
+    //     $query = HirePurchase::selectEntities(null, 3); // 3 means status sale confirm
+
+    //     $product_group_ids = explode(',', $request->product_group);
+    //     $zone_id = explode(',', $request->zone_id);
+
+    //     if ($request->from_date && $request->to_date) {
+    //         $query->whereBetween('approval_date', [$from_date, $to_date]);
+    //     }
+    //     if ($request->zone_id) {
+    //         $zone_id = $request->zone_id;
+    //         $query->whereHas('show_room', function ($q) use ($zone_id) {
+    //             $q->where('zone_id', $zone_id);
+    //         });
+    //     }
+    //     if ($request->product_group) {
+    //         $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+    //             $q->whereIn('product_group_id', $product_group_ids);
+    //         });
+    //     }
+
+
+    //     $hirePurchases = $query->get();
+    //     $total_hirepurchase = $hirePurchases->sum(function ($data) {
+    //         return $data->purchase_product ? $data->purchase_product->hire_price : 0;
+    //     });
+    //     $total_paid = $hirePurchases->sum(function ($data) {
+    //         return $data->purchase_product ? $data->purchase_product->total_paid : 0;
+    //     });
+    //     $total_remaining = $total_hirepurchase - $total_paid;
+    //     return view('report.zone-overview-ajax', compact("total_hirepurchase", "total_paid", "total_remaining"));
+    // }
+
     public function zoneOverviewGetData(Request $request)
     {
-        $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
-        $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
+        $from_date = $request->from_date ? date('Y-m-d 00:00:00', strtotime($request->from_date)) : null;
+        $to_date = $request->to_date ? date('Y-m-d 23:59:59', strtotime($request->to_date)) : null;
 
-        $query = HirePurchase::selectEntities(null, 3); // 3 means status sale confirm
+        $query = HirePurchase::selectEntities(null, 3); // 3 = status sale confirm
 
-        $product_group_ids = explode(',', $request->product_group);
-        $zone_id = explode(',', $request->zone_id);
+        $product_group_ids = $request->product_group ? explode(',', $request->product_group) : [];
+        $zone_id = $request->zone_id ? explode(',', $request->zone_id) : [];
 
-        if ($request->from_date && $request->to_date) {
+        // Filter by date
+        if ($from_date && $to_date) {
             $query->whereBetween('approval_date', [$from_date, $to_date]);
         }
-        if ($request->zone_id) {
-            $zone_id = $request->zone_id;
+
+        // Role-based filtering
+        $user = auth()->user();
+        if ($user->role_id == 2) {
+            // Zone-level manager
+          $query->where('showroom_id', $user->showroom_id);
+
+        } elseif ($user->role_id == 3) {
+            // Showroom-level manager
+            $query->where('showroom_id', $user->showroom_id);
+            //  $query->whereHas('show_room', function ($q) use ($user) {
+            //     $q->where('zone_id', $user->zone_id);
+            // });
+
+        } elseif ($user->role_id == 6) {
+            // Users with multiple zone permissions
+            $permissions = ZonePermission::where('user_id', $user->id)->pluck('zone_id')->toArray();
+            $query->whereHas('show_room', function ($q) use ($permissions) {
+                $q->whereIn('zone_id', $permissions);
+            });
+        } elseif (!empty($zone_id)) {
+            // Admin or other roles filter zones if provided
             $query->whereHas('show_room', function ($q) use ($zone_id) {
-                $q->where('zone_id', $zone_id);
+                $q->whereIn('zone_id', $zone_id);
             });
         }
-        if ($request->product_group) {
+        // If admin does not provide zone_id, all zones are included
+
+        // Product group filtering
+        if (!empty($product_group_ids)) {
             $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
                 $q->whereIn('product_group_id', $product_group_ids);
             });
         }
 
-
         $hirePurchases = $query->get();
+
         $total_hirepurchase = $hirePurchases->sum(function ($data) {
             return $data->purchase_product ? $data->purchase_product->hire_price : 0;
         });
+
         $total_paid = $hirePurchases->sum(function ($data) {
             return $data->purchase_product ? $data->purchase_product->total_paid : 0;
         });
+
         $total_remaining = $total_hirepurchase - $total_paid;
-        return view('report.zone-overview-ajax', compact("total_hirepurchase", "total_paid", "total_remaining"));
+
+        return view('report.zone-overview-ajax', compact(
+            'total_hirepurchase',
+            'total_paid',
+            'total_remaining'
+        ));
     }
 
 

@@ -19,14 +19,24 @@
                                      <option value="showroom">Showroom</option>
                                  </select>
                              </div> --}}
-                             <div class="col-md-4 mb-25">
+                             {{-- <div class="col-md-4 mb-25">
                                  <select name="all_zone[]" id="all_zone" class="form-control">
                                      <option value="">All Zone</option>
                                      @foreach ($zones as $zone)
                                          <option value="{{ $zone->id }}">{{ $zone->name }}</option>
                                      @endforeach
                                  </select>
-                             </div>
+                             </div> --}}
+                             @if (auth()->user()->role_id == 1) {{-- 1 = Admin --}}
+                                 <div class="col-md-4 mb-25">
+                                     <select name="all_zone[]" id="all_zone" class="form-control">
+                                         <option value="">All Zone</option>
+                                         @foreach ($zones as $zone)
+                                             <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                         @endforeach
+                                     </select>
+                                 </div>
+                             @endif
                              <div class="col-md-4 mb-25">
                                  <select name="product_group[]" id="product_group" class="form-control">
                                      <option value="">Product Group</option>
@@ -44,8 +54,9 @@
                                  <p class="m-0">To</p>
                              </div>
                              <div class="col-md-3 mb-3">
-                                 <input type="text" name="to_date" placeholder="To Date" autocomplete="off" value=""
-                                     class="form-control  ih-medium ip-gray radius-xs b-light" id="datepicker17">
+                                 <input type="text" name="to_date" placeholder="To Date" autocomplete="off"
+                                     value="" class="form-control  ih-medium ip-gray radius-xs b-light"
+                                     id="datepicker17">
                              </div>
                              {{-- <div class="col-md-3 pe-0 mb-3">
                                     <input type="search" name="keyword" value="search" class="form-control rounded-r-0"
@@ -68,8 +79,6 @@
 
 
      <script>
-       
-
          $(document).ready(function() {
              getData(1, 0);
 
@@ -80,7 +89,7 @@
              event.preventDefault();
              var myurl = $(this).attr('href');
              var page = $(this).attr('href').split('page=')[1];
-             // Get data 
+             // Get data
              getData(page, 0);
          });
          $('#filter_date').on('click', function() {
@@ -88,7 +97,7 @@
          });
 
          function getData(page, event) {
-           $('.GroupedBarChart').css('display', 'none');
+             $('.GroupedBarChart').css('display', 'none');
 
              var params = {
                  zone_id: $('select[id=all_zone]').val(),
@@ -105,7 +114,7 @@
 
 
 
-             // Field validation 
+             // Field validation
              // if (event == 1 && params.from_date == "") {
              //     toastr.error('From date field is required');
              //     return false;
@@ -122,18 +131,18 @@
                  .attr('href', custome)
                  .text('Export');
              $("#export").html(anchor);
-             // Call 
+             // Call
              $.ajax({
                      url: "{{ url('zone-overview-get-data?page=') }}" + page + "&" + paramStrings.join('&'),
                      type: "get",
                      datatype: "html",
                  })
                  .done(function(data) {
-                    $(".data-append").empty().html(data);
-                    //   $('.GroupedBarChart').css('display', 'block');
-                    //   groupBarChart(".GroupedBarChart", "100%", 280,data.total_hirepurchase_price, data.total_paid, data.total_remaining);
+                     $(".data-append").empty().html(data);
+                     //   $('.GroupedBarChart').css('display', 'block');
+                     //   groupBarChart(".GroupedBarChart", "100%", 280,data.total_hirepurchase_price, data.total_paid, data.total_remaining);
 
-                    //  $("#data-assign").empty().html(data);
+                     //  $("#data-assign").empty().html(data);
                      $('.btn-submit').prop('disabled', false);
                  })
                  .fail(function(jqXHR, ajaxOptions, thrownError) {

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\HirePurchase;
-use Illuminate\Http\Request;
 use App\Models\ErpLog;
 use App\Service\ApiService;
+use App\Models\HirePurchase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ErpController extends Controller
-{   
+{
     public function ErpView($id){
         $title = "Enquiry Type";
         $description = "Some description for the page";
@@ -26,17 +27,30 @@ class ErpController extends Controller
     }
 
     public function ResendErp(Request $request,ApiService $ApiService){
-        $customerInfo = array_filter([
-            "name" => $request->input('name'),
-            "mobile" => $request->input('mobile'),
-            "email" => $request->input('email'),
-            "address" => $request->input('address'),
-            "city" => $request->input("city"), // Assuming $district is set elsewhere
+        // $customerInfo = array_filter([
+        //     "name" => $request->input('name'),
+        //     "mobile" => $request->input('mobile'),
+        //     "email" => $request->input('email'),
+        //     "address" => $request->input('address'),
+        //     "city" => $request->input("city"), // Assuming $district is set elsewhere
+        //     "date_of_birth" => $request->input('date_of_birth'),
+        //     "designation" => $request->input('designation'),
+        //     "profession" => $request->input('profession'),
+        //     "org" => $request->input('org')
+        // ]);
+
+        $customerInfo = [
+            "name"         => $request->input('name'),
+            "mobile"       => $request->input('mobile'),
+            "email"        => $request->input('email'),
+            "address"      => trim($request->input('address') ?? ''), // always string
+            "city"         => $request->input("city"),
             "date_of_birth" => $request->input('date_of_birth'),
-            "designation" => $request->input('designation'),
-            "profession" => $request->input('profession'),
-            "org" => $request->input('org')
-        ]);
+            "designation"  => $request->input('designation'),
+            "profession"   => $request->input('profession'),
+            "org"          => $request->input('org')
+        ];
+
         // Prepare order information
         $orderInfo = array_filter([
             "eorder_no" => $request->input('eorder_no'),
@@ -121,15 +135,16 @@ class ErpController extends Controller
         $requestData = [
             "update_flag" => 0,
             "cancel_flag" => 1,
-            "cus_info" => json_decode($erp_log->cus_info),
-            "order_info" => json_decode($erp_log->order_info),
-            "order_details" => json_decode($erp_log->order_details)
+            "cus_info" => json_decode($erp_log->cus_info, true),
+            "order_info" => json_decode($erp_log->order_info, true),
+            "order_details" => json_decode($erp_log->order_details, true)
         ];
         $erp_log->cancel_flag = 1;
 
         $response = $ApiService->SendToErp($requestData);
+        Log::info('ERP Response', ['response' => $response]);
 
-        if ($response['error'] == 1) {
+        if (@$response['error'] == 1) {
             $erp_log->sent = 0;
         } else {
             $erp_log->sent = 1;

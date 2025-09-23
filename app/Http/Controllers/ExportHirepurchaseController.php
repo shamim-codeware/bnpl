@@ -1,20 +1,22 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\HirePurchase;
-use App\Models\ZonePermission;
+
 use App\Helpers\Helper;
-use Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportPurchase;
-use App\Exports\DueOnNextMonthExport;
+use App\Models\HirePurchase;
 use Illuminate\Http\Request;
+use App\Models\ZonePermission;
+use App\Exports\ExportPurchase;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DueOnNextMonthExport;
 
 class ExportHirepurchaseController extends Controller
 {
-    public function export(Request $request){
+    public function export(Request $request)
+    {
 
-        $query = HirePurchase::with(['purchase_product','purchase_product.product_category','purchase_product.brand','purchase_product.product','show_room','show_room_user','users'])->where('status',3);
+        $query = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'users'])->where('status', 3)->where('is_paid', 1);
         if ($request->from_date && $request->to_date) {
             // Date query
             $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
@@ -33,20 +35,20 @@ class ExportHirepurchaseController extends Controller
             $query->where('showroom_id', $request->showroom_id);
         }
 
-        if($request->store_type){
+        if ($request->store_type) {
             $stor_type = $request->store_type;
             $query->whereHas('show_room', function ($q) use ($stor_type) {
                 $q->where('dealar',  $stor_type);
             });
         }
-        if(Auth::user()->role_id == 2){
+        if (Auth::user()->role_id == 2) {
             $zone_id = Auth::user()->zone_id;
             $query->whereHas('show_room', function ($q) use ($zone_id) {
                 $q->where('zone_id', $zone_id);
             });
-        }elseif(Auth::user()->role_id == 3){
+        } elseif (Auth::user()->role_id == 3) {
             $query->where('showroom_id', Auth::user()->showroom_id);
-        }elseif(Auth::user()->role_id == 6){
+        } elseif (Auth::user()->role_id == 6) {
             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
             $query->whereHas('show_room', function ($q) use ($permission) {
                 $q->whereIn('zone_id', $permission);
@@ -57,10 +59,77 @@ class ExportHirepurchaseController extends Controller
         $hirepurchase = $query->latest()->get();
         $filename = 'full-paid-purchase-report-' . date('m-d-y-H-i-s') . '.xlsx';
         return Excel::download(new ExportPurchase($hirepurchase), $filename);
+    }
+    public function Allexport(Request $request)
+    {
 
+        $query = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'users', 'installment'])->where('status', 3);
+        // if ($request->from_date && $request->to_date) {
+        //     // Date query
+        //     $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
+        //     $to_date    = date('Y-m-d 23:59:59', strtotime($request->to_date));
+        //     // Date
+        //     $query->whereBetween('created_at', [$from_date, $to_date]);
+        // }
+
+        if ($request->over_dues) {
+            $query->whereHas('installment', function ($q) {
+                $q->where('loan_end_date', '<', now())
+                    ->where('status', 0);
+            });
+        } elseif ($request->from_date && $request->to_date) {
+            $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
+            $to_date   = date('Y-m-d 23:59:59', strtotime($request->to_date));
+            $query->whereBetween('created_at', [$from_date, $to_date]);
+        }
+
+        if ($request->zone_id) {
+            $zone_id = $request->zone_id;
+            // Zone
+            $query->whereHas('show_room', function ($q) use ($zone_id) {
+                $q->where('zone_id', $zone_id);
+            });
+        }
+        if ($request->showroom_id) {
+            $query->where('showroom_id', $request->showroom_id);
+        }
+
+        if ($request->store_type) {
+            $stor_type = $request->store_type;
+            $query->whereHas('show_room', function ($q) use ($stor_type) {
+                $q->where('dealar',  $stor_type);
+            });
+        }
+
+        if ($request->over_dues) {
+            $query->whereHas('installment', function ($q) {
+                $q->where('loan_end_date', '<', now())->where('status', 0);
+            });
+        }
+
+        if (Auth::user()->role_id == 2) {
+            $zone_id = Auth::user()->zone_id;
+            $query->whereHas('show_room', function ($q) use ($zone_id) {
+                $q->where('zone_id', $zone_id);
+            });
+        } elseif (Auth::user()->role_id == 3) {
+            $query->where('showroom_id', Auth::user()->showroom_id);
+        } elseif (Auth::user()->role_id == 6) {
+            $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
+            $query->whereHas('show_room', function ($q) use ($permission) {
+                $q->whereIn('zone_id', $permission);
+            });
+        }
+
+
+        $hirepurchase = $query->latest()->get();
+
+        $filename = 'All-bnpl-purchase-list-report-' . date('m-d-y-H-i-s') . '.xlsx';
+        return Excel::download(new ExportPurchase($hirepurchase), $filename);
     }
 
-    public function currentOutstandingExport(Request $request){
+    public function currentOutstandingExport(Request $request)
+    {
         // Use the same query structure as the getCurrentOutstanding method
         $query = HirePurchase::selectEntities(0, 3); // 0 means unpaid (current outstanding), 3 means status sale confirm
 
@@ -124,14 +193,14 @@ class ExportHirepurchaseController extends Controller
             $query->where('order_no', $request->order_no);
         }
 
-        if(Auth::user()->role_id == 2){
+        if (Auth::user()->role_id == 2) {
             $zone_id = Auth::user()->zone_id;
             $query->whereHas('show_room', function ($q) use ($zone_id) {
                 $q->where('zone_id', $zone_id);
             });
-        }elseif(Auth::user()->role_id == 3){
+        } elseif (Auth::user()->role_id == 3) {
             $query->where('showroom_id', Auth::user()->showroom_id);
-        }elseif(Auth::user()->role_id == 6){
+        } elseif (Auth::user()->role_id == 6) {
             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
             $query->whereHas('show_room', function ($q) use ($permission) {
                 $q->whereIn('zone_id', $permission);
@@ -142,28 +211,29 @@ class ExportHirepurchaseController extends Controller
         $filename = 'current-outstanding-report-' . date('m-d-y-H-i-s') . '.xlsx';
         return Excel::download(new ExportPurchase($hirepurchase), $filename);
     }
-    public function dueOnNextMonthExport(Request $request){
+    public function dueOnNextMonthExport(Request $request)
+    {
         $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
         $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
 
         $query = HirePurchase::with([
-            'installment' => function($q) use ($from_date, $to_date) {
+            'installment' => function ($q) use ($from_date, $to_date) {
                 $q->whereBetween('loan_start_date', [$from_date, $to_date])
-                  ->where('status', 0) // Only unpaid installments
-                  ->orderBy('loan_start_date', 'asc');
+                    ->where('status', 0) // Only unpaid installments
+                    ->orderBy('loan_start_date', 'asc');
             },
-            'transaction' => function($q) {
+            'transaction' => function ($q) {
                 $q->where('status', 1)->orderBy('updated_at', 'desc');
             },
             'purchase_product.product_group',
             'purchase_product.product',
             'show_room.zone'
         ])
-        ->where('status', 3) // Only confirmed sales
-        ->whereHas('installment', function ($q) use ($from_date, $to_date) {
-            $q->whereBetween('loan_start_date', [$from_date, $to_date])
-              ->where('status', 0); // Only records with unpaid installments in the date range
-        });
+            ->where('status', 3) // Only confirmed sales
+            ->whereHas('installment', function ($q) use ($from_date, $to_date) {
+                $q->whereBetween('loan_start_date', [$from_date, $to_date])
+                    ->where('status', 0); // Only records with unpaid installments in the date range
+            });
 
         $product_group_ids = explode(',', $request->product_group);
 

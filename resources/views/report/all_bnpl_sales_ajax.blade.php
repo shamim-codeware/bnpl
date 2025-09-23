@@ -98,12 +98,12 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->approval_date ? \App\Helpers\Helper::formatDateStandard($purchase->approval_date) : '' }}
+                            {{ @$purchase->approval_date ? \Carbon\Carbon::parse($purchase->approval_date)->format('d F Y') : '' }}
                         </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ $next_due_date ? \App\Helpers\Helper::formatDateStandard($next_due_date) : 'N/A' }}
+                            {{ $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A' }}
                         </div>
                     </td>
                     <td>

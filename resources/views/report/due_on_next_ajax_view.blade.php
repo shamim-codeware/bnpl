@@ -97,7 +97,8 @@
                     <td>
                         <div class="userDatatable-content">
                             @if($nextDueInstallment)
-                                {{ \App\Helpers\Helper::formatDateStandard($nextDueInstallment->loan_start_date) }}
+                                {{-- {{ \App\Helpers\Helper::formatDateStandard($nextDueInstallment->loan_start_date) }} --}}
+                                {{ \Carbon\Carbon::parse($nextDueInstallment->loan_start_date)->format('d F Y') }}
                             @else
                                 N/A
                             @endif
@@ -108,7 +109,8 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ $last_payment ? \App\Helpers\Helper::formatDateTimeStandard($last_payment) : 'N/A' }}
+                            {{-- {{ $last_payment ? \App\Helpers\Helper::formatDateTimeStandard($last_payment) : 'N/A' }} --}}
+                            {{ $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A' }}
                         </div>
                     </td>
                     <td>
