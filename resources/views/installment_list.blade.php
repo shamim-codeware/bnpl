@@ -230,7 +230,7 @@
                                 </td>
                                 <td>
                                     <div class="userDatatable-content">
-                                        {{    date('d/m/Y', strtotime($item->loan_end_date)), }}
+                                        {{    date('d/m/Y', strtotime($item->loan_start_date)), }}
                                     </div>
                                 </td>
                             </tr>

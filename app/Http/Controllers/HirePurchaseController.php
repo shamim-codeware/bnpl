@@ -407,6 +407,7 @@ class HirePurchaseController extends Controller
             $Installment = Installment::where('hire_purchase_id', $id)->get();
             foreach ($Installment as $key => $instal) {
                 $instal->loan_start_date = date('Y-m-d H:i:00', strtotime("+$key month"));
+                $instal->loan_end_date = date('Y-m-d H:i:00', strtotime("+$key month"));
                 $instal->save();
             }
             $HirePurchase->sale_by = Auth::user()->id;
@@ -700,7 +701,7 @@ class HirePurchaseController extends Controller
             $HirePurchaseProduct = new HirePurchaseProduct;
             $HirePurchaseProduct->fill($hirePurchase_productdata)->save();
 
-           // transaction and installment
+            // transaction and installment
 
             $Installment = new Installment;
 
@@ -714,8 +715,10 @@ class HirePurchaseController extends Controller
             for ($i = 1; $i < $request->installment_month; $i++) {
                 $installmentNextData['hire_purchase_id'] = $HirePurchase->id;
                 $installmentNextData['amount'] = $request->monthly_installment;
+                // $installmentNextData['loan_start_date'] = date('Y-m-d H:i:00', strtotime("+$i month"));
+                // $installmentNextData['loan_end_date'] = date('Y-m-d H:i:00', strtotime("+" . ($i + 1) . " month"));
                 $installmentNextData['loan_start_date'] = date('Y-m-d H:i:00', strtotime("+$i month"));
-                $installmentNextData['loan_end_date'] = date('Y-m-d H:i:00', strtotime("+" . ($i + 1) . " month"));
+                $installmentNextData['loan_end_date'] = date('Y-m-d H:i:00', strtotime("+$i month"));
                 Installment::create($installmentNextData);
             }
 

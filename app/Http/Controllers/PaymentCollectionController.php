@@ -142,22 +142,22 @@ class PaymentCollectionController extends Controller
             $Installment = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 0)->orderby('id', "ASC")->take($number_of_installment)->get();
             foreach ($Installment as $key => $install) {
                 $installment_number = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 1)->count();
-                $response =    $ApiService->CollectionApi($hirepurchase->order_no,$installment_number);
+                $response =    $ApiService->CollectionApi($hirepurchase->order_no, $installment_number);
 
-                if($response->error == 1){
+                if ($response->error == 1) {
                     $sent = 0;
-                }else{
+                } else {
                     $sent = 1;
                 }
-                if($advance_payment > 0){
-                    $data =  $ApiService->FineApi($hirepurchase->order_no,$advance_payment,$installment_number);
-                   // return $data;
+                if ($advance_payment > 0) {
+                    $data =  $ApiService->FineApi($hirepurchase->order_no, $advance_payment, $installment_number);
+                    // return $data;
                 }
                 $data = [
                     'tracking_id' => $hirepurchase->order_no,
                     'ins_no' => $installment_number,
                     'payment_ref' => "Cash",
-                    'response'=> $response,
+                    'response' => $response,
                     'erp_status' => $sent,
                     'transaction_id' => $transaction_id,
                     'installment_id' => $install->id,
@@ -181,11 +181,11 @@ class PaymentCollectionController extends Controller
                     $hirepurchase->save();
                 }
             }
-            if($response->error == 1){
+            if ($response->error == 1) {
                 // $erp_log->sent = 0;
                 // echo $response['error'];
-            }else{
-            //    $erp_log->sent = 1;
+            } else {
+                //    $erp_log->sent = 1;
             }
             DB::commit();
             return redirect()->back()->with('success', 'Success! Installment');
@@ -216,7 +216,10 @@ class PaymentCollectionController extends Controller
     public function TransactionListShow(Request $request)
     {
 
-        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room'])->where('status', 1);
+        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id,status', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room'])
+            ->where('status', 1)->whereHas('hire_purchase', function ($q) {
+                $q->where('status', 3);
+            });
 
         if ($request->from_date && $request->to_date) {
             // Date query
@@ -281,7 +284,10 @@ class PaymentCollectionController extends Controller
     }
     public function TransactionListExport(Request $request)
     {
-        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room'])->where('status', 1);
+        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id.status', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room'])
+            ->where('status', 1)->whereHas('hire_purchase', function ($q) {
+                $q->where('status', 3);
+            });
 
         if ($request->from_date && $request->to_date) {
             // Date query
