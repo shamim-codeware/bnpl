@@ -366,9 +366,12 @@ class HirePurchaseController extends Controller
             $notification->manager = 1;
             $notification->save();
 
+            $now = Carbon::now();
+
             $Installment = Installment::where('hire_purchase_id', $id)->get();
             foreach ($Installment as $key => $instal) {
-                $instal->loan_start_date = date('Y-m-d H:i:00', strtotime("+$key month"));
+                // $instal->loan_start_date = date('Y-m-d H:i:00', strtotime("+$key month"));
+                $instal->loan_start_date = $now->copy()->addMonthsNoOverflow($key)->format('Y-m-d H:i:s');
                 $instal->save();
             }
             $HirePurchase->approved_by = Auth::user()->id;
@@ -404,10 +407,11 @@ class HirePurchaseController extends Controller
                 $erp_log->save();
             }
         } elseif (Auth::user()->role_id == User::MANAGER) {
+            $now = Carbon::now();
             $Installment = Installment::where('hire_purchase_id', $id)->get();
             foreach ($Installment as $key => $instal) {
-                $instal->loan_start_date = date('Y-m-d H:i:00', strtotime("+$key month"));
-                $instal->loan_end_date = date('Y-m-d H:i:00', strtotime("+$key month"));
+                // $instal->loan_start_date = date('Y-m-d H:i:00', strtotime("+$key month"));
+                $instal->loan_start_date = $now->copy()->addMonthsNoOverflow($key)->format('Y-m-d H:i:s');
                 $instal->save();
             }
             $HirePurchase->sale_by = Auth::user()->id;
@@ -565,12 +569,12 @@ class HirePurchaseController extends Controller
     {
         // dd($request->all());
         $request->validate([
-            'nid'             => 'required|digits:17',
-            'guarater_nid.*'  => 'required|digits:17',
+            'nid'             => 'required',
+            'guarater_nid.*'  => 'required',
         ], [
             'nid.digits'              => 'National ID must be exactly 17 digits.',
             'guarater_nid.*.required' => 'Guarantor NID is required.',
-            'guarater_nid.*.digits'   => 'Guarantor NID must be exactly 17 digits.',
+            // 'guarater_nid.*.digits'   => 'Guarantor NID must be exactly 17 digits.',
         ]);
 
         date_default_timezone_set('Asia/Dhaka');
@@ -712,13 +716,15 @@ class HirePurchaseController extends Controller
             $installmentData['status'] = 1;
             $Installment->fill($installmentData)->save();
 
+            $now = Carbon::now();
+
             for ($i = 1; $i < $request->installment_month; $i++) {
                 $installmentNextData['hire_purchase_id'] = $HirePurchase->id;
                 $installmentNextData['amount'] = $request->monthly_installment;
                 // $installmentNextData['loan_start_date'] = date('Y-m-d H:i:00', strtotime("+$i month"));
                 // $installmentNextData['loan_end_date'] = date('Y-m-d H:i:00', strtotime("+" . ($i + 1) . " month"));
-                $installmentNextData['loan_start_date'] = date('Y-m-d H:i:00', strtotime("+$i month"));
-                $installmentNextData['loan_end_date'] = date('Y-m-d H:i:00', strtotime("+$i month"));
+                $installmentNextData['loan_start_date'] = $now->copy()->addMonthsNoOverflow($i)->format('Y-m-d H:i:s');
+                $installmentNextData['loan_end_date'] = $now->copy()->addMonthsNoOverflow($i + 1)->format('Y-m-d H:i:s');
                 Installment::create($installmentNextData);
             }
 
