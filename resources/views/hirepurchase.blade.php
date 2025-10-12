@@ -1,45 +1,61 @@
 <style type="text/css" media="print">
     @page {
         size: auto;
-        margin: 0mm;
+        margin-top: 50px;
+        margin-bottom: 50px;
         padding: 1px;
     }
 </style>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
-
+   @font-face {
+    font-family: 'SolaimanLipi';
+    src: url('/assets/fonts/solaimanlipi/SolaimanLipi.eot');
+    src: url('/assets/fonts/solaimanlipi/SolaimanLipi.eot?#iefix') format('embedded-opentype'),
+        url('/assets/fonts/solaimanlipi/SolaimanLipi.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    }
     .formBody {
         padding: 20px;
     }
-
     body {
-        font-family: 'Jost', sans-serif !important;
-        font-size: 12px !important;
+        font-family: 'SolaimanLipi', sans-serif;
+        font-size: 13px;
         padding: 1px;
         margin: 0px;
     }
 
     table th,
     table td {
-        font-family: 'Jost', sans-serif !important;
-        font-size: 12px !important;
+        font-family: 'SolaimanLipi', sans-serif;
+        font-size: 14px;
         border-collapse: collapse;
-        padding: 1px !important;
+        padding: 2px !important;
     }
 
     p {
         line-height: 20px;
+        font-size: 14px;
+        font-family: 'SolaimanLipi', sans-serif;
     }
 
     @media print {
         @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
-
+        @font-face {
+        font-family: 'SolaimanLipi';
+        src: url('/assets/fonts/solaimanlipi/SolaimanLipi.eot');
+        src: url('/assets/fonts/solaimanlipi/SolaimanLipi.eot?#iefix') format('embedded-opentype'),
+            url('/assets/fonts/solaimanlipi/SolaimanLipi.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+        }
         .formBody {
-            padding: 1px;
+            /* padding: 20px; */
         }
 
         body {
-            font-family: 'Jost', sans-serif !important;
+            font-family: 'SolaimanLipi', sans-serif;
             font-size: 10px !important;
             padding: 0.5px;
             margin: 0px;
@@ -47,16 +63,18 @@
 
         table th,
         table td {
-            font-family: 'Jost', sans-serif !important;
-            font-size: 12px !important;
+            font-family: 'SolaimanLipi', sans-serif;
+            font-size: 14px;
             border-collapse: collapse;
-            padding: 0.5px !important;
+            padding: 2px !important;
         }
 
         p {
             line-height: 18px;
             margin-top: 2px;
             margin-bottom: 2px;
+            font-size: 14px;
+            font-family: 'SolaimanLipi', sans-serif;
         }
 
         body {
@@ -78,21 +96,21 @@
         }
     }
 </style>
-<br>
+
 <div class="formBody" style="width: 795px;margin:0 auto;">
     <table style="width:100%;" cellspacing="0">
         <tbody>
             <tr>
-                <table style="width:100%;margin-bottom:5px" cellspacing="0">
+                <table style="width:100%;margin-bottom:3px" cellspacing="0">
                     <tr>
                         <td>
-                            <h2 style="font-weight: 700; font-size: 22px; color: #000;margin-top:0; margin-bottom: 5px;">
-                                র‌্যাংগ্স ইলেকট্রনিক্স লিমিটেড
-                            </h2>
-                            <p style="font-size: 11.5px; line-height: 14px; margin: 0;margin-bottom: 2px;font-weight:500;">
+                            <h2 style="font-weight: 700; font-size: 22px; color: #000;margin-top:0; margin-bottom: 3px;">
+                                র‍্যাংগ্স ইলেকট্রনিক্স লিমিটেড
+                            </h2> 
+                            <p style="font-size: 12.5px; line-height: 14px; margin: 0;margin-bottom: 2px;font-weight:500;">
                                 সোনারতরী টাওয়ার, ১২ সোনারগাঁও রোড, ঢাকা-১০০০, বাংলাদেশ।
                             </p>
-                            <p style="font-size: 11.5px; line-height: 14px; margin: 0;font-weight:500;">
+                            <p style="font-size: 12.5px; line-height: 14px; margin: 0;font-weight:500;">
                                 হটলাইন : +৮৮ ০৯৬৭৭ ২৪৪ ২৪৪, ই-মেইল : marketing@rangs.com.bd
                             </p>
                         </td>
@@ -103,49 +121,49 @@
                 </table>
             </tr>
             <tr>
-                <table style="width:100%;margin-bottom:5px;" cellspacing="0">
+                <table style="width:100%;margin-bottom:3px;" cellspacing="0">
                     <tr>
-                        <td style="width: 27%;">
+                        <td style="width: 30%;">
                             <table style="width:100%;font-size:14px; text-align:left;">
                             <tr>
-                                <td colspan="2" style="background:#e30613; color:#fff; font-weight:600; text-align:center; padding:5px !important; font-size:16px !important;">
+                                <td colspan="2" style="background:#e30613; color:#fff; font-weight:600; text-align:center; padding:3px !important; font-size:14px !important;">
                                 OFFICE USE ONLY
                                 </td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;">BNPL Order No.</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;">{{ @$hirePurchase->order_no }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding:1px !important;">BNPL Order No.</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->order_no }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;">Product Model</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;">{{ @$hirePurchase->purchase_product->product->product_model }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Product Model</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->product->product_model }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;">Category</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;">{{ @$hirePurchase->purchase_product->product_category->name }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Category</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->product_category->name }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;">Hire Price</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;">{{ @$hirePurchase->purchase_product->hire_price }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Hire Price</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->hire_price }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;">1st Installment</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;">{{ @$hirePurchase->purchase_product->down_payment }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">1st Installment</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->down_payment }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;">Monthly Installment</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;">{{ @$hirePurchase->purchase_product->monthly_installment }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Monthly Installment</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->monthly_installment }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;">Total Installment</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;">
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Total Installment</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
                                 {{ @$hirePurchase->purchase_product->installment_month }}
                                 </td>
                             </tr>
@@ -153,18 +171,18 @@
                         </td>
                         <td style="text-align:center;vertical-align:middle;">
                             <!-- Center Badge -->
-                            <div style="background-color: #ec2026; color: white; padding: 6px 22px; border-radius: 16px; display: inline-block; font-weight: 600; font-size: 20px; text-align: center;">
+                            <div style="background-color: #ec2026; color: white; padding: 5px 22px; border-radius: 16px; display: inline-block; font-weight: 600; font-size: 24px; text-align: center;">
                                 সহজ কিস্তির চুক্তিনামা
                             </div>
-                            <div style="font-size: 11px; margin-top: 5px; font-style: italic;">
+                            <div style="font-size: 12px; margin-top: 5px; font-style: italic;">
                                 (প্রদেয় তথ্যের গোপনীয়তা রক্ষা করা হবে)
                             </div>
-                            <div style="font-size: 11px; margin-top: 2px;">
+                            <div style="font-size: 12px; margin-top: 2px;">
                                 বাংলা অথবা ইংরেজিতে সম্পূর্ণ আবেদন পত্রটি পূরণ যোগ্য
                             </div>
                         </td>
                         <td
-                            style="font-size:12px !important;border:1.5px solid #000;vertical-align:middle;width:155px;height:120px;text-align:center">
+                            style="font-size:13px !important;border:1.5px solid #000;vertical-align:middle;width:155px;height:120px;text-align:center;padding:15px !important;">
                             আবেদনকারীর ২ কপি পাসপোর্ট সাইজের ছবি
                         </td>
                     </tr>
@@ -176,8 +194,8 @@
                         <td style="padding-top:10px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="width:29%;font-weight:600;">১)আবেদনকারীর পূর্ণ নাম(ডাকনাম সহ):</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important">{{ $hirePurchase->name }}</td>
+                                    <td style="width:27%;font-weight:600;">১)আবেদনকারীর পূর্ণ নাম(ডাকনাম সহ):</td>
+                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->name }}</td>
                                 </tr>
                             </table>
                         </td>
@@ -186,7 +204,7 @@
                         <td style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="width: 28%;font-weight:600;">২)
+                                    <td style="width: 27%;font-weight:600;">২)
                                         <input type="checkbox" checked name="relation" id="father"> <label
                                             for="father">পিতা/</label>
                                         <input type="checkbox" name="relation" id="husband"> <label
@@ -195,7 +213,7 @@
                                             for="wife">স্ত্রীর/</label>নাম:
                                     </td>
                                     <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important">{{ $hirePurchase->fathers_name }}</td>
-                                    <td style="width: 18%;font-weight:600;padding-left:5px !important;">৩)ন্যাশনাল আইডি নং:</td>
+                                    <td style="width: 16%;font-weight:600;padding-left:5px !important;">৩)ন্যাশনাল আইডি নং:</td>
                                     <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important">
                                         {{ $hirePurchase->nid }}
                                     </td>
@@ -302,10 +320,10 @@
                                     <td style="width: 6%;font-weight:600;padding-left: 5px !important;">পদবী:</td>
                                     <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important">{{ $hirePurchase->designation }}</td>
                                     <td style="width: 26%;padding-left:5px !important">কতদিন ধরে বর্তমান পেশার সাথে যুক্ত:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;width: 10%;">
+                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;width: 5%;">
                                         {{ $hirePurchase->duration_current_profe }}</td>
                                     <td style="padding-left: 5px !IMPORTANT;width: 4%;">বছর</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;width: 10%;">
+                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;width: 5%;">
                                     </td>
                                     <td style="padding-left: 5px !IMPORTANT;">মাস</td>
                                 </tr>
@@ -485,7 +503,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 4px; font-size:10px;font-weight:600;">(১২)পূর্বে র‌্যাংগস ইলেকট্রনিক্স লিমিটেডের কোন
+                        <td style="padding-top: 4px; font-size:14px;font-weight:600;">(১২)পূর্বে র‌্যাংগস ইলেকট্রনিক্স লিমিটেডের কোন
                             পণ্য কিস্তিতে
                             কিনেছেন কি? @if($hirePurchase->previously_purchased == 1) হ্যাঁ @else না। @endif </td>
                     </tr>
@@ -672,18 +690,18 @@
 
     <table style="width:100%;" cellspacing="0">
         <tr>
-            <td style="padding-top: 0 !important;">
+            <td style="padding-top: 30px !important;">
                 <p style="border-top: 2px dotted #000;padding-top: 4px; text-align: center;margin:0;">১ম নিশ্চয়তা
                     প্রদানকারীর স্বাক্ষর</p>
             </td>
             <td style="width: 15%;"></td>
-            <td style="padding-top: 0 !important;">
+            <td style="padding-top: 30px !important;">
                 <p style="border-top: 2px dotted #000;padding-top: 4px; text-align: center;margin:0;">২য় নিশ্চয়তা
                     প্রদানকারীর স্বাক্ষর</p>
             </td>
         </tr>
     </table>
-    <p style="background: #000;color: #fff;margin: 0 auto;padding: 5px;text-align: center;width: 90px;font-size:18px;margin-bottom: 0;}">শর্তাবলী: </p>
+    <p style="background: #000;color: #fff;margin: 0 auto;padding: 5px;text-align: center;width: 90px;font-size:18px;margin-bottom: 0;">শর্তাবলী: </p>
 @php
 
 $numberToWords = new NumberToWords\NumberToWords();
