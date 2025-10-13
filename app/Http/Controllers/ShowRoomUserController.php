@@ -20,8 +20,8 @@ class ShowRoomUserController extends Controller
         $query = ShowRoomUser::with(['users','showrooms']);
         // Keyword
         if($request->keyword){
-            $query->whereRaw("(name like '%$request->keyword%' or email like '%$request->keyword%' or phone like '%$request->keyword%')");
-        } 
+            $query->whereRaw("(name like '%$request->keyword%' or phone like '%$request->keyword%')");
+        }
         $users = $query->orderBy('id','DESC')->paginate(30);
 
         return view('pages.showroomuser.index',compact('title','description','users'));
@@ -57,7 +57,7 @@ class ShowRoomUserController extends Controller
 
                 $user->fill($request->all())->save();
                 return  redirect('show-room-user')->with('success', 'Success! User Create');
-           
+
         } catch (\Exception $e) {
             return  redirect()->back()->with('error', 'Something went wrong');
         }
@@ -90,7 +90,7 @@ class ShowRoomUserController extends Controller
     {
         $user = ShowRoomUser::findOrFail($id);
         $user->fill($request->all())->save();
- 
+
         return redirect('show-room-user')->with('success', 'Success! Update User');
     }
 
