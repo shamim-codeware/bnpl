@@ -1,7 +1,8 @@
 <style type="text/css" media="print">
     @page {
         size: auto;
-        margin: 0mm;
+        margin-top: 50px;
+        margin-bottom: 50px;
         padding: 1px;
     }
 </style>
