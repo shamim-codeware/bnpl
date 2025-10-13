@@ -35,7 +35,7 @@
                                         <div class="support-order-search">
                                             <form action="{{ url('show-room-user') }}" method="GET" class="support-order-search__form">
                                                 <img src="{{ asset('assets/img/svg/search.svg') }}" alt="search" class="svg">
-                                                <input type="search" name="keyword" value="{{ Request::get('keyword') }}" class="form-control border-0 box-shadow-none" placeholder="Search(Name/Email/Phone)" aria-label="Search">
+                                                <input type="search" name="keyword" value="{{ Request::get('keyword') }}" class="form-control border-0 box-shadow-none" placeholder="Search(Name/Phone)" aria-label="Search">
                                                 <input class="search-btn-btn" type="submit" value="Search">
                                             </form>
                                         </div>
@@ -61,7 +61,7 @@
                                             <th>
                                                 <span class="userDatatable-title">Number</span>
                                             </th>
-                                           
+
                                             <th>
                                                 <span class="userDatatable-title">Showroom</span>
                                             </th>
@@ -74,7 +74,7 @@
                                             <th>
                                                 <span class="userDatatable-title">Created Date</span>
                                             </th>
-                                         
+
                                             <th class="actions">
                                                 <span class="userDatatable-title">Action</span>
                                             </th>
@@ -99,7 +99,7 @@
                                                         {{ $type->phone }}
                                                     </div>
                                                 </td>
-                                               
+
                                                 <td>
                                                     <div class="userDatatable-content--subject">
                                                         {{ @$type->showrooms->name }}
@@ -108,9 +108,9 @@
                                                 <td>
                                                     <div class="userDatatable-content--subject status-check">
                                                         @if ($type->is_active == 1)
-                                                            <p style="background-color: #0e890e">Active</p>  
+                                                            <p style="background-color: #0e890e">Active</p>
                                                         @else
-                                                            <p style="background-color: #ff0000">Inactive</p>  
+                                                            <p style="background-color: #ff0000">Inactive</p>
                                                         @endif
                                                     </div>
                                                 </td>
@@ -124,7 +124,7 @@
                                                         {{ date('d/m/Y', strtotime($type->created_at)) }}
                                                     </div>
                                                 </td>
-                                              
+
                                                 <td>
                                                     <ul class="orderDatatable_actions mb-0 d-flex justify-content-center align-items-center flex-wrap">
                                                         {{-- @if (Auth::user()->user_action(4))
