@@ -64,7 +64,7 @@
 
         body {
             font-family: 'SutonnyMJ', sans-serif;
-            font-size: 10px !important;
+            font-size: 12px !important;
             padding: 3px;
             margin: 0px;
         }

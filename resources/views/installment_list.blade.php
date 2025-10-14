@@ -119,16 +119,80 @@
     <table style="width:100%;" cellspacing="0">
         <tbody>
             <tr>
-                <td>
-                    <table style="width:100%;" cellspacing="0">
-                        <tr>
-                            <td style="width: 50%;padding-bottom:10px !important;">
-                                <table style="width:100%;" cellspacing="0">
-                                    <tr>
-                                        <td style="padding-bottom: 5px !important;">
-                                             <img style="width: 125px;" class="dark" src="{{ asset('assets/img/rangs-logo-1.png') }}" alt="svg">
-                                        </td>
-                                    </tr>
+                <table style="width:100%;margin-bottom:3px" cellspacing="0">
+                    <tr>
+                        <td>
+                            <h2 style="font-weight: 700; font-size: 22px; color: #000;margin-top:0; margin-bottom: 3px;">
+                                র‍্যাংগ্স ইলেকট্রনিক্স লিমিটেড
+                            </h2> 
+                            <p style="font-size: 12.5px; line-height: 14px; margin: 0;margin-bottom: 2px;font-weight:500;">
+                                সোনারতরী টাওয়ার, ১২ সোনারগাঁও রোড, ঢাকা-১০০০, বাংলাদেশ।
+                            </p>
+                            <p style="font-size: 12.5px; line-height: 14px; margin: 0;font-weight:500;">
+                                হটলাইন : +৮৮ ০৯৬৭৭ ২৪৪ ২৪৪, ই-মেইল : marketing@rangs.com.bd
+                            </p>
+                        </td>
+                        <td style="text-align: right;">
+                            <img src="{{ asset('assets/img/sony_rangs.png') }}" alt="Logo" width="200">
+                        </td>
+                    </tr>
+                </table>
+            </tr>
+            <tr>
+                <table style="width:100%;margin-bottom:3px;" cellspacing="0">
+                    <tr>
+                        <td style="width: 30%;">
+                            <table style="width:100%;font-size:14px; text-align:left;">
+                            <tr>
+                                <td colspan="2" style="background:#e30613; color:#fff; font-weight:600; text-align:center; padding:3px !important; font-size:14px !important;">
+                                OFFICE USE ONLY
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding:1px !important;">BNPL Order No.</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
+                                    {{ $hirepurchase->order_no }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Product Model</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
+                                    {{ $hirepurchase->purchase_product->product->product_model }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Category</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
+                                    {{ $hirepurchase->purchase_product->product_category->name }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Showroom Name:</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
+                                    {{ $hirepurchase->show_room->name }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Approval date:</td>
+                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
+                                    {{ date('d/m/Y', strtotime($hirepurchase->created_at)) }}
+                                </td>
+                            </tr>
+                            </table>
+                        </td>
+                        <td style="text-align:center;vertical-align:middle;">
+                            <!-- Center Badge -->
+                            <div style="background-color: #ec2026; color: white; padding: 3px 22px; border-radius: 16px; display: inline-block; font-weight: 500; font-size: 23px; text-align: center;">
+                                Installment List
+                            </div>
+                        </td>
+                        <td style="width:31%;vertical-align:top;">
+                              <table style="width:100%;text-align:right;" cellspacing="0">
                                     <tr>
                                         <td style="font-weight: 600;">Customer Name :
                                             {{ $hirepurchase->name }}
@@ -147,34 +211,13 @@
                                         </td>
                                     </tr>
                                 </table>
-                            </td>
-                            <td style="width: 50%;text-align:right;padding-bottom:10px !important;">
-                                <table style="width:100%;text-align:right;" cellspacing="0">
-                                    <tr>
-                                        <td style="font-weight: 600;">Order No: {{ $hirepurchase->order_no }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600;">Product Model: {{ $hirepurchase->purchase_product->product->product_model }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600;">Category: {{ $hirepurchase->purchase_product->product_category->name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600;">Showroom Name: {{ $hirepurchase->show_room->name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600;">Approval date: {{    date('d/m/Y', strtotime($hirepurchase->created_at)) }}</td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
+                        </td>
+                    </tr>
+                </table>
             </tr>
             <tr>
                 <td>
-                    <table style="margin:0 auto;" class="table mb-0 table-bordered list_table">
+                    <table style="margin:0 auto;width:100%;" class="table mb-0 table-bordered list_table">
                         <thead>
                             <tr class="userDatatable-header">
                                 <th>
