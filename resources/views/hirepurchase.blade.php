@@ -258,9 +258,10 @@
                         <td style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="width: 22%; font-weight:600;">৫)এই বাসস্থান 
-                                        <span style="font-family: 'Jost', sans-serif;">{{ $hirePurchase->pr_residence_status }}</span> এবং
-                                        আমি</td>
+                                    <td style="width: 22%; font-weight:600;">
+                                        ৫)এই বাসস্থান 
+                                        <span style="font-family: 'Jost', sans-serif;">{{ $hirePurchase->pr_residence_status }}</span>
+                                         এবং আমি</td>
                                     <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
                                         {{ $hirePurchase->pr_duration_staying }}</td>
                                         <td style="padding-left: 5px !important;width: 4%;">বছর</td>
@@ -502,9 +503,14 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 4px; font-size:12px;font-weight:600;">(১২)পূর্বে র‌্যাংগস ইলেকট্রনিক্স লিমিটেডের কোন
-                            পণ্য কিস্তিতে
-                            কিনেছেন কি? @if($hirePurchase->previously_purchased == 1) হ্যাঁ @else না। @endif </td>
+                        <td style="padding-top: 4px; font-size:12px;font-weight:600;">
+                            (১২)পূর্বে র‌্যাংগস ইলেকট্রনিক্স লিমিটেডের কোন পণ্য কিস্তিতে কিনেছেন কি? 
+                            {{-- @if($hirePurchase->previously_purchased == 1) হ্যাঁ @else না। @endif  --}}
+                            <input type="checkbox" name="purchase" id="purchased"> 
+                            <label for="purchased">হ্যাঁ/</label>
+                            <input type="checkbox" name="purchase" id="is_purchase"> 
+                            <label for="is_purchase">না।/</label>
+                        </td>
                     </tr>
                     @if($hirePurchase->previously_purchased == 1)
                     <tr>
@@ -558,8 +564,8 @@
                         <td style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="width:42%;font-weight:600;">
-                                        ১৪) উল্লেখিত ঠিকানা হতে <span style="font-family: 'Jost', sans-serif;">Rangs</span> ইলেকট্রনিক্স লিমিটে এর:
+                                    <td style="width:43%;font-weight:600;">
+                                        ১৪) উল্লেখিত ঠিকানা হতে র‍্যাংগ্স ইলেকট্রনিক্স লিমিটেড এর:
                                     </td>
                                     <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 29%;">
                                         {{ @$hirePurchase->show_room->name }}
