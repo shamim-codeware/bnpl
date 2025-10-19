@@ -123,7 +123,7 @@
                         <td>
                             <h2 style="font-weight: 700; font-size: 22px; color: #000;margin-top:0; margin-bottom: 3px;">
                                 র‍্যাংগ্স ইলেকট্রনিক্স লিমিটেড
-                            </h2> 
+                            </h2>
                             <p style="font-size: 12.5px; line-height: 14px; margin: 0;margin-bottom: 2px;font-weight:500;">
                                 সোনারতরী টাওয়ার, ১২ সোনারগাঁও রোড, ঢাকা-১০০০, বাংলাদেশ।
                             </p>
@@ -305,7 +305,7 @@
                             <tr>
                                   <td colspan="6">
                                     <div class="userDatatable-content">
-                                        Advance Payment
+                                        Late Amount :
                                     </div>
                                 </td>
                                 <td colspan="6">
@@ -329,15 +329,15 @@
                         </tbody>
                     </table>
                     <p style="font-size: 16px;margin-top:20px;">1. Payment must be made withing the Due date mentioned in the Installment List.</p>
-                    <p style="font-size: 16px">2. Late payment fee will be applicable if customer due is over 30days.</p>
-                    <p style="font-size: 16px">3. In case of default or stop communication for more than 60days, Rangs Electronics Limited will contact with the Guarantors to settle the overdue amount.</p>
+                    <p style="font-size: 16px">2. Late payment fee will be applicable if customer due is over 30 days.</p>
+                    <p style="font-size: 16px">3. In case of default or stop communication for more than 60 days, Rangs Electronics Limited will contact with the Guarantors to settle the overdue amount.</p>
                     <p style="font-size: 16px">
                         4. In case Guarantors don't respond, Rangs Electronics Limited will have rights to take legal step for recovery.
                     </p>
                     <table style="width:20%;margin-top:30px;" cellspacing="0">
                         <tr>
                             <td style="text-align: center;padding-top:5px !important;border-top:2px dashed #000;vertical-align:bottom;padding-bottom: 45px !important;text-align: left;font-weight:600;">
-                                Signature of Customer 
+                                Signature of Customer
                             </td>
                         </tr>
                     </table>

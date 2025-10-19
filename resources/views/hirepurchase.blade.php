@@ -103,7 +103,7 @@
                         <td>
                             <h2 style="font-weight: 700; font-size: 24px; color: #000;margin-top:0; margin-bottom: 3px;">
                                 র‍্যাংগ্স ইলেকট্রনিক্স লিমিটেড
-                            </h2> 
+                            </h2>
                             <p style="font-size: 12.5px; line-height: 14px; margin: 0;margin-bottom: 2px;font-weight:500;">
                                 সোনারতরী টাওয়ার, ১২ সোনারগাঁও রোড, ঢাকা-১০০০, বাংলাদেশ।
                             </p>
@@ -258,7 +258,7 @@
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width: 28%; font-weight:600;">
-                                        ৫)এই বাসস্থান 
+                                        ৫)এই বাসস্থান
                                         <span style="font-family: 'Jost', sans-serif;">
                                             {{-- {{ $hirePurchase->pr_residence_status }} --}}
                                             Own/Rented
@@ -506,11 +506,11 @@
                     </tr>
                     <tr>
                         <td style="padding-top: 4px; font-size:12px;font-weight:600;">
-                            (১২)পূর্বে র‌্যাংগস ইলেকট্রনিক্স লিমিটেডের কোন পণ্য কিস্তিতে কিনেছেন কি? 
+                            (১২)পূর্বে র‌্যাংগস ইলেকট্রনিক্স লিমিটেডের কোন পণ্য কিস্তিতে কিনেছেন কি?
                             {{-- @if($hirePurchase->previously_purchased == 1) হ্যাঁ @else না। @endif  --}}
-                            <input type="checkbox" name="purchase" id="purchased"> 
+                            <input type="checkbox" name="purchase" id="purchased">
                             <label for="purchased">হ্যাঁ/</label>
-                            <input type="checkbox" name="purchase" id="is_purchase"> 
+                            <input type="checkbox" name="purchase" id="is_purchase">
                             <label for="is_purchase">না।/</label>
                         </td>
                     </tr>
@@ -603,7 +603,7 @@
                                                 ১
                                             @endif)
                                             নাম:
-                                        </td> 
+                                        </td>
                                         <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
                                             {{ $guaran->guarater_name }}</td>
                                         <td style="width: 13%;padding-left: 5px !important;">
@@ -692,7 +692,7 @@
     <p style="margin-bottom: 0; margin-top:2px">
         আমি/আমরা (১) ও (২) নং অংশে উল্লেখিত ব্যক্তি/ব্যক্তিবর্গ এই আবেদন পত্রের ২য় ও ৩য় পৃষ্ঠায় বর্ণিত ও প্রদত্ত সকল তথ্য অবগত হইয়া স্বেচ্ছায় ও সজ্ঞানে হইতে সম্মত হইলাম এবং সেই সাথে এই মর্মে অঙ্গীকার করিতেছি যে, আবেদনকারী কিস্তিতে যে পণ্যটি ক্রয়ের জন্য আবেদন করিয়াছেন, তাহার নিকট ঐ পণ্যটি কিস্তিতে বিক্রয় করা হলে যদি সে ঐ পণ্যটির মূল্য মাসিক কিস্তিতে নিয়মিত ভাবে এবং যথাসময়ে পরিশোধ করিতে ব্যর্থ হয় সেক্ষেত্রে আমি/আমরা উহার অপরিশোধিত মূল্য পরিশোধে করিতে অথবা পণ্যটি ফেরত দেওয়ার ব্যবস্থা করিতে আইনত বাধ্য থাকিব।
     </p>
-    <p style="margin-top: 5px;margin-bottom:0;">এই চুক্তিনামা আজ, <span style="font-size: 16px;">{{  date('d/m/Y h:i A', strtotime($hirePurchase->updated_at))  }}</span> তারিখ উপরোক্ত পক্ষসমূহের মধ্যে নিম্নলিখিত শর্তাবলীর
+    <p style="margin-top: 5px;margin-bottom:0;">এই চুক্তিনামা আজ, <span style="font-family: 'Jost', Arial, sans-serif; font-size: 12px;">{{  date('d/m/Y h:i A', strtotime($hirePurchase->updated_at))  }}</span> তারিখ উপরোক্ত পক্ষসমূহের মধ্যে নিম্নলিখিত শর্তাবলীর
     সম্মতি সাপেক্ষে,সম্পাদিত হল।</p>
 
     <table style="width:100%;" cellspacing="0">
@@ -820,7 +820,7 @@ $hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product
 
     <p>
         ১৩। প্রতিনিধিগণ সম্মিলিতভাবে বা পৃথক পৃথকভাবে সম্মত হলেন যে তাহাদের দায়দায়িত্ব কিস্তি গ্রহণকারীর অনুরূপ হবে। যদিও সকল ক্ষেত্রে তাহাদের
-প্রত্যেকে নিজে কিস্তি গ্রহণকারী এবং সম্মিলিতভাবে বা পৃথক পৃথকভাবে র‌্যাংগস ইলেকট্রনিকস লিমিটেড এর নিকটঃ 
+প্রত্যেকে নিজে কিস্তি গ্রহণকারী এবং সম্মিলিতভাবে বা পৃথক পৃথকভাবে র‌্যাংগস ইলেকট্রনিকস লিমিটেড এর নিকটঃ
     </p>
     <p>
         (ক) সকল মাসিক কিস্তি ও পাওনা নিয়মিত ও সময়মত পরিশোধের জনা এতদ্বারা আবদ্ধ হন।
