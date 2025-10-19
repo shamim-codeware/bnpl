@@ -64,7 +64,6 @@
         body {
             font-family: 'SutonnyMJ', sans-serif;
             font-size: 12px !important;
-            padding: 3px;
             margin: 0px;
         }
 
@@ -73,7 +72,7 @@
             font-family: 'SutonnyMJ', sans-serif;
             font-size: 12px !important;
             border-collapse: collapse;
-            padding: 2 !important;
+            padding: 1.5px !important;
         }
 
         p {
@@ -112,7 +111,7 @@
     <table style="width:100%;font-weight:600;" cellspacing="0">
         <tbody> 
             <tr>
-                <table style="width:100%;margin-bottom:5px" cellspacing="0">
+                <table style="width:100%;margin-bottom:3px" cellspacing="0">
                     <tr>
                         <td>
                             <h2 style="font-weight: 600; font-size: 24px; color: #000;margin-top:0; margin-bottom: 6px;">
@@ -411,11 +410,11 @@
                                 </table>
                             </td>
                             <td style="width:20px"></td>
-                            <td style="width: 32%;!important;padding-top: 42px !important;">
+                            <td style="width: 32%;!important;padding-top: 32px !important;">
                                 <p style="border-top: 2px dotted #000;padding-top: 4px; text-align: center;"> বিক্রয় প্রতিনিধির সীলসহ স্বাক্ষর</p>
                             </td>
                             <td style="width:20px"></td>
-                            <td style="width: 32%;!important;padding-top: 42px !important;">
+                            <td style="width: 32%;!important;padding-top: 32px !important;">
                                 <p style="border-top: 2px dotted #000;padding-top: 4px; text-align: center;">শোরুম ইনচার্জের সীলসহ স্বাক্ষর</p>
                             </td>
                         </tr>
