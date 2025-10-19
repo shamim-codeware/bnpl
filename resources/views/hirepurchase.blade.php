@@ -1,9 +1,8 @@
 <style type="text/css" media="print">
     @page {
         size: auto;
-        margin-top: 50px;
-        margin-bottom: 50px;
-        padding: 1px;
+        margin-top: 40px;
+        margin-bottom: 40px;
     }
 </style>
 <style>
@@ -16,7 +15,7 @@
     font-style: normal;
     }
     .formBody {
-        padding: 20px;
+        /* padding: 20px; */
     }
     body {
         font-family: 'SutonnyMJ', sans-serif;
@@ -99,7 +98,7 @@
     <table style="width:100%;" cellspacing="0">
         <tbody>
             <tr>
-                <table style="width:100%;margin-bottom:3px" cellspacing="0">
+                <table style="width:100%;margin-bottom:0px" cellspacing="0">
                     <tr>
                         <td>
                             <h2 style="font-weight: 700; font-size: 24px; color: #000;margin-top:0; margin-bottom: 3px;">
@@ -130,38 +129,38 @@
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding:1px !important;">BNPL Order No.</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->order_no }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding:1px !important;">BNPL Order No.</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->order_no }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Product Model</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->product->product_model }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Product Model</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->product->product_model }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Category</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->product_category->name }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Category</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->product_category->name }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Hire Price</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->hire_price }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Hire Price</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->hire_price }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">1st Installment</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->down_payment }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">1st Installment</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->down_payment }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Monthly Installment</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->monthly_installment }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Monthly Installment</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->monthly_installment }}</td>
                             </tr>
 
                             <tr>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Total Installment</td>
-                                <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Total Installment</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
                                 {{ @$hirePurchase->purchase_product->installment_month }}
                                 </td>
                             </tr>
@@ -193,7 +192,7 @@
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width:29%;font-weight:600;">১)আবেদনকারীর পূর্ণ নাম(ডাকনাম সহ):</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->name }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->name }}</td>
                                 </tr>
                             </table>
                         </td>
@@ -210,9 +209,9 @@
                                         <input type="checkbox" name="relation" id="wife"> <label
                                             for="wife">স্ত্রীর/</label>নাম:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->fathers_name }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->fathers_name }}</td>
                                     <td style="width: 17%;font-weight:600;padding-left:5px !important;">৩)ন্যাশনাল আইডি নং:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->nid }}
                                     </td>
                                 </tr>
@@ -226,11 +225,11 @@
                                     <td style="width:28%;">
                                         <strong style="font-weight:600;">৪)বর্তমান বাসস্থানের ঠিকানা:</strong> বাড়ি/গ্রাম:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->pr_house_no }}
                                     </td>
                                     <td style="width: 7%;padding-left:5px !important;">ডাকঘর:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->pr_road_no }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->pr_road_no }}</td>
                                 </tr>
                             </table>
                         </td>
@@ -242,12 +241,12 @@
                                     <td style="width:11%;">
                                         থানা ও জেলা:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ @$hirePurchase->upazilapr->name }} ,
                                         {{ @$hirePurchase->districtpr->en_name }},
                                     </td>
                                     <td style="width: 9%;">মোবাইল নং:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->pr_phone }}
                                     </td>
                                 </tr>
@@ -262,10 +261,10 @@
                                         ৫)এই বাসস্থান 
                                         <span style="font-family: 'Jost', sans-serif;">{{ $hirePurchase->pr_residence_status }}</span>
                                          এবং আমি</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
                                         {{ $hirePurchase->pr_duration_staying }}</td>
                                         <td style="padding-left: 5px !important;width: 4%;">বছর</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
                                     </td>
                                     <td style="font-weight:600;padding-left:5px !important;">মাস ধরে এই ঠিকানায় বসবাস করছি।</td>
                                 </tr>
@@ -279,11 +278,11 @@
                                     <td style="width:19%;">
                                        <strong>৬)স্থায়ী ঠিকানা:</strong>বাড়ি/গ্রাম:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->pa_house_no }}
                                     </td>
                                     <td style="width: 7%;padding-left: 5px !important;">ডাকঘর:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->pa_road_no }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->pa_road_no }}</td>
                                 </tr>
                             </table>
                         </td>
@@ -295,12 +294,12 @@
                                     <td style="width:11%;">
                                         থানা ও জেলা:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width:46%">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width:46%">
                                         {{ @$hirePurchase->districtpa->en_name }} ,
                                         {{ @$hirePurchase->upazilapa->name }},
                                     </td>
                                     <td style="width: 10%;padding-left: 5px ! IMPORTANT">মোবাইল নং:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->pa_phone }}
                                     </td>
                                 </tr>
@@ -314,16 +313,16 @@
                                     <td style="width:7%;font-weight:600;">
                                         ৭)পেশা:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width:20%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width:20%;">
                                         {{ $hirePurchase->customer_profession->name }}
                                     </td>
                                     <td style="width: 6%;font-weight:600;padding-left: 5px !important;">পদবী:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->designation }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->designation }}</td>
                                     <td style="width: 26%;padding-left:5px !important">কতদিন ধরে বর্তমান পেশার সাথে যুক্ত:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 5%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 5%;">
                                         {{ $hirePurchase->duration_current_profe }}</td>
                                     <td style="padding-left: 5px !IMPORTANT;width: 4%;">বছর</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 5%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 5%;">
                                     </td>
                                     <td style="padding-left: 5px !IMPORTANT;">মাস</td>
                                 </tr>
@@ -337,11 +336,11 @@
                                     <td style="width:12%;font-weight:600;">
                                         প্রতিষ্ঠানের নাম:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->organization_name }}
                                     </td>
                                     <td style="width: 13%;padding-left: 5px !important;">কর্মস্থলের ঠিকানা:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->organization_short_desc }}</td>
                                 </tr>
                             </table>
@@ -354,15 +353,15 @@
                                     <td style="width:8%;">
                                         বাড়ি/গ্রাম:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->org_house_no }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->org_house_no }}</td>
                                     <td style="width: 7%;padding-left: 5px !important;">ডাকঘর:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->org_road_no }}
                                     </td>
                                     <td style="width: 10%;padding-left: 5px !important;">
                                         থানা ও জেলা:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ @$hirePurchase->districtorg->en_name }} ,
                                         {{ @$hirePurchase->upazilaorg->name }}
                                     </td>
@@ -375,11 +374,11 @@
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width: 9%;">মোবাইল নং:</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->org_phone }}
                                     </td>
                                     <td style="width: 14%;padding-left: 5px !important;">মাসিক আয়(টাকা):</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ $hirePurchase->month_income }}
                                     </td>
                                 </tr>
@@ -393,7 +392,7 @@
                                     <td style="width:6%;font-weight:600;">
                                         ৮)বয়স:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">{{ $hirePurchase->age }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">{{ $hirePurchase->age }}</td>
                                     <td style="width: 4%;font-weight:600;padding-left:5px !important">বছর</td>
                                     <td style="width: 30px;"></td>
                                     <td style="font-weight:600;">৯)
@@ -413,14 +412,14 @@
                                     <td style="width:16%;font-weight:600;">
                                         ১০)(ক) সন্তান সংখ্যা:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
                                         {{ $hirePurchase->number_of_children }}
                                     </td>
                                     <td style="width: 8%;font-weight:600;padding-left:5px !important;">জন,</td>
                                     <td style="width:15%;font-weight:600;">
                                         (খ) অন্যান্য পোষ্য:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
                                         {{ $hirePurchase->other_family_member }}</td>
                                     <td style="font-weight:600;padding-left:5px !important;">জন</td>
                                 </tr>
@@ -446,13 +445,13 @@
                                                 (১)
                                                 নাম:
                                             </td>
-                                            <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">{{ $row->name }}
+                                            <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">{{ $row->name }}
                                             </td>
                                             <td>সম্পর্ক</td>
-                                            <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 30%;">
+                                            <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 30%;">
                                                 {{ $row->relation }}</td>
                                             <td>বয়স</td>
-                                            <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 15%;">{{ $row->age }}
+                                            <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 15%;">{{ $row->age }}
                                             </td>
                                         </tr>
                                     </table>
@@ -467,16 +466,16 @@
                                     <td style="width:3%;">
                                         (গ)
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 5%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 5%;">
                                     </td>
                                     <td style="padding-left: 5px !important;width:3%;">স্ত্রী</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 4%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 4%;">
                                     </td>
                                     <td style="width: 10%;padding-left: 5px !important;">সন্তানের নামঃ</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;">
                                     </td>
                                     <td style="width: 5%;padding-left: 5px !important;">বয়সঃ</td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 5%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 5%;">
                                     </td>
                                     <td style="padding-left: 5px !IMPORTANT;width: 4%;">বছর</td>
                                 </tr>
@@ -490,12 +489,12 @@
                                     <td style="width:27%;font-weight:600;">
                                         (১১)কোন পণ্য/মডেল কিনতে ইচ্ছুক:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
                                         {{ @$hirePurchase->purchase_product->product->product_model }}</td>
                                     <td style="width: 9%;font-weight:600;padding-left:5px !important">
                                         বিক্রয়মূল্য:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ @$hirePurchase->purchase_product->hire_price }}
                                     </td>
                                 </tr>
@@ -520,13 +519,13 @@
                                     <td style="width:29%;">
                                         যদি কিনে থাকেন তবে কি কিনেছেন?:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
                                         {{ $hirePurchase->pre_b_product_id == 'others' ? $hirePurchase->type_product : @$hirePurchase->pre_purchase_product->product_model }}
                                     </td>
                                     <td style="width: 11%;">
                                         ক্রয়ের তারিখ:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->pre_purchase_date }}
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->pre_purchase_date }}
                                     </td>
                                 </tr>
                             </table>
@@ -540,7 +539,7 @@
                                     <td style="width:24%;">
                                         কোন শোরুম থেকে কিনেছেন?:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                         {{ @$hirePurchase->ppshow_room->name }}</td>
                                 </tr>
                             </table>
@@ -554,7 +553,7 @@
                                     <td style="width:50%;font-weight:600;">
                                         ১৩) এখন যে সামগ্রী কিনতে চান তা কোন ঠিকানায় ব্যবহার করা হবে?:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->shipping_address }}
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $hirePurchase->shipping_address }}
                                     </td>
                                 </tr>
                             </table>
@@ -567,13 +566,13 @@
                                     <td style="width:43%;font-weight:600;">
                                         ১৪) উল্লেখিত ঠিকানা হতে র‍্যাংগ্স ইলেকট্রনিক্স লিমিটেড এর:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 29%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 29%;">
                                         {{ @$hirePurchase->show_room->name }}
                                     </td>
-                                    <td style="width: 12%;padding-left: 5px !important;">
+                                    <td style="width: 11%;padding-left: 5px !important;">
                                         শোরুমের দূরত্ব:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 7%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 7%;">
                                         {{ $hirePurchase->distance_from_showroom }}</td>
                                     <td style="padding-left: 5px !important;">
                                         মাইল/কি.মি।
@@ -583,7 +582,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 7px;font-weight:600;">(১৫) আপনার আত্মীয়/পরিচিত এমন দুজন ব্যক্তি যারা আপনার গ্যারান্টার
+                        <td style="padding-top: 7px;font-weight:600;">(১৫) আপনার আত্মীয়/পরিচিত এমন দুজন ব্যক্তি যারা আপনার গ্যারান্টর
                             অথবা
                             নিশ্চয়তা প্রদানকারী হবেন
                             এবং তারা আবেদনকারীর অবর্তমানে/অনাদায়ে বকেয়া পাওনা পরিশোধ করতে ইচ্ছুক তাদের নাম ও ঠিকানা:
@@ -602,12 +601,12 @@
                                             @endif)
                                             নাম:
                                         </td> 
-                                        <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
+                                        <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
                                             {{ $guaran->guarater_name }}</td>
                                         <td style="width: 13%;padding-left: 5px !important;">
                                             পিতা/স্বামীর নাম:
                                         </td>
-                                        <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                        <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                             {{ $guaran->guarater_relation_name }}</td>
                                     </tr>
                                 </table>
@@ -620,7 +619,7 @@
                                         <td style="width:6%;">
                                             ঠিকানা:
                                         </td>
-                                        <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                        <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                             {{ $guaran->guarater_address_present }}</td>
                                     </tr>
                                 </table>
@@ -633,12 +632,12 @@
                                         <td style="width:14%;">
                                             ন্যাশনাল আইডি নং:
                                         </td>
-                                        <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 32%;">
+                                        <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 32%;">
                                             {{ $guaran->guarater_nid }}</td>
                                         <td style="width: 12%;padding-left: 5px !important;">
                                             মোবাইল নাম্বার:
                                         </td>
-                                        <td style="border: 1px solid #000;background: #e6e7e9;padding-left:3px !important;font-family: 'Jost', sans-serif;">
+                                        <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
                                             {{ $guaran->guarater_phone }}
                                         </td>
                                     </tr>
@@ -688,19 +687,19 @@
     <!-- <p>#1 Customer Application form
         Before customer’s Signature:  -->
     <p style="margin-bottom: 0; margin-top:2px">
-        আমি/আমরা (১) ও (২) নং অংশে উল্লেখিত ব্যক্তি/ব্যক্তি বর্গ এই আবেদন পত্রের ২য় ও ৩য় পৃষ্ঠায় বর্ণিত ও প্রদত্ত সকল তথ্য অবগত হইয়া স্বেচ্ছায় ও সজ্ঞানে অবহিত হইতে সম্মত হইলাম এবং সেই সাথে এই মর্মে অঙ্গীকার করিতেছি যে, আবেদনকারী কিস্তিতে যে পণ্যটি ক্রয়ের জন্য আবেদন করিয়াছেন, তাহার নিকট ঐ পণ্যটি কিস্তিতে বিক্রয় করা হলে যদি সে ঐ পণ্যটির মূল্য মাসিক কিস্তিতে নিয়মিত ভাবে এবং যথাসময়ে পরিশোধ করিতে ব্যর্থ হয় সেক্ষেত্রে আমি/আমরা উহার অপরিশোধিত মূল্য পরিশোধে করিতে অথবা পণ্যটি ফেরত দেওয়ার ব্যবস্থা করিতে আইনত বাধ্য থাকিব।
+        আমি/আমরা (১) ও (২) নং অংশে উল্লেখিত ব্যক্তি/ব্যক্তিবর্গ এই আবেদন পত্রের ২য় ও ৩য় পৃষ্ঠায় বর্ণিত ও প্রদত্ত সকল তথ্য অবগত হইয়া স্বেচ্ছায় ও সজ্ঞানে হইতে সম্মত হইলাম এবং সেই সাথে এই মর্মে অঙ্গীকার করিতেছি যে, আবেদনকারী কিস্তিতে যে পণ্যটি ক্রয়ের জন্য আবেদন করিয়াছেন, তাহার নিকট ঐ পণ্যটি কিস্তিতে বিক্রয় করা হলে যদি সে ঐ পণ্যটির মূল্য মাসিক কিস্তিতে নিয়মিত ভাবে এবং যথাসময়ে পরিশোধ করিতে ব্যর্থ হয় সেক্ষেত্রে আমি/আমরা উহার অপরিশোধিত মূল্য পরিশোধে করিতে অথবা পণ্যটি ফেরত দেওয়ার ব্যবস্থা করিতে আইনত বাধ্য থাকিব।
     </p>
-    <p style="margin-top: 5px;">এই চুক্তিনামা আজ, <span style="font-size: 16px;">{{  date('d/m/Y h:i A', strtotime($hirePurchase->updated_at))  }}</span> তারিখ উপরোক্ত পক্ষসমূহের মধ্যে নিম্নলিখিত শর্তাবলীর
+    <p style="margin-top: 5px;margin-bottom:0;">এই চুক্তিনামা আজ, <span style="font-size: 16px;">{{  date('d/m/Y h:i A', strtotime($hirePurchase->updated_at))  }}</span> তারিখ উপরোক্ত পক্ষসমূহের মধ্যে নিম্নলিখিত শর্তাবলীর
     সম্মতি সাপেক্ষে,সম্পাদিত হল।</p>
 
     <table style="width:100%;" cellspacing="0">
         <tr>
-            <td style="padding-top: 30px !important;">
+            <td style="padding-top: 15px !important;padding-bottom:0 !important;">
                 <p style="border-top: 2px dotted #000;padding-top: 4px; text-align: center;margin:0;">১ম নিশ্চয়তা
                     প্রদানকারীর স্বাক্ষর</p>
             </td>
-            <td style="width: 15%;"></td>
-            <td style="padding-top: 30px !important;">
+            <td style="width: 15%;padding-bottom:0 !important;"></td>
+            <td style="padding-top: 15px !important;padding-bottom:0 !important;">
                 <p style="border-top: 2px dotted #000;padding-top: 4px; text-align: center;margin:0;">২য় নিশ্চয়তা
                     প্রদানকারীর স্বাক্ষর</p>
             </td>
@@ -713,20 +712,20 @@ $numberToWords = new NumberToWords\NumberToWords();
 $numberTransformer = $numberToWords->getNumberTransformer('en'); // 'en' for English
 $hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product->hire_price);
 @endphp
-    <p>১ । কিস্তিতে পণ্য গ্রহণকারী কর্তৃক ১ম কিস্তি <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->down_payment }} </span> টাকা এবং
-        অবশিষ্ট <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->hire_price - @$hirePurchase->purchase_product->down_payment }} </span> টাকা ভবিষ্যতে <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->installment_month - 1 }}</span> টি কিস্তিতে
-        মাসিক <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->monthly_installment }}</span> টাকা হারে প্রদানের অঙ্গীকারের ভিত্তিতে ও প্রতিনিধিগণের অনুরোধে র‌্যাংগ্স ইলেকট্রনিকস
-        লিমিটেড কিস্তিতে পণ্য গ্রহণকারীকে একটি  <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->product_category->name }}</span>
-        মডেল <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->product->product_model }}</span> সিরিয়াল
-        নম্বর <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->serial_no }}</span> (অতঃপর কিস্তিকৃত পণ্য হিসেবে গণ্য হবে) যার
-        সর্বমোট মুল্য <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->hire_price }}</span> টাকা
-        কথায় <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ $hirePriceInWords }}</span>
-        প্রদান করতে (কিস্তিতে পণ্য গ্রহণকারী ক্রয় করবার অধিকার সাপেক্ষে) সম্মত হলেন।</p>
+    <p>১ । কিস্তিতে পণ্য গ্রহণকারী কর্তৃক ১ম কিস্তি <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->down_payment }} </span> টাকা এবং
+        অবশিষ্ট <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->hire_price - @$hirePurchase->purchase_product->down_payment }} </span> টাকা ভবিষ্যতে <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->installment_month - 1 }}</span> টি কিস্তিতে
+        মাসিক <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->monthly_installment }}</span> টাকা হারে প্রদানের অঙ্গীকারের ভিত্তিতে ও প্রতিনিধিগণের অনুরোধে র‌্যাংগ্স ইলেকট্রনিকস
+        লিমিটেড কিস্তিতে পণ্য গ্রহণকারীকে একটি  <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->product_category->name }}</span>
+        মডেল <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->product->product_model }}</span> সিরিয়াল
+        নম্বর <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->serial_no }}</span> (অতঃপর কিস্তিকৃত পণ্য হিসেবে গণ্য হবে) যার
+        সর্বমোট মূল্য <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->hire_price }}</span> টাকা
+        কথায় <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ $hirePriceInWords }}</span>
+        প্রদান করতে (কিস্তিতে পণ্য গ্রহণকারী ক্রয় করার অধিকার সাপেক্ষে) সম্মত হলেন।</p>
 
 
     <p><span style="display: block;font-weight:600;">২। কিস্তি চলাকালীন সময়ে কিস্তি গ্রহণকারী নিম্নবর্ণিত শর্তসমূহ মেনে চলতে বাধ্য থাকবেন।</span>
 
-        (ক) কিস্তি গ্রহণকারী মাসিক কিস্তি <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->monthly_installment }}</span> টাকা, প্রতি মাসের <span style="border: 1px solid #000;background: #e6e7e9;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{  date('d', strtotime($hirePurchase->created_at))  }}</span> তারিখ এর
+        (ক) কিস্তি গ্রহণকারী মাসিক কিস্তি <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->monthly_installment }}</span> টাকা, প্রতি মাসের <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{  date('d', strtotime($hirePurchase->created_at))  }}</span> তারিখ এর
         মধ্যে যে শোরুম থেকে কিস্তিতে পণ্য গ্রহণ করেছেন, সেখানে নগদে পরিশোধ করবেন।</p>
 
     <p>(খ) কিস্তিতে পণ্য গ্রহণকারী, কিস্তিকৃত পণ্যটি ভাল, ত্রুটিমুক্ত ও কর্মক্ষম রাখবেন এবং র‌্যাংগ্স ইলেকট্রনিকস
@@ -740,7 +739,7 @@ $hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product
     <p>(ঘ) কিস্তিকৃত পণ্য, কিস্তি গ্রহণকারী উপরোল্লিখিত ঠিকানায় নিজ দায়িত্বে ও তত্ত্বাবধায়নে রাখবেন এবং র‌্যাংগ্স
         ইলেকট্রনিকস লিমিটেড এর লিখিত পূর্ব অনুমতি ব্যতীত সেখান হইতে কিস্তিকৃত পণ্য স্থানান্তর করা যাবে না বা অন্য
         কোনভাবে বন্ধক, বিক্রয়, কিস্তি, হস্তান্তর ইত্যাদি করতে পারবেন না। এই শর্ত প্রতিনিধিগণের জ্ঞাতসারে বা অগোচরে
-        কিস্তি গ্রহণকারী ভংগ করলে বা তাদের যে কেউ অনুরূপ করিলে র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড অত্র চুক্তি বাতিল করার
+        কিস্তি গ্রহণকারী ভঙ্গ করলে বা তাদের যে কেউ অনুরূপ করিলে র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড এর চুক্তি বাতিল করার
         অধিকারী হবেন এবং তৎক্ষনাৎ র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড এর নিকট কিস্তিকৃত পন্য কিস্তি গ্রহণকারী বুঝিয়ে দিতে
         বাধ্য থাকিবে ।</p>
 
@@ -754,7 +753,7 @@ $hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product
 
     <p>
         (চ) কোন কারণে কিস্তি গ্রহণকারীর ঠিকানা বা কিস্তিকৃত পণ্যের অবস্থা খুঁজে বের করতে হলে এই সংক্রান্ত যাবতীয় খরচাদি
-        বা কোন সময়ের জন্য যদি অন্য কারো দখল হতে কিস্তিকৃত পণ্য পুনরূদ্ধার করতে হয়, তাহার যাবতীয় খরচাদি চাহিবামাত্র
+        বা কোন সময়ের জন্য যদি অন্য কারো দখল হতে কিস্তিকৃত পণ্য পুনরূদ্ধার করতে হয়, তাহার যাবতীয় খরচাদি চাহিবা মাত্র
         কিস্তিতে পণ্য গ্রহণকারী র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড কে পরিশোধ করতে বাধ্য থাকবেন।
     </p>
     <p>৩ । কিস্তি গ্রহণকারীর ইচ্ছা বা অনিচ্ছাকৃত অবহেলা বা অন্য যেকোন কারণে গ্রহণকৃত পণ্য অগ্নি বা বন্যার কারণে ক্ষতি বা
@@ -770,7 +769,7 @@ $hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product
         প্রদানকৃত অর্থ কিস্তি গ্রহণকারী ফেরত পাবেন না ।</p>
 
     <p>৬। কিস্তি গ্রহণকারী এই চুক্তিকালীন সময়ে কিস্তির শর্তাবলি যথাযথভাবে পালন পূর্বক কিস্তিকৃত পণ্য ক্রয়ের অধিকারী হবেন
-        এবং এই ক্ষেত্রে র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড এর প্রচলিত নিয়ম অনুযায়ী শীঘ্রই অর্থ পরিশোধের জন্য তাহাকে রেয়াত
+        তবে এই ক্ষেত্রে র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড এর প্রচলিত নিয়ম অনুযায়ী শীঘ্রই অর্থ পরিশোধের জন্য তাহাকে রেয়াত
         দেওয়া যাবে।</p>
 
 
@@ -785,8 +784,8 @@ $hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product
 
     <p>(ঘ) এমন কোন কাজ করে যা কিস্তিকৃত পণ্যের উপর র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড এর স্বার্থ ও অধিকার ক্ষুন্ন হয় ।
 
-        কিস্তি গ্রহণকারী এই চুক্তিতে বর্ণিত তাহার উপর অর্পিত সকল বা যে কোন শর্ত ও বিধানাবলি যথাযতভাবে পালন ও সম্পন্ন
-        করতে ব্যর্থ হলে (এই চুক্তির মূখ্য উপাদান) র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড তৎক্ষণাৎ কিস্তির চুক্তি বাতিল (ইহার অন্য
+        কিস্তি গ্রহণকারী এই চুক্তিতে বর্ণিত তাহার উপর অর্পিত সকল বা যে কোন শর্ত ও বিধানাবলি যথাযথ ভাবে পালন ও সম্পন্ন
+        করতে ব্যর্থ হলে র‌্যাংগ্স ইলেকট্রনিকস লিমিটেড তৎক্ষণাৎ কিস্তির চুক্তি বাতিল (ইহার অন্য
         যেকোন অধিকার ক্ষুন্ন না করে) করার অধিকারী হবেন এবং অত্র চুক্তি বলে কিস্তিকৃত পণ্য পূর্ণদখল নিতে পারবেন।</p>
 
 
@@ -818,7 +817,7 @@ $hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product
 
     <p>
         ১৩। প্রতিনিধিগণ সম্মিলিতভাবে বা পৃথক পৃথকভাবে সম্মত হলেন যে তাহাদের দায়দায়িত্ব কিস্তি গ্রহণকারীর অনুরূপ হবে। যদিও সকল ক্ষেত্রে তাহাদের
-প্রত্যেকে নিজে কিস্তি গ্রহণকারী এবং সম্মিলিতভাবে বা পৃথক পৃথকভাবে র‌্যাংগস ইলেকট্রনিকস লিমিটেড এর নিকট ঃ
+প্রত্যেকে নিজে কিস্তি গ্রহণকারী এবং সম্মিলিতভাবে বা পৃথক পৃথকভাবে র‌্যাংগস ইলেকট্রনিকস লিমিটেড এর নিকটঃ 
     </p>
     <p>
         (ক) সকল মাসিক কিস্তি ও পাওনা নিয়মিত ও সময়মত পরিশোধের জনা এতদ্বারা আবদ্ধ হন।
@@ -863,14 +862,14 @@ $hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product
                 <p style="margin-top: 0;margin-bottom:0;font-weight:600;">সংযুক্তি :</p>
                 <br>
                 <p style="margin-top: 0 !important;">১. আবেদনকারীর পাসপোর্ট সাইজের রঙিন ছবি - দুই কপি।</p>
-                <p>২. আবেদনকারীর জাতীয় পরিচয়পত্রের কপি - স্বাক্ষর সহ ফটোকপি।</p>
+                <p>২. আবেদনকারীর জাতীয় পরিচয়পত্রের কপির স্বাক্ষর সহ ফটোকপি।</p>
                 <p>৩. আবেদনকারীর বর্তমান ঠিকানার ইউটিলিটি (বিদ্যুৎ, পানি বা গ্যাস ইত্যাদি) বিলের কপি - স্বাক্ষরসহ ফটোকপি।</p>
                 <p>৪. আবেদনকারীর ব্যাংক একাউন্টের স্বাক্ষরসহ এবং তারিখ বিহীন একটি চেক - মূল কপি। </p>
                 <p>৫. আবেদনকারীর বর্তমান পেশার স্বপক্ষের প্রমাণাদি (আইডি কার্ড, ভিজিটিং কার্ড, বাড়ি মালিকের ক্ষেত্রে বাড়ি ভাড়া গ্রহণের রশিদের কপি ইত্যাদি)।</p>
                 <p>৬. ১ম নিশ্চয়তা প্রদানকারীর জাতীয় পরিচয়পত্রের কপি - স্বাক্ষর সহ ফটোকপি।</p>
                 <p>৭. ১ম নিশ্চয়তা প্রদানকারীর প্রদত্ত ঠিকানার ইউটিলিটি (বিদ্যুৎ, পানি বা গ্যাস ইত্যাদি) বিলের কপি - স্বাক্ষরসহ ফটোকপি।</p>
-                <p>৮. ২য় নিশ্চয়তা প্রদানকারীর জাতীয় পরিচয়পত্রের কপি - স্বাক্ষর সহ ফটোকপি।</p>
-                <p>৯. ২য় নিশ্চয়তা প্রদানকারীর প্রদত্ত ঠিকানার ইউটিলিটি (বিদ্যুৎ, পানি বা গ্যাস ইত্যাদি) বিলের কপি - স্বাক্ষরসহ ফটোকপি। </p>
+                <p>৮. ২য় নিশ্চয়তা প্রদানকারীর জাতীয় পরিচয়পত্রের কপি। স্বাক্ষর সহ ফটোকপি।</p>
+                <p>৯. ২য় নিশ্চয়তা প্রদানকারীর প্রদত্ত ঠিকানার ইউটিলিটি (বিদ্যুৎ, পানি বা গ্যাস ইত্যাদি) বিলের কপি স্বাক্ষরসহ ফটোকপি। </p>
                 <p>১০. প্রযোজ্য ক্ষেত্রে অন্যান্য প্রয়োজনীয় তথ্যাদি।</p>
             </td>
             <td style="width:38%;vertical-align: top;">

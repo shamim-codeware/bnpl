@@ -1,22 +1,21 @@
 <style type="text/css" media="print">
     @page {
         size: auto;
-        margin-top: 50px;
-        margin-bottom: 50px;
-        padding: 1px;
+        margin-top: 40px;
+        margin-bottom: 40px;
     }
 </style>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
 
     .formBody {
-        padding: 20px;
+        /* padding: 20px; */
     }
 
     body {
         font-family: 'Jost', sans-serif !important;
         font-size: 12px !important;
-        padding: 1px;
+        padding: 2px;
         margin: 0px;
     }
 
@@ -25,7 +24,7 @@
         font-family: 'Jost', sans-serif !important;
         font-size: 14px !important;
         border-collapse: collapse;
-        padding: 1px !important;
+        padding: 2px !important;
     }
     .list_table{
         border-collapse: collapse;
@@ -53,12 +52,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
 
         .formBody {
-            padding: 20px 40px;
+            /* padding: 20px 40px; */
         }
 
         body {
             font-family: 'Jost', sans-serif !important;
-            font-size: 10px !important;
+            font-size: 12px !important;
             padding: 0.5px;
             margin: 0px;
         }
@@ -323,13 +322,25 @@
                                 </td>
                                 <td colspan="6">
                                     <div class="userDatatable-content">
-                                  <b>  {{ $due }}</b>
+                                        <b>{{ $due }}</b>
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <p><b>Note :</b> This is system generated statement. No signature is required.</p>
+                    <p style="font-size: 16px;margin-top:20px;">1. Payment must be made withing the Due date mentioned in the Installment List.</p>
+                    <p style="font-size: 16px">2. Late payment fee will be applicable if customer due is over 30days.</p>
+                    <p style="font-size: 16px">3. In case of default or stop communication for more than 60days, Rangs Electronics Limited will contact with the Guarantors to settle the overdue amount.</p>
+                    <p style="font-size: 16px">
+                        4. In case Guarantors don't respond, Rangs Electronics Limited will have rights to take legal step for recovery.
+                    </p>
+                    <table style="width:20%;margin-top:30px;" cellspacing="0">
+                        <tr>
+                            <td style="text-align: center;padding-top:5px !important;border-top:2px dashed #000;vertical-align:bottom;padding-bottom: 45px !important;text-align: left;font-weight:600;">
+                                Signature of Customer 
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </tbody>
