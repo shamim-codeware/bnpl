@@ -257,9 +257,12 @@
                         <td style="padding-top: 7px;">
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
-                                    <td style="width: 22%; font-weight:600;">
+                                    <td style="width: 28%; font-weight:600;">
                                         ৫)এই বাসস্থান 
-                                        <span style="font-family: 'Jost', sans-serif;">{{ $hirePurchase->pr_residence_status }}</span>
+                                        <span style="font-family: 'Jost', sans-serif;">
+                                            {{-- {{ $hirePurchase->pr_residence_status }} --}}
+                                            Own/Rented
+                                        </span>
                                          এবং আমি</td>
                                     <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 10%;">
                                         {{ $hirePurchase->pr_duration_staying }}</td>
