@@ -30,6 +30,9 @@
                     <span class="userDatatable-title">Last Paid Amount</span>
                 </th>
                 <th>
+                    <span class="userDatatable-title">Late Payment Fee</span>
+                </th>
+                <th>
                     <span class="userDatatable-title">Outstanding Blance</span>
                 </th>
                 <th>
@@ -96,6 +99,9 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $last_paid_amount }}</div>
+                    </td>
+                    <td>
+                        <div class="userDatatable-content">{{ $purchase->late_fee }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $outstanding_balance }}</div>

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Zone;
 use App\Models\Brand;
+use App\Helpers\Helper;
 use App\Models\Product;
 use App\Models\ShowRoom;
 use App\Models\Installment;
@@ -13,16 +15,14 @@ use Illuminate\Http\Request;
 use App\Models\ZonePermission;
 use App\Models\ProductCategory;
 use Illuminate\Support\Facades\Auth;
-use App\Exports\DueOnNextMonthExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Helpers\Helper;
-use App\Models\User;
+use App\Exports\DueOnNextMonthExport;
 
-use function PHPUnit\Framework\returnArgument;
+use App\Traits\LateFeeCalculationTrait;
 
 class ReportController extends Controller
 {
-
+    use LateFeeCalculationTrait;
 
 
     public function DueOnNextmonth()
@@ -123,6 +123,11 @@ class ReportController extends Controller
 
         $hirepurchase = $query->latest()->paginate();
 
+        // Calculate late fees for each hire purchase
+        foreach ($hirepurchase as $hire) {
+            $hire->late_fee = $this->calculateLateFine($hire->id);
+        }
+
         return view('report.due_on_next_ajax_view', compact("hirepurchase", "from_date", 'to_date'));
     }
 
@@ -215,6 +220,11 @@ class ReportController extends Controller
         $hirepurchase = $this->filterHirePurchase($request, 0, $sale_status); // 0 means unpaid
         $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
         $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
+
+        // Calculate late fees for each hire purchase
+        foreach ($hirepurchase as $hire) {
+            $hire->late_fee = $this->calculateLateFine($hire->id);
+        }
 
         // return $hirepurchase;
         return view('report.current_outstanding_ajax', compact("hirepurchase", "from_date", 'to_date'));

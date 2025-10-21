@@ -240,6 +240,7 @@
                                 <th>
                                     <span class="userDatatable-title">Due Date</span>
                                 </th>
+                                <th><span class="userDatatable-title">Remarks</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -276,6 +277,11 @@
                                         {{    date('d/m/Y', strtotime($item->loan_start_date)), }}
                                     </div>
                                 </td>
+                                <td>
+                                    <div class="userDatatable-content">
+                                        {{ $item->fine_remarks ?? '' }}
+                                    </div>
+                                </td>
                             </tr>
                             @endforeach
                                 <tr>
@@ -305,12 +311,24 @@
                             <tr>
                                   <td colspan="6">
                                     <div class="userDatatable-content">
-                                        Late Amount :
+                                        Late Payment Fee :
                                     </div>
                                 </td>
                                 <td colspan="6">
                                     <div class="userDatatable-content">
-                                    <b>{{ $advance_amount }}</b>
+                                    <b>{{ $late_fee }}</b>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                  <td colspan="6">
+                                    <div class="userDatatable-content">
+                                        Total Paid Late Payment Fee :
+                                    </div>
+                                </td>
+                                <td colspan="6">
+                                    <div class="userDatatable-content">
+                                    <b>{{ number_format($installments->sum('fine_amount'), 2) }}</b>
                                     </div>
                                 </td>
                             </tr>

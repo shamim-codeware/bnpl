@@ -179,11 +179,19 @@
                                                         <span>{{ $out_standing_amount }} TK</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15 text-end">
-                                                        <span class="fw-medium">Late Fine Amount:</span>
+                                                        <span class="fw-medium">Late Payment Fee:</span>
                                                     </div>
-                                                    <div class="col-md-5 mb-15">
+                                                    {{-- <div class="col-md-5 mb-15">
                                                         <span>{{  $total_installment_paid - @$product_details->purchase_product->total_paid }}</span>
-                                                    </div>
+                                                    </div> --}}
+                                                    <div class="col-md-5 mb-15">
+                                                                <span class="{{ $totalFine > 0 ? 'text-danger fw-bold' : '' }}">
+                                                                    {{ number_format($totalFine, 2) }} TK
+                                                                    @if($totalFine > 0)
+                                                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                                                                    @endif
+                                                                </span>
+                                                            </div>
                                                     <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Interest Rate:</span>
                                                     </div>

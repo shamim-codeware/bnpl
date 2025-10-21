@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Zone;
 use App\Models\Brand;
+use App\Helpers\Helper;
 use App\Models\Product;
 use App\Models\ShowRoom;
 use App\Models\Installment;
@@ -13,13 +14,15 @@ use Illuminate\Http\Request;
 use App\Models\ZonePermission;
 use App\Models\ProductCategory;
 use App\Exports\BnplOrdersExport;
-use App\Exports\DefaulterCustomersExport;
-use App\Helpers\Helper;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Traits\LateFeeCalculationTrait;
+use App\Exports\DefaulterCustomersExport;
 
 class ExternalReportController extends Controller
 {
+    use LateFeeCalculationTrait;
+
     public function AllBnplSale()
     {
         $title = "All BNPL Orders";
@@ -33,12 +36,24 @@ class ExternalReportController extends Controller
         $hirepurchase = $this->filterBnplOrders($request, true); // true means use pagination
         $from_date = $request->from_date ? date('Y-m-d 00:00:00', strtotime($request->from_date)) : null;
         $to_date = $request->to_date ? date('Y-m-d 23:59:59', strtotime($request->to_date)) : null;
+
+        // Calculate late fees for each hire purchase
+        foreach ($hirepurchase as $hire) {
+            $hire->late_fee = $this->calculateLateFine($hire->id);
+        }
+
         return view('report.all_bnpl_sales_ajax', compact("hirepurchase", "from_date", 'to_date'));
     }
 
     public function AllBnplSaleExport(Request $request)
     {
         $hirepurchase = $this->filterBnplOrders($request, false); // false means no pagination
+
+            // Calculate late fees for each hire purchase
+            foreach ($hirepurchase as $hire) {
+                $hire->late_fee = $this->calculateLateFine($hire->id);
+            }
+
         return Excel::download(new BnplOrdersExport($hirepurchase), 'All_BNPL_Orders_' . Helper::formatDateTimeFilename() . '.xlsx');
     }
 
@@ -78,12 +93,24 @@ class ExternalReportController extends Controller
 
         $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
         $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
+
+        // Calculate late fees for each hire purchase
+        foreach ($customers as $customer) {
+            $customer->late_fee = $this->calculateLateFine($customer->id);
+        }
+
         return view('report.defaulter_customers_ajax', compact("customers", "from_date", 'to_date'));
     }
 
     public function DefaulterReportExport(Request $request)
     {
         $customers = $this->filterDefaulterCustomers($request, false);
+
+        // Calculate late fees for each hire purchase
+        foreach ($customers as $customer) {
+            $customer->late_fee = $this->calculateLateFine($customer->id);
+        }
+
         return Excel::download(new DefaulterCustomersExport($customers), 'Defaulter_Customers_Report_' . Helper::formatDateTimeFilename() . '.xlsx');
     }
 

@@ -40,6 +40,7 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
             "First Installment",
             "Monthly Installment",
             "Total Payment Received",
+            "Late Payment Fee",
             "Outstanding Balance",
             "Total Installment",
             "Paid Installment",
@@ -351,6 +352,7 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
         $firstInstallment, // Conditional: 0.00 if rejected/cancelled
         @$purchase->purchase_product ? (float)($purchase->purchase_product->monthly_installment) : '0.00',
         $totalPaymentReceived, // Conditional: 0.00 if rejected/cancelled
+        @$purchase->late_fee ?? 0.00,
         $outstandingBalanceFormatted, // Conditional: 0.00 if rejected/cancelled
         @$purchase->installment ? $purchase->installment->count() : '0',
         $paidInstallment, // Conditional: 0 if rejected/cancelled

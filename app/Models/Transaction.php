@@ -11,7 +11,7 @@ class Transaction extends Model
 
     protected $table = "transactions";
     protected $fillable = [
-        'hire_purchase_id', 'payment_type','amount','transaction_type','number_of_instllment','created_by','status'
+        'hire_purchase_id', 'payment_type','amount','transaction_type','number_of_instllment','created_by','status', 'fine_amount','fine_remarks'
     ];
 
     public function hire_purchase(){

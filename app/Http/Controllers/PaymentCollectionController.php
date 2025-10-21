@@ -41,11 +41,14 @@ class PaymentCollectionController extends Controller
         foreach ($selectedInstallments as $installment) {
             $loanStartDate = Carbon::parse($installment->loan_start_date);
             $currentDate = Carbon::now();
-            // Calculate months overdue
-            $monthsOverdue = $loanStartDate->diffInMonths($currentDate);
-            // Add fine only if overdue
-            if ($monthsOverdue > 1) {
-                $totalFine += ($monthsOverdue - 1) * $lateFinePerMonth;
+            // Only calculate fine if the start date has passed
+            if ($currentDate->greaterThan($loanStartDate)) {
+                $monthsOverdue = $loanStartDate->diffInMonths($currentDate);
+
+                // Add fine only if overdue by more than 1 month
+                if ($monthsOverdue > 1) {
+                    $totalFine += ($monthsOverdue - 1) * $lateFinePerMonth;
+                }
             }
         }
         // Calculate the total amount (monthly installment + fine)
@@ -110,6 +113,8 @@ class PaymentCollectionController extends Controller
         // dd($request->all());
         date_default_timezone_set('Asia/Dhaka');
         $data = $request->all();
+        $data['fine_amount'] = (float) ($request->fine_amount ?? 0);
+        $data['fine_remarks'] = $request->fine_remarks;
         $data['transaction_type'] = "Installment ";
         $data['created_by'] = Auth::user()->id;
         $advance_payment = 0;
@@ -165,6 +170,12 @@ class PaymentCollectionController extends Controller
                 //PaymentErpHistory::create($data);
                 $ins = Installment::findOrFail($install->id);
                 $ins->status = 1;
+
+                if ($request->fine_amount > 0 && $key == 0) {
+                    $ins->fine_amount = $request->fine_amount;
+                    $ins->fine_remarks = $request->fine_remarks;
+                }
+
                 $ins->save();
             }
 

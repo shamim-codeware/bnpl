@@ -30,6 +30,9 @@
                     <span class="userDatatable-title">Total Paid</span>
                 </th>
                 <th>
+                    <span class="userDatatable-title">Late Payment Fee</span>
+                </th>
+                <th>
                     <span class="userDatatable-title">Outstanding Balance</span>
                 </th>
                 <th>
@@ -108,6 +111,9 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->purchase_product->total_paid }}</div>
+                    </td>
+                    <td>
+                        <div class="userDatatable-content">{{ @$purchase->late_fee }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $outstanding_balance }}</div>

@@ -33,10 +33,12 @@ use App\Models\HirePurchaseProduct;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use App\Traits\LateFeeCalculationTrait;
 use Illuminate\Support\Facades\Session;
 
 class HirePurchaseController extends Controller
 {
+    use LateFeeCalculationTrait;
 
 
     public function apiMarge()
@@ -473,7 +475,12 @@ class HirePurchaseController extends Controller
         $total_installment_paid = Installment::where('hire_purchase_id', $id)->where('status', 1)->sum('amount');
         // $total_payment = Transaction::where('hire_purchase_id',$id)->sum('amount');
         // $due_amount  = Transaction::where('hire_purchase_id',$id)->sum('amount');
-        return view('installment.hire_purchase.product_details', compact("title", "description", "product_details", 'installments', 'installment_date', 'out_standing_amount', 'total_installment_paid'));
+
+        // Calculate total fine for all overdue installments
+        $totalFine = $this->calculateLateFine($id);
+
+
+        return view('installment.hire_purchase.product_details', compact("title", "description", "product_details", 'installments', 'installment_date', 'out_standing_amount', 'total_installment_paid', 'totalFine'));
     }
 
     public function AllPurchase()
@@ -569,12 +576,13 @@ class HirePurchaseController extends Controller
     {
         // dd($request->all());
         $request->validate([
-            'nid'             => 'required',
-            'guarater_nid.*'  => 'required',
+            'nid'             => 'required|digits_between:10,20',
+            'guarater_nid.*'  => 'required|digits_between:10,20',
         ], [
-            'nid.digits'              => 'National ID must be exactly 17 digits.',
-            'guarater_nid.*.required' => 'Guarantor NID is required.',
-            // 'guarater_nid.*.digits'   => 'Guarantor NID must be exactly 17 digits.',
+            'nid.required'              => 'National ID is required.',
+            'nid.digits_between'        => 'National ID must be at least 10 digits.',
+            'guarater_nid.*.required'   => 'Guarantor NID is required.',
+            'guarater_nid.*.digits_between' => 'Guarantor NID must be at least 10 digits.',
         ]);
 
         date_default_timezone_set('Asia/Dhaka');
@@ -672,7 +680,7 @@ class HirePurchaseController extends Controller
             $HirePurchase = new HirePurchase;
             $HirePurchase->fill($personal_info)->save();
             //Erp Service
-            // $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
+            $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
             //guarantor info
             $GuaranterInfo = new GuaranterInfo;
             foreach ($request->guarater_name as $key => $name) {
@@ -776,7 +784,9 @@ class HirePurchaseController extends Controller
         }
         $installments = Installment::where('hire_purchase_id', $id)->get();
 
-        return view('installment_list', compact("hirepurchase", 'installments', 'total_installment_amount', 'advance_amount', 'due'));
+        $late_fee = $this->calculateLateFine($id);
+
+        return view('installment_list', compact("hirepurchase", 'installments', 'total_installment_amount', 'advance_amount', 'due', 'late_fee'));
     }
 
     /**

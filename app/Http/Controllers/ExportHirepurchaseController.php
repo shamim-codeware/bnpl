@@ -10,9 +10,11 @@ use App\Exports\ExportPurchase;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DueOnNextMonthExport;
+use App\Traits\LateFeeCalculationTrait;
 
 class ExportHirepurchaseController extends Controller
 {
+    use LateFeeCalculationTrait;
     public function export(Request $request)
     {
 
@@ -208,6 +210,11 @@ class ExportHirepurchaseController extends Controller
         }
 
         $hirepurchase = $query->latest()->get();
+
+        foreach ($hirepurchase as $hire) {
+            $hire->late_fee = $this->calculateLateFine($hire->id);
+        }
+
         $filename = 'current-outstanding-report-' . date('m-d-y-H-i-s') . '.xlsx';
         return Excel::download(new ExportPurchase($hirepurchase), $filename);
     }
@@ -263,6 +270,11 @@ class ExportHirepurchaseController extends Controller
         }
 
         $hirepurchase = $query->latest()->get();
+
+        foreach ($hirepurchase as $hire) {
+            $hire->late_fee = $this->calculateLateFine($hire->id);
+        }
+
         $filename = 'due-on-next-month-report-' . \App\Helpers\Helper::formatDateTimeFilename(now()) . '.xlsx';
         return Excel::download(new DueOnNextMonthExport($hirepurchase), $filename);
     }

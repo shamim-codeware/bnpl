@@ -103,7 +103,7 @@
                                                                 <input name="nid" id="nid"
                                                                     class="input rounded-r-0 @error('nid') is-invalid @enderror"
                                                                     type="number" value="{{ old('nid') }}"
-                                                                    placeholder="Enter 17 digit National ID Number" />
+                                                                    placeholder="Enter at least 10 digit National ID Number" />
                                                                 <div class="placeholder">
                                                                     <p class="m-0">National ID No:<span
                                                                             class="text-danger">*</span></p>
@@ -747,7 +747,7 @@
                                                                 <div class="input-holder">
                                                                     <input name="guarater_nid[]" id="nid"
                                                                         class="input rounded-r-0" type="number"
-                                                                        placeholder="Enter 17 digit National ID Number" />
+                                                                        placeholder="Enter at least 10 digit National ID Number" />
                                                                     <div class="placeholder">
                                                                         <p class="m-0">National ID No:<span
                                                                                 class="text-danger">*</span>
@@ -856,7 +856,7 @@
                                                                 <div class="input-holder">
                                                                     <input name="guarater_nid[]" id="nid"
                                                                         class="input rounded-r-0" type="number"
-                                                                        placeholder="Enter 17 digit National ID Number" />
+                                                                        placeholder="Enter at least 10 digit National ID Number" />
                                                                     <div class="placeholder">
                                                                         <p class="m-0">National ID No:<span
                                                                                 class="text-danger">*</span>

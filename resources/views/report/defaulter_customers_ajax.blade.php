@@ -21,6 +21,9 @@
                     <span class="userDatatable-title">Total Amount</span>
                 </th>
                 <th>
+                    <span class="userDatatable-title">Late Payment Fee</span>
+                </th>
+                <th>
                     <span class="userDatatable-title">Outstanding Balance</span>
                 </th>
                 <th>
@@ -82,6 +85,9 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ @$customer->purchase_product ? (float)($customer->purchase_product->hire_price) : '0.00' }}</div>
+                    </td>
+                    <td>
+                        <div class="userDatatable-content">{{ (float)($customer->late_fee) }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ (float)($outstanding_balance) }}</div>
