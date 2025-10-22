@@ -113,6 +113,23 @@
 
     }
 </style>
+
+<style type="text/css" media="print">
+    @page {
+        size: auto;
+        margin-top: 40px;
+        margin-bottom: 50px;
+
+        /* Footer with page counter */
+        @bottom-right {
+            content: "পৃষ্ঠা - " counter(page) "/" counter(pages);
+            font-family: 'SutonnyMJ', sans-serif;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+        }
+    }
+</style>
+
 <br>
 <div class="formBody" style="width: 850px;margin:0 auto;">
     <table style="width:100%;" cellspacing="0">

@@ -107,9 +107,26 @@
         }
     }
 </style>
+
+<style type="text/css" media="print">
+    @page {
+        size: auto;
+        margin-top: 40px;
+        margin-bottom: 50px;
+
+        /* Footer with page counter */
+        @bottom-right {
+            content: "পৃষ্ঠা - " counter(page) "/" counter(pages);
+            font-family: 'SutonnyMJ', sans-serif;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+        }
+    }
+</style>
+
 <div class="formBody" style="width: 795px;margin:0 auto;">
     <table style="width:100%;font-weight:600;" cellspacing="0">
-        <tbody> 
+        <tbody>
             <tr>
                 <table style="width:100%;margin-bottom:3px" cellspacing="0">
                     <tr>
@@ -134,9 +151,9 @@
                 @foreach($guarantor as $key=>$guaran)
                 <table style="width:100%;" cellspacing="0" class= @if($key==1) second_guarantor @else first_guarantor @endif>
                     <tr>
-                        @if($key==1) 
+                        @if($key==1)
                         <td></td>
-                        @else 
+                        @else
                         <td style="text-align:center;vertical-align:middle;padding-bottom:4px !important;">
                             <div style="background-color: #ec2026; color: white; padding: 6px 22px; border-radius: 16px; display: inline-block; font-weight: 600; font-size: 18px; text-align: center;">
                                 নিশ্চয়তা প্রদানকারীর তথ্যসমূহ
@@ -238,13 +255,13 @@
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width:8%;">
-                                        ৫)ক.বয়স 
+                                        ৫)ক.বয়স
                                     </td>
                                     <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $guaran->age }}</td>
                                     <td style="width: 4%;">বছর,</td>
                                     <td style="width: 13%;">খ.বৈবাহিক অবস্থা</td>
                                     <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $guaran->marital_status }}</td>
-                                    
+
                                     <td style="width: 12%;">গ.সন্তানের সংখ্যা</td>
                                     <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ $guaran->number_of_children }}</td>
                                     <td style="width: 19%;">ঘ.অন্যান্য পোষ্যদের সংখ্যা:</td>
@@ -394,7 +411,7 @@
             </tr>
             <tr>
                 <td>
-                    দরখাস্তকারীর উপরোল্লিখিত তথ্যসমূহ বিক্রয়ের পূর্বে যাচাই করা হয়েছে এবং সত্য বলে জানা গিয়েছে। 
+                    দরখাস্তকারীর উপরোল্লিখিত তথ্যসমূহ বিক্রয়ের পূর্বে যাচাই করা হয়েছে এবং সত্য বলে জানা গিয়েছে।
                 </td>
             </tr>
             <tr>
