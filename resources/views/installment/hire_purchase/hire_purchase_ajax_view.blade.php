@@ -115,7 +115,7 @@
 
                             <a style="white-space: nowrap" class="btn btn-info"
                                 href="{{ url('product_details/' . $hire->id) }}" target="_blank">Product Details</a>
-                            @if (Auth::user()->role_id == 1 && $hire->status != 3)
+                            @if (Auth::user()->role_id == 1 && $hire->status != 3 && $hire->status = 0 )
                                 <a style="white-space: nowrap" class="btn btn-success"
                                     href="{{ url('hire-purchase-product-edit/' . $hire->id) }}">Product Edit</a>
                             @endif
