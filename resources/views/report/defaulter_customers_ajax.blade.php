@@ -54,22 +54,38 @@
 
                     // Find the earliest overdue installment
                     if ($customer->installment && count($customer->installment) > 0) {
-                        $overdue_installments = $customer->installment->filter(function($installment) {
-                            return $installment->status == 0 && $installment->loan_start_date < now()->toDateString();
-                        })->sortBy('loan_start_date');
+                        $overdue_installments = $customer->installment
+                            ->filter(function ($installment) {
+                                return $installment->status == 0 &&
+                                    $installment->loan_start_date < now()->toDateString();
+                            })
+                            ->sortBy('loan_start_date');
 
                         if ($overdue_installments->count() > 0) {
                             $next_due_date = $overdue_installments->first()->loan_start_date;
                         }
                     }
 
-                    if ($customer->purchase_product) {
-                        $outstanding_balance = $customer->purchase_product->hire_price - $customer->purchase_product->total_paid;
-                    }
+                    // Installment paid from DB (not from eager-loaded collection)
+                    $installment_paid = \App\Models\Installment::where('hire_purchase_id', $customer->id)
+                        ->where('status', 1)
+                        ->sum('amount');
+
+                    // Hire price
+                    $hire_price = $customer->purchase_product->hire_price ?? 0;
+
+                    // Late fee from Trait
+                    $lateFeeService = app(App\Service\LateFeeService::class);
+                    $late_fee = $lateFeeService->calculateLateFine($customer->id);
+
+                    // Final outstanding balance
+                    $outstanding_balance = $hire_price - $installment_paid + $late_fee;
+
                 @endphp
                 <tr>
                     <td>
-                        <div class="userDatatable-content">{{ ($customers->currentpage()-1) * $customers->perpage() + $key + 1 }}</div>
+                        <div class="userDatatable-content">
+                            {{ ($customers->currentpage() - 1) * $customers->perpage() + $key + 1 }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $customer->order_no }}</div>
@@ -78,19 +94,22 @@
                         <div class="userDatatable-content">{{ $customer->name }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $customer->purchase_product->product->product_model }}</div>
+                        <div class="userDatatable-content">{{ $customer->purchase_product->product->product_model }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $customer->pr_phone }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$customer->purchase_product ? (float)($customer->purchase_product->hire_price) : '0.00' }}</div>
+                        <div class="userDatatable-content">
+                            {{ @$customer->purchase_product ? (float) $customer->purchase_product->hire_price : '0.00' }}
+                        </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ (float)($customer->late_fee) }}</div>
+                        <div class="userDatatable-content">{{ (float) $customer->late_fee }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ (float)($outstanding_balance) }}</div>
+                        <div class="userDatatable-content">{{ (float) $outstanding_balance }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
@@ -101,7 +120,7 @@
                                     $last_payment = $last_transaction->created_at;
                                 }
                             @endphp
-                            {{ $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y')  : 'N/A' }}
+                            {{ $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A' }}
                         </div>
                     </td>
                     <td>

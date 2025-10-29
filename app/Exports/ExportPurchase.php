@@ -2,15 +2,16 @@
 
 namespace App\Exports;
 
-use App\Models\HirePurchase;
-use App\Models\Installment;
-use Maatwebsite\Excel\Concerns\FromCollection;
-
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
 use DB;
+use App\Models\Installment;
+use App\Models\HirePurchase;
+
+use App\Service\LateFeeService;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithEvents
 {
@@ -47,7 +48,22 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             $last_paid_amount = $lastTransaction->amount;
         }
 
-        $outstanding_balance = $filter_data->purchase_product ? ($filter_data->purchase_product->hire_price - $filter_data->purchase_product->total_paid) : 0;
+        // $outstanding_balance = $filter_data->purchase_product ? ($filter_data->purchase_product->hire_price - $filter_data->purchase_product->total_paid) : 0;
+        // Installment paid
+        $installment_paid = $filter_data->installment
+            ? $filter_data->installment->where('status', 1)->sum('amount')
+            : 0;
+
+        // Hire price
+        $hire_price = $filter_data->purchase_product->hire_price ?? 0;
+
+        // Late fee via Trait (assume LateFeeService class exists)
+        $lateFeeService = app(LateFeeService::class);
+        $late_fee = $lateFeeService->calculateLateFine($filter_data->id);
+
+        // Final outstanding balance
+        $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
+
         $next_installment_date = Installment::where('hire_purchase_id', $filter_data->id)->where('status', 0)->orderby('id', "ASC")->first();
         return [
             @$filter_data->show_room->name,

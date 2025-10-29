@@ -2,13 +2,14 @@
 
 namespace App\Exports;
 
-use App\Models\Installment;
 use App\Helpers\Helper;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use App\Models\Installment;
+use App\Service\LateFeeService;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, WithEvents
 {
@@ -261,13 +262,23 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
         $last_payment_date = $purchase->transaction[count($purchase->transaction) - 1]->updated_at;
     }
 
-    // Calculate outstanding balance
-    $outstanding_balance = Installment::where('hire_purchase_id', $purchase->id)
-        ->where('status', 0)
-        ->sum('amount');
+        // Calculate outstanding balance
+        // $outstanding_balance = Installment::where('hire_purchase_id', $purchase->id)
+        //     ->where('status', 0)
+        //     ->sum('amount');
+        $installment_paid = $purchase->installment->where('status', 1)->sum('amount');
+        $hire_price = $purchase->purchase_product->hire_price ?? 0;
 
-    // Get status text
-    $status_text = '';
+        // Trait use করা class instance আনতে হবে
+        $lateFeeService = app(LateFeeService::class);
+        $late_fee = $lateFeeService->calculateLateFine($purchase->id);
+
+        // মোট বাকি = (hire_price - paid) + late_fee
+        $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
+
+
+        // Get status text
+        $status_text = '';
     switch($purchase->status) {
         case 0:
             $status_text = 'Pending';

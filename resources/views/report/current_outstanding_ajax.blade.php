@@ -68,11 +68,23 @@
                         $last_paid_amount = $lastTransaction->amount;
                     }
 
-                    $outstanding_balance = $purchase->purchase_product ? ($purchase->purchase_product->hire_price - $purchase->purchase_product->total_paid) : 0;
+                    // $outstanding_balance = $purchase->purchase_product ? ($purchase->purchase_product->hire_price - $purchase->purchase_product->total_paid) : 0;
+                    // Installment paid
+                    $installment_paid = $purchase->installment->where('status', 1)->sum('amount');
+                    $hire_price = $purchase->purchase_product->hire_price ?? 0;
+
+                    // Late fee via Trait
+                    $lateFeeService = app(App\Service\LateFeeService::class);
+                    $late_fee = $lateFeeService->calculateLateFine($purchase->id);
+
+                    // Final outstanding balance
+                    $outstanding_balance = $hire_price - $installment_paid + $late_fee;
+
                 @endphp
                 <tr>
                     <td>
-                        <div class="userDatatable-content">{{ ($hirepurchase->currentPage() - 1) * $hirepurchase->perPage() + $key + 1 }}</div>
+                        <div class="userDatatable-content">
+                            {{ ($hirepurchase->currentPage() - 1) * $hirepurchase->perPage() + $key + 1 }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $purchase->order_no }}</div>
@@ -85,17 +97,22 @@
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? (float)($purchase->purchase_product->hire_price) : '0.00' }}</div>
-                    </td>
-                    <td>
-                        <div class="userDatatable-content">{{ \Carbon\Carbon::parse(@$firstLoanStartDate)->format('d F Y') }}
+                        <div class="userDatatable-content">
+                            {{ @$purchase->purchase_product ? (float) $purchase->purchase_product->hire_price : '0.00' }}
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ \Carbon\Carbon::parse(@$lastLoanEndDate)->format('d F Y') }}</div>
+                        <div class="userDatatable-content">
+                            {{ \Carbon\Carbon::parse(@$firstLoanStartDate)->format('d F Y') }}
+                        </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ \Carbon\Carbon::parse(@$last_payment)->format('d F Y') }}</div>
+                        <div class="userDatatable-content">
+                            {{ \Carbon\Carbon::parse(@$lastLoanEndDate)->format('d F Y') }}</div>
+                    </td>
+                    <td>
+                        <div class="userDatatable-content">{{ \Carbon\Carbon::parse(@$last_payment)->format('d F Y') }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $last_paid_amount }}</div>
@@ -113,14 +130,16 @@
                         <div class="userDatatable-content">{{ @$purchase->show_room->zone->name }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content"><a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}" target="_blank">Product Details</a></div>
+                        <div class="userDatatable-content"><a class="btn btn-info"
+                                href="{{ url('product_details', $purchase->id) }}" target="_blank">Product Details</a>
+                        </div>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
-     @if(empty($hirepurchase))
-    <p class="text-center">Data Not Found</p>
+    @if (empty($hirepurchase))
+        <p class="text-center">Data Not Found</p>
     @endif
     <div class="pt-2">
         {{ $hirepurchase->links() }}

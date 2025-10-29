@@ -3,11 +3,12 @@
 namespace App\Exports;
 
 use App\Helpers\Helper;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use App\Service\LateFeeService;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class DueOnNextMonthExport implements FromCollection, WithHeadings, WithMapping, WithEvents
 {
@@ -61,10 +62,18 @@ class DueOnNextMonthExport implements FromCollection, WithHeadings, WithMapping,
         }
 
         // Calculate outstanding balance
-        $outstanding_balance = 0;
-        if ($purchase->purchase_product) {
-            $outstanding_balance = $purchase->purchase_product->hire_price - $purchase->purchase_product->total_paid;
-        }
+        $installment_paid = \App\Models\Installment::where('hire_purchase_id', $purchase->id)
+            ->where('status', 1)
+            ->sum('amount');
+
+        $hire_price = $purchase->purchase_product->hire_price ?? 0;
+
+        $lateFeeService = app(LateFeeService::class);
+
+        $late_fee = $lateFeeService->calculateLateFine($purchase->id);
+
+        $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
+
 
         static $slNo = 0;
         $slNo++;

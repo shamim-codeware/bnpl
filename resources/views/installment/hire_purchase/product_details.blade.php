@@ -170,7 +170,7 @@
                                                         <span class="fw-medium">Total loan paid amount:</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15">
-                                                        <span>{{ @$product_details->purchase_product->total_paid }} TK</span>
+                                                        <span>{{ @$total_loan_paid_amount }} TK</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Outstanding balance:</span>

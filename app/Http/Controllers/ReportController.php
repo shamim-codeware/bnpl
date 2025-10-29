@@ -127,7 +127,6 @@ class ReportController extends Controller
         foreach ($hirepurchase as $hire) {
             $hire->late_fee = $this->calculateLateFine($hire->id);
         }
-
         return view('report.due_on_next_ajax_view', compact("hirepurchase", "from_date", 'to_date'));
     }
 

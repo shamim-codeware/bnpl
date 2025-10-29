@@ -53,6 +53,7 @@
             </tr>
         </thead>
         <tbody>
+            {{-- @dd($hirepurchase) --}}
             @foreach ($hirepurchase as $key => $purchase)
                 @php
                     // Get next due installment in the specified date range
@@ -70,14 +71,30 @@
                     }
 
                     // Calculate outstanding balance
-                    $outstanding_balance = 0;
-                    if ($purchase->purchase_product) {
-                        $outstanding_balance = $purchase->purchase_product->hire_price - $purchase->purchase_product->total_paid;
-                    }
+                    $installment_paid = \App\Models\Installment::where('hire_purchase_id', $purchase->id)
+                        ->where('status', 1)
+                        ->sum('amount');
+
+                    $hire_price = $purchase->purchase_product->hire_price ?? 0;
+
+                    // Late fee via Trait
+                    $lateFeeService = app(App\Service\LateFeeService::class);
+                    $late_fee = $lateFeeService->calculateLateFine($purchase->id);
+
+                    logger([
+                        'purchase_id' => $purchase->id,
+                        'installment_paid' => $installment_paid,
+                        'hire_price' => $hire_price,
+                        'late_fee' => $late_fee,
+                    ]);
+
+                    // Final outstanding balance
+                    $outstanding_balance = $hire_price - $installment_paid + $late_fee;
                 @endphp
                 <tr>
                     <td>
-                        <div class="userDatatable-content">{{ ($hirepurchase->currentPage() - 1) * $hirepurchase->perPage() + $key + 1 }}</div>
+                        <div class="userDatatable-content">
+                            {{ ($hirepurchase->currentPage() - 1) * $hirepurchase->perPage() + $key + 1 }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $purchase->order_no }}</div>
@@ -92,14 +109,17 @@
                         <div class="userDatatable-content">{{ @$purchase->purchase_product->product_group->name }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product->product->product_model }}</div>
-                    </td>
-                    <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? number_format($purchase->purchase_product->hire_price, 2) : '0.00' }}</div>
+                        <div class="userDatatable-content">{{ @$purchase->purchase_product->product->product_model }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            @if($nextDueInstallment)
+                            {{ @$purchase->purchase_product ? number_format($purchase->purchase_product->hire_price, 2) : '0.00' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="userDatatable-content">
+                            @if ($nextDueInstallment)
                                 {{-- {{ \App\Helpers\Helper::formatDateStandard($nextDueInstallment->loan_start_date) }} --}}
                                 {{ \Carbon\Carbon::parse($nextDueInstallment->loan_start_date)->format('d F Y') }}
                             @else
@@ -108,7 +128,9 @@
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? number_format($purchase->purchase_product->monthly_installment, 2) : '0.00' }}</div>
+                        <div class="userDatatable-content">
+                            {{ @$purchase->purchase_product ? number_format($purchase->purchase_product->monthly_installment, 2) : '0.00' }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
@@ -123,7 +145,7 @@
                         <div class="userDatatable-content">{{ number_format($purchase->late_fee, 2) }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ number_format($outstanding_balance, 2) }}</div>
+                        <div class="userDatatable-content">{{ number_format($outstanding_balance ?? 0, 2) }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->show_room->name }}</div>
@@ -133,14 +155,15 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            <a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}" target="_blank">Product Details</a>
+                            <a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}"
+                                target="_blank">Product Details</a>
                         </div>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
-    @if($hirepurchase->isEmpty())
+    @if ($hirepurchase->isEmpty())
         <p class="text-center">Data Not Found</p>
     @endif
     <div class="pt-2">

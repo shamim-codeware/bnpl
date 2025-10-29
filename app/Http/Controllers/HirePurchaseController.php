@@ -454,33 +454,33 @@ class HirePurchaseController extends Controller
 
     public function ProductDetails($id)
     {
-        // $notification = Notification::where('hire_id', $id)->first();
-        // if(empty($notification)){
-        //     return redirect()->back()->with('error', 'Notification Not Found Based On Given Hirepurchase Id');
-        // }
-        // $notificationSeen = NotificationSeen::where('notification_id', $notification->id)->first();
-        // if (empty($notificationSeen)) {
-        //     return redirect()->back()->with('error', 'Notification Seen Not Found Based On Given Notification Id');
-        // }
-        // $notificationSeen->is_seen = 1;
-        // $notificationSeen->user_id = Auth::id();
-        // $notificationSeen->save();
         $title = "Product Details";
         $description = "Some description for the page";
         $product_details = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'transaction', 'installment', 'erplog'])->findOrFail($id);
-        $installments = Transaction::with(['hire_purchase:id,name,pr_phone', 'users', 'hire_purchase.purchase_product.product'])->where('hire_purchase_id', $id)->get();
-        $installment_date = Installment::where('hire_purchase_id', $id)->orderBy('id', 'DESC')->first();
-        $out_standing_amount = Installment::where('hire_purchase_id', $id)->where('status', 0)->sum('amount');
 
-        $total_installment_paid = Installment::where('hire_purchase_id', $id)->where('status', 1)->sum('amount');
-        // $total_payment = Transaction::where('hire_purchase_id',$id)->sum('amount');
-        // $due_amount  = Transaction::where('hire_purchase_id',$id)->sum('amount');
+        $total_installment_paid = Installment::where('hire_purchase_id', $id)
+            ->where('status', 1)
+            ->sum('amount');
 
-        // Calculate total fine for all overdue installments
+        $paid_fine_amount = Installment::where('hire_purchase_id', $id)
+            ->where('status', 1)
+            ->sum('fine_amount');
+
+        $total_loan_paid_amount = $total_installment_paid + $paid_fine_amount;
+
+
+        $hire_price = $product_details->purchase_product->hire_price ?? 0;
+
         $totalFine = $this->calculateLateFine($id);
 
+        $out_standing_amount = ($hire_price - $total_installment_paid) + $totalFine;
+        // dd($out_standing_amount);
 
-        return view('installment.hire_purchase.product_details', compact("title", "description", "product_details", 'installments', 'installment_date', 'out_standing_amount', 'total_installment_paid', 'totalFine'));
+        $installments = Transaction::with(['hire_purchase:id,name,pr_phone', 'users', 'hire_purchase.purchase_product.product'])->where('hire_purchase_id', $id)->get();
+        $installment_date = Installment::where('hire_purchase_id', $id)->orderBy('id', 'DESC')->first();
+
+
+        return view('installment.hire_purchase.product_details', compact("title", "description", "product_details", 'installments', 'installment_date', 'out_standing_amount', 'total_installment_paid', 'totalFine', 'total_loan_paid_amount'));
     }
 
     public function AllPurchase()
@@ -778,13 +778,19 @@ class HirePurchaseController extends Controller
         $advance_amount = $hirepurchase->purchase_product->advance_pay;
         $hire_price = $hirepurchase->purchase_product->hire_price;
 
-        $due = $hire_price - $total_installment_amount;
-        if ($advance_amount > 0) {
-            $due = $hire_price - ($total_installment_amount + $advance_amount);
-        }
-        $installments = Installment::where('hire_purchase_id', $id)->get();
+        $late_fee = $this->calculateLateFine($id);
+
+        // $due = $hire_price - $total_installment_amount;
+        // if ($advance_amount > 0) {
+        //     $due = $hire_price - ($total_installment_amount + $advance_amount);
+        // }
 
         $late_fee = $this->calculateLateFine($id);
+
+        $due = ($hire_price - $total_installment_amount) + $late_fee;
+
+        $installments = Installment::where('hire_purchase_id', $id)->get();
+
 
         return view('installment_list', compact("hirepurchase", 'installments', 'total_installment_amount', 'advance_amount', 'due', 'late_fee'));
     }

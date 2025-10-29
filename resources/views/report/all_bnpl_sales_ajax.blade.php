@@ -50,6 +50,11 @@
             </tr>
         </thead>
         <tbody>
+
+            @php
+                $lateFeeService = app(App\Service\LateFeeService::class);
+            @endphp
+
             @foreach ($hirepurchase as $key => $purchase)
                 @php
                     $last_payment = '';
@@ -62,9 +67,16 @@
                         $last_paid_amount = $lastTransaction->amount;
                     }
 
-                    if ($purchase->purchase_product) {
-                        $outstanding_balance = $purchase->purchase_product->hire_price - $purchase->purchase_product->total_paid;
-                    }
+                    // if ($purchase->purchase_product) {
+                    //     $outstanding_balance =
+                    //         $purchase->purchase_product->hire_price - $purchase->purchase_product->total_paid;
+                    // }
+
+                    $installment_paid = $purchase->installment->where('status', 1)->sum('amount');
+                    $hire_price = $purchase->purchase_product->hire_price ?? 0;
+
+                    $late_fee = $lateFeeService->calculateLateFine($purchase->id);
+                    $outstanding_balance = $hire_price - $installment_paid + $late_fee;
 
                     $next_due_date = null;
                     if ($purchase->installment && count($purchase->installment) > 0) {
@@ -78,7 +90,8 @@
                 @endphp
                 <tr>
                     <td>
-                        <div class="userDatatable-content">{{ ($hirepurchase->currentPage() - 1) * $hirepurchase->perPage() + $key + 1 }}</div>
+                        <div class="userDatatable-content">
+                            {{ ($hirepurchase->currentPage() - 1) * $hirepurchase->perPage() + $key + 1 }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $purchase->order_no }}</div>
@@ -128,7 +141,7 @@
                         <div class="userDatatable-content">
                             @php
                                 $statusText = '';
-                                switch($purchase->status) {
+                                switch ($purchase->status) {
                                     case 0:
                                         $statusText = 'Pending';
                                         break;

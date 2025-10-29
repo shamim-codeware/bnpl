@@ -60,9 +60,20 @@ class DefaulterCustomersExport implements FromCollection, WithHeadings, WithMapp
             }
         }
 
-        if ($customer->purchase_product) {
-            $outstanding_balance = $customer->purchase_product->hire_price - $customer->purchase_product->total_paid;
-        }
+        // Installment paid from DB
+        $installment_paid = \App\Models\Installment::where('hire_purchase_id', $customer->id)
+            ->where('status', 1)
+            ->sum('amount');
+
+        // Hire price
+        $hire_price = $customer->purchase_product->hire_price ?? 0;
+
+        // Late fee from Trait
+        $lateFeeService = app(\App\Service\LateFeeService::class);
+        $late_fee = $lateFeeService->calculateLateFine($customer->id);
+
+        // Final outstanding balance
+        $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
 
         $last_payment = null;
         if ($customer->transaction && count($customer->transaction) > 0) {
