@@ -780,13 +780,6 @@ class HirePurchaseController extends Controller
 
         $late_fee = $this->calculateLateFine($id);
 
-        // $due = $hire_price - $total_installment_amount;
-        // if ($advance_amount > 0) {
-        //     $due = $hire_price - ($total_installment_amount + $advance_amount);
-        // }
-
-        $late_fee = $this->calculateLateFine($id);
-
         $due = ($hire_price - $total_installment_amount) + $late_fee;
 
         $installments = Installment::where('hire_purchase_id', $id)->get();

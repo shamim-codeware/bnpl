@@ -109,7 +109,7 @@
                         <div class="userDatatable-content">{{ (float) $customer->late_fee }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ (float) $outstanding_balance }}</div>
+                        <div class="userDatatable-content">{{ number_format($outstanding_balance, 2)}}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">

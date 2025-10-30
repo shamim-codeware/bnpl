@@ -121,7 +121,7 @@
                         <div class="userDatatable-content">{{ $purchase->late_fee }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $outstanding_balance }}</div>
+                        <div class="userDatatable-content">{{number_format($outstanding_balance, 2) }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->pr_phone }}</div>

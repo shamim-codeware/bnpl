@@ -357,7 +357,7 @@
                                 </td>
                                 <td colspan="6">
                                     <div class="userDatatable-content">
-                                        <b>{{ $due }}</b>
+                                        <b>{{number_format($due, 2) }}</b>
                                     </div>
                                 </td>
                             </tr>

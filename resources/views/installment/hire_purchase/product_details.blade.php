@@ -176,7 +176,7 @@
                                                         <span class="fw-medium">Outstanding balance:</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15">
-                                                        <span>{{ $out_standing_amount }} TK</span>
+                                                        <span>{{ number_format($out_standing_amount, 2) }} TK</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Late Payment Fee:</span>

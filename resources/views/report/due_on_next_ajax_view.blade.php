@@ -81,12 +81,12 @@
                     $lateFeeService = app(App\Service\LateFeeService::class);
                     $late_fee = $lateFeeService->calculateLateFine($purchase->id);
 
-                    logger([
-                        'purchase_id' => $purchase->id,
-                        'installment_paid' => $installment_paid,
-                        'hire_price' => $hire_price,
-                        'late_fee' => $late_fee,
-                    ]);
+                    // logger([
+                    //     'purchase_id' => $purchase->id,
+                    //     'installment_paid' => $installment_paid,
+                    //     'hire_price' => $hire_price,
+                    //     'late_fee' => $late_fee,
+                    // ]);
 
                     // Final outstanding balance
                     $outstanding_balance = $hire_price - $installment_paid + $late_fee;
