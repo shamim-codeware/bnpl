@@ -295,7 +295,7 @@ class PaymentCollectionController extends Controller
     }
     public function TransactionListExport(Request $request)
     {
-        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id.status', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room'])
+        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id,status', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room'])
             ->where('status', 1)->whereHas('hire_purchase', function ($q) {
                 $q->where('status', 3);
             });

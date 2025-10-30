@@ -72,7 +72,7 @@
                     <div class="d-flex justify-content-center">
                         <div class="userDatatable-inline-title">
                             <a href="#" class="text-dark fw-500">
-                                <h6>{{ \App\Helpers\Helper::formatDateTimeStandard($item->created_at) }}</h6>
+                                <h6>{{ \Carbon\Carbon::parse($item->created_at)->format('d F Y') }}</h6>
                             </a>
                         </div>
                     </div>
