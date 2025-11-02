@@ -65,6 +65,12 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
         $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
 
         $next_installment_date = Installment::where('hire_purchase_id', $filter_data->id)->where('status', 0)->orderby('id', "ASC")->first();
+
+        $paid_fine_amount = $filter_data->installment
+            ? $filter_data->installment->sum('fine_amount')
+            : 0.00;
+
+
         return [
             @$filter_data->show_room->name,
             $filter_data->order_no,
@@ -80,8 +86,11 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             @$filter_data->purchase_product->down_payment,
             @$filter_data->purchase_product->monthly_installment,
             @$filter_data->purchase_product->total_paid,
-            @$filter_data->late_fee ?? 0.00,
-            $outstanding_balance,
+            // @$late_fee ?? 0.00,
+            number_format($late_fee, 2),
+            number_format($paid_fine_amount, 2),
+            // $outstanding_balance,
+            number_format($outstanding_balance, 2),
             @$filter_data->installment->count(),
             @$filter_data->installment->where('status', 1)->count(),
             @$filter_data->installment->where('status', 0)->count(),
@@ -118,6 +127,7 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             "Monthly Installment",
             "Total Payment Received",
             "Late Payment Fee",
+            "Total Paid Late Payment Fee",
             "Outstanding Balance",
             "Total Installment",
             "Paid Installment",
