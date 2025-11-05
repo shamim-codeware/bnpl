@@ -3,9 +3,10 @@
 namespace App\Exports;
 
 use DB;
+use Carbon\Carbon;
 use App\Models\Installment;
-use App\Models\HirePurchase;
 
+use App\Models\HirePurchase;
 use App\Service\LateFeeService;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -70,6 +71,25 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             ? $filter_data->installment->sum('fine_amount')
             : 0.00;
 
+        $isDefaulter = false;
+
+        if ($filter_data->installment) {
+            $today = now()->startOfDay(); // Compare dates without time
+
+            // Check if any unpaid installment has a due date before today
+            foreach ($filter_data->installment as $installment) {
+                if ($installment->status == 0) { // unpaid
+                    $dueDate = Carbon::parse($installment->loan_start_date)->startOfDay();
+                    if ($dueDate->lt($today)) {
+                        $isDefaulter = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $status = $isDefaulter ? 'Defaulter' : 'Regular';
+
 
         return [
             @$filter_data->show_room->name,
@@ -106,6 +126,8 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             $filter_data->pr_phone,
             @$filter_data->show_room_user->name,
             @$filter_data->users->name,
+            @$filter_data->show_room->zone->name,
+            $status,
         ];
     }
 
@@ -139,7 +161,8 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             "Phone Number",
             "Sales Representative",
             "Created By	",
-            //            "Zone"
+            "Zone",
+            "Status",
         ];
     }
 
