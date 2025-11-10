@@ -136,12 +136,159 @@ class HirePurchaseController extends Controller
     }
 
 
+    // public function Product_update(Request $request, $id)
+    // {
+    //     date_default_timezone_set('Asia/Dhaka');
+    //     // Find the hire purchase product
+    //     $hirePurchaseProduct = HirePurchaseProduct::where('hire_purchase_id', $id)->firstOrFail();
+    //     $hirePurchase = HirePurchase::findOrFail($id);
+
+    //     // Get the original values for comparison
+    //     $originalHirePrice = $hirePurchaseProduct->hire_price;
+    //     $originalDownPayment = $hirePurchaseProduct->down_payment;
+
+    //     // Get the new values
+    //     $hire_price = $request->hire_price;
+    //     $down_payment = $request->down_payment;
+
+    //     // Calculate due amounts
+    //     $originalDue = $originalHirePrice - $originalDownPayment;
+    //     $newDue = $hire_price - $down_payment;
+    //     $additionalCreditNeeded = $newDue - $originalDue;
+
+    //     // Check showroom credit limit
+    //     $showroom = ShowRoom::findOrFail($hirePurchase->showroom_id);
+    //     $availableCredit = $showroom->remaining_credit + $originalDue;
+
+    //     if ($additionalCreditNeeded > $availableCredit) {
+    //         return redirect()->back()->with('error', 'You have exceeded your credit limitation. Your current available credit is ' . $availableCredit);
+    //     }
+    //     DB::beginTransaction();
+    //     //        try {
+    //     // Update hire purchase product
+    //     $hirePurchaseProduct->product_group_id = $request->product_group_id;
+    //     $hirePurchaseProduct->product_category_id = $request->product_category_id;
+    //     $hirePurchaseProduct->product_brand_id = $request->product_brand_id;
+    //     $hirePurchaseProduct->product_model_id = $request->product_model_id;
+    //     $hirePurchaseProduct->product_size_id = $request->product_size_id;
+    //     $hirePurchaseProduct->serial_no = $request->serial_no;
+    //     $hirePurchaseProduct->cash_price = $request->cash_price;
+    //     $hirePurchaseProduct->hire_price = $request->hire_price;
+    //     $hirePurchaseProduct->down_payment = $request->down_payment;
+    //     $hirePurchaseProduct->installment_month = $request->installment_month;
+    //     $hirePurchaseProduct->monthly_installment = $request->monthly_installment;
+    //     $hirePurchaseProduct->save();
+
+    //     // Update showroom credit
+    //     $showroom->remaining_credit = $availableCredit - $newDue;
+    //     $showroom->save();
+
+    //     // Update installments if the monthly amount or period has changed
+    //     if (
+    //         $hirePurchaseProduct->monthly_installment != $request->monthly_installment ||
+    //         $hirePurchaseProduct->installment_month != $request->installment_month
+    //     ) {
+    //         // Keep the down payment installment
+    //         $firstInstallment = Installment::where('hire_purchase_id', $id)
+    //             ->orderBy('id', 'asc')
+    //             ->first();
+
+    //         $firstInstallment->amount = $request->down_payment;
+    //         $firstInstallment->loan_start_date = date('Y-m-d H:i:00');
+    //         $firstInstallment->loan_end_date = date('Y-m-d H:i:00');
+    //         $firstInstallment->status = 1;
+    //         $firstInstallment->save();
+    //         // Delete all other installments
+    //         Installment::where('hire_purchase_id', $id)
+    //             ->where('id', '!=', $firstInstallment->id)
+    //             ->delete();
+    //         // Create new installments
+    //         for ($i = 1; $i < $request->installment_month; $i++) {
+    //             $installmentData = [
+    //                 'hire_purchase_id' => $id,
+    //                 'amount' => $request->monthly_installment,
+    //                 'loan_start_date' => date('Y-m-d H:i:00', strtotime("+$i month")),
+    //                 'loan_end_date' => date('Y-m-d H:i:00', strtotime("+" . ($i + 1) . " month")),
+    //                 'status' => 0
+    //             ];
+    //             Installment::create($installmentData);
+    //         }
+    //     }
+    //     // Update transaction
+    //     $transaction = Transaction::where('hire_purchase_id', $id)->first();
+    //     $transaction->amount = $request->down_payment;
+    //     $transaction->transaction_type = "Down Payment";
+    //     $transaction->payment_type = 1;
+    //     $transaction->created_by = Auth::user()->id;
+    //     $transaction->status = 0;
+    //     $transaction->save();
+    //     // Update ERP log
+    //     $erp_log = ErpLog::where('tracking_number', $id)->first();
+
+    //     // Prepare order info
+    //     $orderInfo = array_filter([
+    //         "eorder_no" => $hirePurchase->order_no,
+    //         "entry_date" => now()->toDateTimeString(),
+    //         "down_payment" => $request->down_payment,
+    //         'instalments_rate' => $request->monthly_installment,
+    //         "no_instalments" => (int)$request->installment_month - 1,
+    //         "sales_from" => "$showroom->name",
+    //         "delivery_from" => "$showroom->name",
+    //         "delivery_fee" => 0,
+    //         "note" => $request->organization_short_desc,
+    //     ]);
+
+    //     $product_model = Product::where('id', $request->product_model_id)->first()->product_model;
+    //     // Prepare order details array
+    //     $orderDetails = [
+    //         [
+    //             "item_model"     => "$product_model",
+    //             "item_qty"       => 1,
+    //             "unit_rate"      => $request->hire_price,
+    //             "unit_wise_disc" => 0
+    //         ]
+    //     ];
+    //     // Full data for the API request
+    //     $orderJsonDetails = json_encode($orderDetails);
+    //     $orderJsonInfo = json_encode($orderInfo);
+    //     $erpLogData = [
+    //         'order_details' => $orderJsonDetails,
+    //         'order_info'    => $orderJsonInfo,
+    //         'tracking_number' => $hirePurchase->id,
+    //         'sent'           => 0,
+    //         // 'response'      => $response
+    //     ];
+    //     $erp_log->fill($erpLogData)->save();
+
+    //     DB::commit();
+    //     return redirect()->back()->with('success', 'Product updated successfully.');
+    //     //        } catch (\Throwable $e) {
+    //     //            DB::rollback();
+    //     //            return redirect()->back()->with('error', 'Something went wrong! Please try again.');
+    //     //        }
+    // }
+
     public function Product_update(Request $request, $id)
     {
         date_default_timezone_set('Asia/Dhaka');
         // Find the hire purchase product
         $hirePurchaseProduct = HirePurchaseProduct::where('hire_purchase_id', $id)->firstOrFail();
         $hirePurchase = HirePurchase::findOrFail($id);
+
+        // Store previous data for audit
+        $previousData = [
+            'product_group_id' => $hirePurchaseProduct->product_group_id,
+            'product_category_id' => $hirePurchaseProduct->product_category_id,
+            'product_brand_id' => $hirePurchaseProduct->product_brand_id,
+            'product_model_id' => $hirePurchaseProduct->product_model_id,
+            'product_size_id' => $hirePurchaseProduct->product_size_id,
+            'serial_no' => $hirePurchaseProduct->serial_no,
+            'cash_price' => $hirePurchaseProduct->cash_price,
+            'hire_price' => $hirePurchaseProduct->hire_price,
+            'down_payment' => $hirePurchaseProduct->down_payment,
+            'installment_month' => $hirePurchaseProduct->installment_month,
+            'monthly_installment' => $hirePurchaseProduct->monthly_installment,
+        ];
 
         // Get the original values for comparison
         $originalHirePrice = $hirePurchaseProduct->hire_price;
@@ -178,6 +325,47 @@ class HirePurchaseController extends Controller
         $hirePurchaseProduct->installment_month = $request->installment_month;
         $hirePurchaseProduct->monthly_installment = $request->monthly_installment;
         $hirePurchaseProduct->save();
+
+        // Validate and create audit log
+        $currentUserId = Auth::user()->id ?? null;
+        $userExists = $currentUserId && DB::table('users')->where('id', $currentUserId)->exists();
+
+        if ($userExists) {
+            // Create audit log only if user exists
+            DB::table('hire_purchase_product_audits')->insert([
+                'hire_purchase_product_id' => $hirePurchaseProduct->id,
+                'updated_by' => $currentUserId,
+                'previous_data' => json_encode($previousData),
+                'current_data' => json_encode([
+                    'product_group_id' => $request->product_group_id,
+                    'product_category_id' => $request->product_category_id,
+                    'product_brand_id' => $request->product_brand_id,
+                    'product_model_id' => $request->product_model_id,
+                    'product_size_id' => $request->product_size_id,
+                    'serial_no' => $request->serial_no,
+                    'cash_price' => $request->cash_price,
+                    'hire_price' => $request->hire_price,
+                    'down_payment' => $request->down_payment,
+                    'installment_month' => $request->installment_month,
+                    'monthly_installment' => $request->monthly_installment,
+                ]),
+                'changed_fields' => json_encode($this->getChangedFields($previousData, [
+                    'product_group_id' => $request->product_group_id,
+                    'product_category_id' => $request->product_category_id,
+                    'product_brand_id' => $request->product_brand_id,
+                    'product_model_id' => $request->product_model_id,
+                    'product_size_id' => $request->product_size_id,
+                    'serial_no' => $request->serial_no,
+                    'cash_price' => $request->cash_price,
+                    'hire_price' => $request->hire_price,
+                    'down_payment' => $request->down_payment,
+                    'installment_month' => $request->installment_month,
+                    'monthly_installment' => $request->monthly_installment,
+                ])),
+                'updated_at' => now(),
+                'created_at' => now()
+            ]);
+        }
 
         // Update showroom credit
         $showroom->remaining_credit = $availableCredit - $newDue;
@@ -234,8 +422,8 @@ class HirePurchaseController extends Controller
             "no_instalments" => (int)$request->installment_month - 1,
             "sales_from" => "$showroom->name",
             "delivery_from" => "$showroom->name",
-            "delivery_fee" => 0,
-            "note" => $request->organization_short_desc,
+            "note" => $hirePurchase->organization_short_desc,
+            'payment_ref' => "Cash"
         ]);
 
         $product_model = Product::where('id', $request->product_model_id)->first()->product_model;
@@ -268,6 +456,20 @@ class HirePurchaseController extends Controller
         //        }
     }
 
+    // Helper method to get changed fields
+    private function getChangedFields($previousData, $currentData)
+    {
+        $changedFields = [];
+        foreach ($previousData as $key => $value) {
+            if ($currentData[$key] !== $value) {
+                $changedFields[$key] = [
+                    'from' => $value,
+                    'to' => $currentData[$key]
+                ];
+            }
+        }
+        return $changedFields;
+    }
 
 
     public function PendingSaleView(Request $request)
