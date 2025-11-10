@@ -170,10 +170,23 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
         // Set conditional values based on status
         $firstInstallment = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->down_payment, 2) : '0.00');
 
-        $totalPaymentReceived = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00');
+        // $totalPaymentReceived = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00');
+        $totalPaymentReceived = $isRejectedOrCancelled
+            ? '0.00'
+            : number_format(
+                $purchase->installment
+                    ->where('status', 1)
+                    ->sum(function ($installment) {
+                        return $installment->amount + $installment->fine_amount;
+                    }),
+                2
+            );
+        // $outstandingBalanceFormatted = $isRejectedOrCancelled ? '0.00' :
+        //     number_format($outstanding_balance, 2);
 
-        $outstandingBalanceFormatted = $isRejectedOrCancelled ? '0.00' :
-            number_format($outstanding_balance, 2);
+        $outstandingBalanceFormatted = $isRejectedOrCancelled
+            ? '0.00'
+            : number_format(max(0, $outstanding_balance), 2);
 
         $paidInstallment = $isRejectedOrCancelled ? '0' : (@$purchase->installment ? $purchase->installment->where('status', 1)->count() : '0');
 

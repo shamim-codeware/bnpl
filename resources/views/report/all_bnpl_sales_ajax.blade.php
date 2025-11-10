@@ -67,16 +67,26 @@
                         $last_paid_amount = $lastTransaction->amount;
                     }
 
-                    // if ($purchase->purchase_product) {
-                    //     $outstanding_balance =
-                    //         $purchase->purchase_product->hire_price - $purchase->purchase_product->total_paid;
-                    // }
+                    $installment_paid = $purchase->installment->where('status', 1)->sum(function ($installment) {
+                        return $installment->amount + $installment->fine_amount;
+                    });
 
-                    $installment_paid = $purchase->installment->where('status', 1)->sum('amount');
+                    $total_paid = $installment_paid;
+
+                    $just_installment_paid = $purchase->installment->where('status', 1)->sum('amount');
                     $hire_price = $purchase->purchase_product->hire_price ?? 0;
 
                     $late_fee = $lateFeeService->calculateLateFine($purchase->id);
-                    $outstanding_balance = $hire_price - $installment_paid + $late_fee;
+
+                    // logger([
+                    //     'late_fee' => $late_fee,
+                    //     'just_installment_paid' => $just_installment_paid,
+                    //     'hire_price' => $hire_price,
+                    // ])
+
+                    // $outstanding_balance = $hire_price - $just_installment_paid + $late_fee;
+                   $outstanding_balance = max(0, $hire_price - $just_installment_paid + $late_fee);
+
 
                     $next_due_date = null;
                     if ($purchase->installment && count($purchase->installment) > 0) {
@@ -122,8 +132,11 @@
                             {{ $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A' }}
                         </div>
                     </td>
-                    <td>
+                    {{-- <td>
                         <div class="userDatatable-content">{{ @$purchase->purchase_product->total_paid }}</div>
+                    </td> --}}
+                    <td>
+                        <div class="userDatatable-content">{{ @$total_paid }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->late_fee }}</div>
