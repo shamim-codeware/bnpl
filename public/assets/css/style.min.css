@@ -4377,7 +4377,7 @@ body.top-menu .navbar-left .customizer-trigger+.top-menu {
     height: 72px;
     padding-left: 15px;
     /* background-color: #3673476e; */
-    min-width: 280px;
+    /* min-width: 280px; */
     -webkit-box-pack: justify;
     -ms-flex-pack: justify;
     justify-content: space-between;
@@ -40587,4 +40587,58 @@ label[for="et_pb_contact_brand_file_request_0"] {
 }
 .offer_text h1 {
     font-size: 23px;
+}
+
+/* header responsive css */
+
+@media (max-width: 767px) {
+
+    /* Hide the marquee on very small screens */
+    .dashboard_marque {
+        display: none;
+    }
+
+    /* Or make it responsive */
+    .dashboard_marque {
+        width: calc(100vw - 180px) !important;
+        /* Adjust based on your navbar elements */
+        max-width: 100%;
+        overflow: hidden;
+        margin: 0 auto;
+    }
+
+    /* Adjust navbar layout for mobile */
+    .navbar-right {
+        margin-left: auto !important;
+    }
+
+    .offer_text {
+        display: none;
+        /* Hide "Buy Now Pay later" on mobile if needed */
+    }
+}
+.navbar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dashboard_marque {
+    flex: 1;
+    /* Take remaining space */
+    min-width: 0;
+    /* Allow shrinking */
+    overflow: hidden;
+}
+
+@media (max-width: 767px) {
+    .navbar {
+        flex-wrap: wrap;
+    }
+
+    .dashboard_marque {
+        order: 3;
+        width: 100%;
+        margin-top: 10px;
+    }
 }
