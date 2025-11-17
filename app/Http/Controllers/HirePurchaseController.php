@@ -979,12 +979,16 @@ class HirePurchaseController extends Controller
         $total_installment_amount = $hirepurchase->installment->where('status', 1)->sum('amount');
         $advance_amount = $hirepurchase->purchase_product->advance_pay;
         $hire_price = $hirepurchase->purchase_product->hire_price;
+        $installments = Installment::where('hire_purchase_id', $id)->get();
+
+        foreach ($installments as $installment) {
+            $installment->calculated_late_fee = $this->calculateInstallmentLateFine($installment);
+        }
 
         $late_fee = $this->calculateLateFine($id);
 
         $due = ($hire_price - $total_installment_amount) + $late_fee;
 
-        $installments = Installment::where('hire_purchase_id', $id)->get();
 
 
         return view('installment_list', compact("hirepurchase", 'installments', 'total_installment_amount', 'advance_amount', 'due', 'late_fee'));

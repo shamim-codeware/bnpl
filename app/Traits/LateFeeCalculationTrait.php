@@ -32,4 +32,27 @@ trait LateFeeCalculationTrait
 
         return $totalFine;
     }
+
+    private function calculateInstallmentLateFine($installment)
+    {
+        $lateFinePerMonth = 500;
+
+        // If already paid, no late fee
+        if ($installment->status == 1) {
+            return 0;
+        }
+
+        $loanStartDate = Carbon::parse($installment->loan_start_date);
+        $currentDate = Carbon::now();
+
+        if ($currentDate->greaterThan($loanStartDate)) {
+            $monthsOverdue = $loanStartDate->diffInMonths($currentDate);
+
+            if ($monthsOverdue > 1) {
+                return ($monthsOverdue - 1) * $lateFinePerMonth;
+            }
+        }
+
+        return 0;
+    }
 }

@@ -760,11 +760,11 @@
                                                             <div class="holder">
                                                                 <div
                                                                     class="input-holder input border-start-0 rounded-l-0 upload_holder">
-                                                                    <input type="file" name="file" id="file3"
+                                                                    <input type="file" name="file" id="file2"
                                                                         class="inputfile"
                                                                         data-multiple-caption="{count} files selected"
                                                                         multiple />
-                                                                    <label for="file3"><span><i
+                                                                    <label for="file2"><span><i
                                                                                 class="uil uil-upload"></i></span></label>
                                                                 </div>
                                                             </div>

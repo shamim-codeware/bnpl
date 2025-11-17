@@ -255,6 +255,9 @@
                                     <span class="userDatatable-title">Amount</span>
                                 </th>
                                 <th>
+                                    <span class="userDatatable-title">Late Fee</span>
+                                </th>
+                                <th>
                                     <span class="userDatatable-title">Due Date</span>
                                 </th>
                                 <th><span class="userDatatable-title">Remarks</span></th>
@@ -289,6 +292,15 @@
                                         {{ $item->amount }}
                                     </div>
                                 </td>
+                                <td>
+                                    <div class="userDatatable-content">
+                                        @if($item->calculated_late_fee > 0)
+                                            <span style="color: #e30613; font-weight: 600;">{{ number_format($item->calculated_late_fee, 2) }}</span>
+                                        @else
+                                            0.00
+                                        @endif
+                                    </div>
+                                 </td>
                                 <td>
                                     <div class="userDatatable-content">
                                         {{    date('d/m/Y', strtotime($item->loan_start_date)), }}
@@ -328,7 +340,7 @@
                             <tr>
                                   <td colspan="6">
                                     <div class="userDatatable-content">
-                                        Late Payment Fee :
+                                       Total Late Payment Fee :
                                     </div>
                                 </td>
                                 <td colspan="6">
