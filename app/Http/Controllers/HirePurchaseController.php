@@ -13,6 +13,7 @@ use App\Models\Upazila;
 use App\Models\Customer;
 use App\Models\District;
 use App\Models\ShowRoom;
+use App\Models\Incentive;
 use App\Models\Installment;
 use App\Models\ProductType;
 use App\Models\Transaction;
@@ -882,7 +883,7 @@ class HirePurchaseController extends Controller
             $HirePurchase = new HirePurchase;
             $HirePurchase->fill($personal_info)->save();
             //Erp Service
-            $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
+            // $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
             //guarantor info
             $GuaranterInfo = new GuaranterInfo;
             foreach ($request->guarater_name as $key => $name) {
@@ -948,6 +949,26 @@ class HirePurchaseController extends Controller
             $transactionData['status'] = 0;
 
             $transaction->fill($transactionData)->save();
+
+            if ($request->down_payment > 0) {
+                // Calculate down payment incentive (0.50% if down payment >= 40% of hire price)
+                $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
+
+                if ($down_payment_percentage >= 40) {
+                    $down_payment_incentive_rate = 0.50; // 0.50%
+                    $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;
+
+                    Incentive::create([
+                        'hire_purchase_id' => $HirePurchase->id,
+                        'showroom_user_id' => $showroom_user,
+                        'type' => 'down_payment',
+                        'amount' => $request->down_payment,
+                        'incentive_rate' => $down_payment_incentive_rate,
+                        'incentive_amount' => $down_payment_incentive_amount,
+                        'status' => 'pending'
+                    ]);
+                }
+            }
 
             $showroom->remaining_credit = $remaining_credit;
             $productName = Product::where('id', $request->product_group_id)->first();

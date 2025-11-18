@@ -3,19 +3,20 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Zone;
 use App\Models\ShowRoom;
+use App\Models\Incentive;
 use App\Models\Installment;
 use App\Models\Transaction;
 use App\Service\ApiService;
 use App\Models\HirePurchase;
 use Illuminate\Http\Request;
 use App\Models\ZonePermission;
+use App\Models\PaymentErpHistory;
 use Illuminate\Support\Facades\DB;
 use App\Models\HirePurchaseProduct;
-use App\Models\PaymentErpHistory;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -192,6 +193,34 @@ class PaymentCollectionController extends Controller
                     $hirepurchase->save();
                 }
             }
+
+            $allPaid = Installment::where('hire_purchase_id', $request->hire_purchase_id)
+                ->where('status', 0)
+                ->count() === 0;
+
+            $latestDueDate = Installment::where('hire_purchase_id', $request->hire_purchase_id)
+                ->max('loan_start_date');
+
+            $now = Carbon::now();
+            $withinDeadline = $now->lte(Carbon::parse($latestDueDate));
+
+            if ($allPaid && $withinDeadline) {
+                $incentiveRate = 2.5;
+                $totalCollected = Transaction::where('hire_purchase_id', $request->hire_purchase_id)->sum('amount');
+                $incentiveAmount = ($totalCollected * $incentiveRate) / 100;
+
+                Incentive::create([
+                    'hire_purchase_id' => $request->hire_purchase_id,
+                    'showroom_user_id' => $hirepurchase->showroom_user_id, // অথবা showroom_user_id from hirepurchase
+                    'type' => 'collection',
+                    'amount' => $totalCollected,
+                    'incentive_rate' => $incentiveRate,
+                    'incentive_amount' => $incentiveAmount,
+                    'status' => 'pending',
+                    'payment_date' => null,
+                ]);
+            }
+
             if ($response->error == 1) {
                 // $erp_log->sent = 0;
                 // echo $response['error'];
