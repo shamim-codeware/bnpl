@@ -45,6 +45,7 @@ use App\Http\Controllers\PaymentCollectionController;
 use App\Http\Controllers\CustomerProfessionController;
 use App\Http\Controllers\DownPaymentSettingController;
 use App\Http\Controllers\ExportHirepurchaseController;
+use App\Http\Controllers\IncentiveConfigurationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -219,6 +220,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('installment-list/{id}', [HirePurchaseController::class, 'InstallmentList']);
 
+    Route::get('/incentive-configuration-status/{id}', [IncentiveConfigurationController::class, 'toggleStatus'])
+        ->name('incentive-configuration.status');
 
     Route::middleware(['check.permission'])->group(function () {
         Route::resources([
@@ -241,6 +244,7 @@ Route::group(['middleware' => 'auth'], function () {
             'brand'               => BrandController::class,
             'sizes'               => SizeController::class,
             'group'               => ProductTypeController::class,
+            'incentive-configuration'    => IncentiveConfigurationController::class,
             'menus'               => MenuController::class,
             'credit-score'        => CreditScorController::class,
             'hire-purchase'       => HirePurchaseController::class,
