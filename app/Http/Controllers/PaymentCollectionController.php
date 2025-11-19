@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\HirePurchaseProduct;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\GeneralIncentiveConfig;
 
 
 
@@ -204,14 +205,31 @@ class PaymentCollectionController extends Controller
             $now = Carbon::now();
             $withinDeadline = $now->lte(Carbon::parse($latestDueDate));
 
+            // if ($allPaid && $withinDeadline) {
+            //     $incentiveRate = 2.5;
+            //     $totalCollected = Transaction::where('hire_purchase_id', $request->hire_purchase_id)->sum('amount');
+            //     $incentiveAmount = ($totalCollected * $incentiveRate) / 100;
+
+            //     Incentive::create([
+            //         'hire_purchase_id' => $request->hire_purchase_id,
+            //         'showroom_user_id' => $hirepurchase->showroom_user_id, // অথবা showroom_user_id from hirepurchase
+            //         'type' => 'collection',
+            //         'amount' => $totalCollected,
+            //         'incentive_rate' => $incentiveRate,
+            //         'incentive_amount' => $incentiveAmount,
+            //         'status' => 'pending',
+            //         'payment_date' => null,
+            //     ]);
+            // }
+
             if ($allPaid && $withinDeadline) {
-                $incentiveRate = 2.5;
+                $incentiveRate = GeneralIncentiveConfig::getCollectionIncentiveRate();
                 $totalCollected = Transaction::where('hire_purchase_id', $request->hire_purchase_id)->sum('amount');
                 $incentiveAmount = ($totalCollected * $incentiveRate) / 100;
 
                 Incentive::create([
                     'hire_purchase_id' => $request->hire_purchase_id,
-                    'showroom_user_id' => $hirepurchase->showroom_user_id, // অথবা showroom_user_id from hirepurchase
+                    'showroom_user_id' => $hirepurchase->showroom_user_id,
                     'type' => 'collection',
                     'amount' => $totalCollected,
                     'incentive_rate' => $incentiveRate,

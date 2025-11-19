@@ -292,7 +292,7 @@
                                         {{ $item->amount }}
                                     </div>
                                 </td>
-                                <td>
+                                {{-- <td>
                                     <div class="userDatatable-content">
                                         @if($item->calculated_late_fee > 0)
                                             <span style="color: #e30613; font-weight: 600;">{{ number_format($item->calculated_late_fee, 2) }}</span>
@@ -300,7 +300,23 @@
                                             0.00
                                         @endif
                                     </div>
-                                 </td>
+                                 </td> --}}
+
+                                 <td>
+                                        <div class="userDatatable-content">
+                                            @if($item->calculated_late_fee > 0)
+                                                @if($item->status == 1)
+                                                    <!-- Paid late fee - show in normal color -->
+                                                    <span style="font-weight: 600;">{{ number_format($item->calculated_late_fee, 2) }}</span>
+                                                @else
+                                                    <!-- Unpaid late fee - show in red -->
+                                                    <span style="color: #e30613; font-weight: 600;">{{ number_format($item->calculated_late_fee, 2) }}</span>
+                                                @endif
+                                            @else
+                                                0.00
+                                            @endif
+                                        </div>
+                                    </td>
                                 <td>
                                     <div class="userDatatable-content">
                                         {{    date('d/m/Y', strtotime($item->loan_start_date)), }}
@@ -381,7 +397,7 @@
                     <p style="font-size: 16px">
                         4. In case Guarantors don't respond, Rangs Electronics Limited will have rights to take legal step for recovery.
                     </p>
-                    <table style="width:20%;margin-top:30px;" cellspacing="0">
+                    <table style="width:20%;margin-top:32px;" cellspacing="0">
                         <tr>
                             <td style="text-align: center;padding-top:5px !important;border-top:2px dashed #000;vertical-align:bottom;padding-bottom: 45px !important;text-align: left;font-weight:600;">
                                 Signature of Customer

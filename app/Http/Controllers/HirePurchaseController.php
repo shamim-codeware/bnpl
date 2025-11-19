@@ -34,6 +34,7 @@ use App\Models\HirePurchaseProduct;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use App\Models\GeneralIncentiveConfig;
 use App\Traits\LateFeeCalculationTrait;
 use Illuminate\Support\Facades\Session;
 
@@ -950,12 +951,35 @@ class HirePurchaseController extends Controller
 
             $transaction->fill($transactionData)->save();
 
+            // if ($request->down_payment > 0) {
+            //     // Calculate down payment incentive (0.50% if down payment >= 40% of hire price)
+            //     $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
+
+            //     if ($down_payment_percentage >= 40) {
+            //         $down_payment_incentive_rate = 0.50; // 0.50%
+            //         $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;
+
+            //         Incentive::create([
+            //             'hire_purchase_id' => $HirePurchase->id,
+            //             'showroom_user_id' => $showroom_user,
+            //             'type' => 'down_payment',
+            //             'amount' => $request->down_payment,
+            //             'incentive_rate' => $down_payment_incentive_rate,
+            //             'incentive_amount' => $down_payment_incentive_amount,
+            //             'status' => 'pending'
+            //         ]);
+            //     }
+            // }
+
             if ($request->down_payment > 0) {
-                // Calculate down payment incentive (0.50% if down payment >= 40% of hire price)
+                // Get dynamic values from configuration
+                $down_payment_threshold = GeneralIncentiveConfig::getDownPaymentThreshold();
+                $down_payment_incentive_rate = GeneralIncentiveConfig::getDownPaymentIncentiveRate();
+
+                // Calculate down payment percentage
                 $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
 
-                if ($down_payment_percentage >= 40) {
-                    $down_payment_incentive_rate = 0.50; // 0.50%
+                if ($down_payment_percentage >= $down_payment_threshold) {
                     $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;
 
                     Incentive::create([
@@ -1003,7 +1027,12 @@ class HirePurchaseController extends Controller
         $installments = Installment::where('hire_purchase_id', $id)->get();
 
         foreach ($installments as $installment) {
-            $installment->calculated_late_fee = $this->calculateInstallmentLateFine($installment);
+            // $installment->calculated_late_fee = $this->calculateInstallmentLateFine($installment);
+            if ($installment->status == 1) {
+                $installment->calculated_late_fee = $installment->fine_amount ?? 0;
+            } else {
+                $installment->calculated_late_fee = $this->calculateInstallmentLateFine($installment);
+            }
         }
 
         $late_fee = $this->calculateLateFine($id);

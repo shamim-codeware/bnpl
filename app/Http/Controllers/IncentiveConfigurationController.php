@@ -7,14 +7,51 @@ use Illuminate\Http\Request;
 use App\Models\ProductCategory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\GeneralIncentiveConfig;
 use App\Models\IncentiveConfiguration;
 
 class IncentiveConfigurationController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     $title = "Incentive Configuration";
+    //     $description = "Manage product incentives";
+
+    //     $categories = ProductCategory::orderBy('name', 'ASC')->get();
+    //     $products = Product::orderBy('product_model', 'ASC')->get();
+
+    //     $query = IncentiveConfiguration::with(['creator']);
+
+    //     // Filter by type
+    //     if ($request->type) {
+    //         $query->where('type', $request->type);
+    //     }
+
+    //     // Search
+    //     if ($request->keyword) {
+    //         $query->where('name', 'like', "%{$request->keyword}%");
+    //     }
+
+    //     $incentives = $query->orderBy('id', 'DESC')->paginate(30);
+
+    //     return view('pages.settings.incentive-config.index', compact(
+    //         'title',
+    //         'description',
+    //         'incentives',
+    //         'categories',
+    //         'products'
+    //     ));
+    // }
+
     public function index(Request $request)
     {
         $title = "Incentive Configuration";
-        $description = "Manage product incentives";
+        $description = "Manage general and product incentives";
+
+        // Get all general incentive configurations
+        $downPaymentThreshold = GeneralIncentiveConfig::where('config_type', 'down_payment_threshold')->first();
+        $downPaymentIncentiveRate = GeneralIncentiveConfig::where('config_type', 'down_payment_incentive_rate')->first();
+        $collectionIncentiveRate = GeneralIncentiveConfig::where('config_type', 'collection_incentive_rate')->first();
 
         $categories = ProductCategory::orderBy('name', 'ASC')->get();
         $products = Product::orderBy('product_model', 'ASC')->get();
@@ -38,8 +75,62 @@ class IncentiveConfigurationController extends Controller
             'description',
             'incentives',
             'categories',
-            'products'
+            'products',
+            'downPaymentThreshold',
+            'downPaymentIncentiveRate',
+            'collectionIncentiveRate'
         ));
+    }
+
+    public function storeGeneralConfig(Request $request)
+    {
+        $request->validate([
+            'down_payment_threshold' => 'required|numeric|min:0|max:100',
+            'down_payment_incentive_rate' => 'required|numeric|min:0|max:100',
+            'collection_incentive_rate' => 'required|numeric|min:0|max:100',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Update or create down payment threshold
+            GeneralIncentiveConfig::updateOrCreate(
+                ['config_type' => 'down_payment_threshold'],
+                [
+                    'value' => $request->down_payment_threshold,
+                    'description' => 'Down Payment Percentage Threshold for Incentive',
+                    'is_active' => true,
+                    'created_by' => Auth::id()
+                ]
+            );
+
+            // Update or create down payment incentive rate
+            GeneralIncentiveConfig::updateOrCreate(
+                ['config_type' => 'down_payment_incentive_rate'],
+                [
+                    'value' => $request->down_payment_incentive_rate,
+                    'description' => 'Down Payment Incentive Rate',
+                    'is_active' => true,
+                    'created_by' => Auth::id()
+                ]
+            );
+
+            // Update or create collection incentive rate
+            GeneralIncentiveConfig::updateOrCreate(
+                ['config_type' => 'collection_incentive_rate'],
+                [
+                    'value' => $request->collection_incentive_rate,
+                    'description' => 'Collection Incentive Rate',
+                    'is_active' => true,
+                    'created_by' => Auth::id()
+                ]
+            );
+
+            DB::commit();
+            return redirect()->back()->with('success', 'General incentive configurations updated successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to update configurations: ' . $e->getMessage());
+        }
     }
 
     public function store(Request $request)

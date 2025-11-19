@@ -222,6 +222,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/incentive-configuration-status/{id}', [IncentiveConfigurationController::class, 'toggleStatus'])
         ->name('incentive-configuration.status');
+    Route::post('/general-incentive-config', [IncentiveConfigurationController::class, 'storeGeneralConfig'])->name('general-incentive-config.store');
 
     Route::middleware(['check.permission'])->group(function () {
         Route::resources([
