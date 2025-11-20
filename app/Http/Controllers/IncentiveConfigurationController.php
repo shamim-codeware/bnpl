@@ -12,37 +12,6 @@ use App\Models\IncentiveConfiguration;
 
 class IncentiveConfigurationController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $title = "Incentive Configuration";
-    //     $description = "Manage product incentives";
-
-    //     $categories = ProductCategory::orderBy('name', 'ASC')->get();
-    //     $products = Product::orderBy('product_model', 'ASC')->get();
-
-    //     $query = IncentiveConfiguration::with(['creator']);
-
-    //     // Filter by type
-    //     if ($request->type) {
-    //         $query->where('type', $request->type);
-    //     }
-
-    //     // Search
-    //     if ($request->keyword) {
-    //         $query->where('name', 'like', "%{$request->keyword}%");
-    //     }
-
-    //     $incentives = $query->orderBy('id', 'DESC')->paginate(30);
-
-    //     return view('pages.settings.incentive-config.index', compact(
-    //         'title',
-    //         'description',
-    //         'incentives',
-    //         'categories',
-    //         'products'
-    //     ));
-    // }
-
     public function index(Request $request)
     {
         $title = "Incentive Configuration";
@@ -143,12 +112,11 @@ class IncentiveConfigurationController extends Controller
 
         DB::beginTransaction();
         try {
-            // Get the name based on type
-            if ($request->type == 'category') {
+            if ($request->type === 'category') {
                 $category = ProductCategory::findOrFail($request->reference_id);
                 $name = $category->name;
 
-                // Check if already exists
+                // Check if category incentive already exists
                 $exists = IncentiveConfiguration::where('type', 'category')
                     ->where('reference_id', $request->reference_id)
                     ->exists();
@@ -156,17 +124,39 @@ class IncentiveConfigurationController extends Controller
                 if ($exists) {
                     return redirect()->back()->with('error', 'Incentive for this category already exists!');
                 }
+
+                // Check if any model under this category already has incentive
+                $modelExists = IncentiveConfiguration::where('type', 'model')
+                    ->whereIn('reference_id', function ($query) use ($category) {
+                        $query->select('id')
+                            ->from('products')
+                            ->where('category_id', $category->id);
+                    })
+                    ->exists();
+
+                if ($modelExists) {
+                    return redirect()->back()->with('error', 'One or more models under this category already have incentives. Category-level incentive cannot be added.');
+                }
             } else {
                 $product = Product::findOrFail($request->reference_id);
                 $name = $product->product_model;
 
-                // Check if already exists
+                // Check if model incentive already exists
                 $exists = IncentiveConfiguration::where('type', 'model')
                     ->where('reference_id', $request->reference_id)
                     ->exists();
 
                 if ($exists) {
                     return redirect()->back()->with('error', 'Incentive for this model already exists!');
+                }
+
+                // Check if this model's category already has a category-level incentive
+                $categoryIncentiveExists = IncentiveConfiguration::where('type', 'category')
+                    ->where('reference_id', $product->category_id)
+                    ->exists();
+
+                if ($categoryIncentiveExists) {
+                    return redirect()->back()->with('error', 'This model\'s category already has a category-level incentive. Model-level incentive cannot be added.');
                 }
             }
 

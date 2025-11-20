@@ -13,10 +13,35 @@ class Incentive extends Model
         'hire_purchase_id',
         'showroom_user_id',
         'type',
+        'sure_shot_type',
+        'category_id',
+        'product_model_id',
+        'product_category_name',
+        'product_model_name',
         'amount',
         'incentive_rate',
         'incentive_amount',
         'status',
         'payment_date'
     ];
+
+    public function hirePurchase()
+    {
+        return $this->belongsTo(HirePurchase::class);
+    }
+
+    public function showroomUser()
+    {
+        return $this->belongsTo(ShowRoomUser::class, 'showroom_user_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_model_id');
+    }
 }

@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\GeneralIncentiveConfig;
+use App\Models\IncentiveConfiguration;
 use App\Traits\LateFeeCalculationTrait;
 use Illuminate\Support\Facades\Session;
 
@@ -989,6 +990,53 @@ class HirePurchaseController extends Controller
                         'amount' => $request->down_payment,
                         'incentive_rate' => $down_payment_incentive_rate,
                         'incentive_amount' => $down_payment_incentive_amount,
+                        'status' => 'pending'
+                    ]);
+                }
+            }
+
+            $product_category_id = $request->product_category_id;
+            $product_model_id = $request->product_model_id;
+
+            // Check for Sure Shot Incentive (Model first, then Category - as per your requirement)
+            $model_incentive_config = IncentiveConfiguration::where('type', 'model')
+                ->where('reference_id', $product_model_id)
+                ->where('is_active', true)
+                ->first();
+
+            if ($model_incentive_config) {
+                // Model-wise incentive applies (Tk 1000 example)
+                Incentive::create([
+                    'hire_purchase_id' => $HirePurchase->id,
+                    'showroom_user_id' => $showroom_user,
+                    'type' => 'sure_shot',
+                    'sure_shot_type' => 'model',
+                    'product_model_id' => $product_model_id,
+                    'product_model_name' => $model_incentive_config->name,
+                    'amount' => 0, // Or the model amount
+                    'incentive_rate' => 0, // Fixed amount, no rate
+                    'incentive_amount' => $model_incentive_config->incentive_amount, // Tk 1000
+                    'status' => 'pending'
+                ]);
+            } else {
+                // Check category-wise incentive
+                $category_incentive_config = IncentiveConfiguration::where('type', 'category')
+                    ->where('reference_id', $product_category_id)
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($category_incentive_config) {
+                    // Category-wise incentive applies (Tk 500 example)
+                    Incentive::create([
+                        'hire_purchase_id' => $HirePurchase->id,
+                        'showroom_user_id' => $showroom_user,
+                        'type' => 'sure_shot',
+                        'sure_shot_type' => 'category',
+                        'category_id' => $product_category_id,
+                        'product_category_name' => $category_incentive_config->name,
+                        'amount' => 0, // Or the category amount
+                        'incentive_rate' => 0, // Fixed amount, no rate
+                        'incentive_amount' => $category_incentive_config->incentive_amount, // Tk 500
                         'status' => 'pending'
                     ]);
                 }
