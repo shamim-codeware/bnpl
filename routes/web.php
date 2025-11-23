@@ -270,6 +270,8 @@ Route::group(['middleware' => 'auth'], function () {
         //external Report alist
         Route::get('cancelled-bnpl-sales', [ExternalReportController::class, 'CancelBnplSale'])->name('cancelled-bnpl-sales');
 
+        Route::get('incentive-report', [ExternalReportController::class, 'IncentiveReport'])->name('incentive-report');
+
         //all Bnpl
         Route::get('all-bnpl-orders', [ExternalReportController::class, 'AllBnplSale'])->name('all-bnpl-sales');
         //Defaulter Report
@@ -288,6 +290,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('cancelled-bnpl-sales-action', [ExternalReportController::class, 'CancelBnplSaleAction'])->name('cancelled-bnpl-sales-action');
     Route::get('cancelled-bnpl-sales-export', [ExternalReportController::class, 'CancelBnplSaleExport'])->name('cancelled-bnpl-sales-export');
 
+    Route::get('incentive-report-action', [ExternalReportController::class, 'IncentiveReportAction'])->name('incentive-report-action');
+    Route::get('incentive-report-export', [ExternalReportController::class, 'IncentiveReportExport'])->name('incentive-report-export');
     //Report Action
     Route::get('monthly-report', function () {
         $title = "Monthly Report";

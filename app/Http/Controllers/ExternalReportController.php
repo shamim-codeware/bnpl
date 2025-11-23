@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Helpers\Helper;
 use App\Models\Product;
 use App\Models\ShowRoom;
+use App\Models\Incentive;
 use App\Models\Installment;
 use App\Models\ProductType;
 use App\Models\HirePurchase;
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\ZonePermission;
 use App\Models\ProductCategory;
 use App\Exports\BnplOrdersExport;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Traits\LateFeeCalculationTrait;
@@ -49,10 +51,10 @@ class ExternalReportController extends Controller
     {
         $hirepurchase = $this->filterBnplOrders($request, false); // false means no pagination
 
-            // Calculate late fees for each hire purchase
-            foreach ($hirepurchase as $hire) {
-                $hire->late_fee = $this->calculateLateFine($hire->id);
-            }
+        // Calculate late fees for each hire purchase
+        foreach ($hirepurchase as $hire) {
+            $hire->late_fee = $this->calculateLateFine($hire->id);
+        }
 
         return Excel::download(new BnplOrdersExport($hirepurchase), 'All_BNPL_Orders_' . Helper::formatDateTimeFilename() . '.xlsx');
     }
@@ -298,9 +300,9 @@ class ExternalReportController extends Controller
             ])
             ->where('is_paid', 0) // Not fully paid
             ->where('status', 3)  // Confirmed sale
-            ->whereHas('installment', function($q) {
+            ->whereHas('installment', function ($q) {
                 $q->where('status', 0) // Unpaid installment
-                  ->whereDate('loan_start_date', '<', now()); // Overdue (loan_start_date is past current date)
+                    ->whereDate('loan_start_date', '<', now()); // Overdue (loan_start_date is past current date)
             });
 
         $product_group_ids = explode(',', $request->product_group);
@@ -364,12 +366,188 @@ class ExternalReportController extends Controller
 
         // Add the days_overdue and last_payment_date as additional selected fields
         $query->addSelect([
-            \DB::raw('COALESCE(DATEDIFF(NOW(), (SELECT MIN(loan_start_date) FROM installments WHERE hire_purchase_id = hire_purchases.id AND status = 0 AND loan_start_date < NOW())), 0) as days_overdue'),
-            \DB::raw('(SELECT MAX(updated_at) FROM installments WHERE hire_purchase_id = hire_purchases.id AND status = 1) as last_payment_date')
+            DB::raw('COALESCE(DATEDIFF(NOW(), (SELECT MIN(loan_start_date) FROM installments WHERE hire_purchase_id = hire_purchases.id AND status = 0 AND loan_start_date < NOW())), 0) as days_overdue'),
+            DB::raw('(SELECT MAX(updated_at) FROM installments WHERE hire_purchase_id = hire_purchases.id AND status = 1) as last_payment_date')
         ]);
 
         $query = $query->latest();
         $per_page = $request->per_page ?? 30;
         return $paginate ? $query->paginate($per_page) : $query->get();
+    }
+
+    public function IncentiveReport()
+    {
+        $title = "Incentive Report";
+        $description = "Comprehensive report of all incentives paid and pending";
+
+        $data = $this->prepareDataForIncentiveReport();
+
+        return view('report.incentive', compact('title', 'description', 'data'));
+    }
+
+    public function IncentiveReportAction(Request $request)
+    {
+        $incentives = $this->filterIncentiveReport($request, true);
+        // dd($incentives);
+
+        $from_date = $request->from_date ? date('Y-m-d 00:00:00', strtotime($request->from_date)) : null;
+        $to_date = $request->to_date ? date('Y-m-d 23:59:59', strtotime($request->to_date)) : null;
+
+        return view('report.incentive_ajax', compact("incentives", "from_date", 'to_date'));
+    }
+
+    public function IncentiveReportExport(Request $request)
+    {
+        $incentives = $this->filterIncentiveReport($request, false);
+
+        // Export logic using Maatwebsite/Excel or direct CSV
+        $headers = [
+            "Content-Type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=incentive_report_" . date('Y-m-d') . ".csv"
+        ];
+
+        $callback = function () use ($incentives) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, [
+                'SL',
+                'Order No',
+                'Customer Name',
+                'Product Group',
+                'Product Model',
+                'Incentive Type',
+                'Incentive Category',
+                'Incentive Amount',
+                'Status',
+                'Created Date',
+                'Showroom',
+                'User'
+            ]);
+
+            foreach ($incentives as $key => $incentive) {
+                $customer_name = $incentive->hirePurchase->name ?? '';
+                $product_group = $incentive->hirePurchase->purchase_product->product->types->name ?? '';
+                $product_model = $incentive->hirePurchase->purchase_product->product->product_model ?? '';
+                $incentive_category = '';
+
+                if ($incentive->sure_shot_type == 'category') {
+                    $incentive_category = $incentive->product_category_name ?? '';
+                } elseif ($incentive->sure_shot_type == 'model') {
+                    $incentive_category = $incentive->product_model_name ?? '';
+                } else {
+                    $incentive_category = $incentive->type;
+                }
+
+                $showroom_name = $incentive->hirePurchase->show_room->name ?? '';
+                $user_name = $incentive->hirePurchase->users->name ?? '';
+
+                fputcsv($file, [
+                    $key + 1,
+                    $incentive->hirePurchase->order_no,
+                    $customer_name,
+                    $product_group,
+                    $product_model,
+                    ucfirst($incentive->type),
+                    $incentive_category,
+                    number_format($incentive->incentive_amount, 2),
+                    ucfirst($incentive->status),
+                    $incentive->created_at->format('d/m/Y H:i:s'),
+                    $showroom_name,
+                    $user_name
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    private function prepareDataForIncentiveReport()
+    {
+        $showrooms = ShowRoom::select('id', 'name')->orderBy('name')->get();
+        $product_category = ProductCategory::select('id', 'name')->orderBy('name')->get();
+        $product_type = ProductType::select('id', 'name')->orderBy('name')->get();
+        $products = Product::select('id', 'product_model')->orderBy('product_model')->get();
+        $brands = Brand::select('id', 'name')->orderBy('name')->get();
+
+        // Add zones for higher-level users
+        $zones = collect(); // Initialize empty collection
+        if (auth()->user()->role_id == 1 || auth()->user()->role_id == 6) {
+            $zones = \App\Models\Zone::select('id', 'name')->orderBy('name')->get();
+        }
+
+        return compact('showrooms', 'product_category', 'product_type', 'products', 'brands', 'zones');
+    }
+
+    private function filterIncentiveReport(Request $request, $paginate = true)
+    {
+        // Parse dates from request
+        $from_date = $request->from_date ? date('Y-m-d 00:00:00', strtotime($request->from_date)) : null;
+        $to_date = $request->to_date ? date('Y-m-d 23:59:59', strtotime($request->to_date)) : null;
+
+        $query = Incentive::with([
+            'hirePurchase.show_room',
+            'hirePurchase.purchase_product.product',
+            'hirePurchase.purchase_product.product.types',
+            'hirePurchase.users'
+        ])->orderBy('id', 'DESC');
+
+        // Filter by date range
+        // if ($from_date && $to_date) {
+        //     $query->whereBetween('incentives.created_at', [$from_date, $to_date]);
+        // }
+
+        // Filter by showroom
+        if ($request->showroom_ctp) {
+            $query->whereHas('hirePurchase.show_room', function ($q) use ($request) {
+                $q->where('show_rooms.id', $request->showroom_ctp);
+            });
+        }
+
+        // // Filter by product category
+        if ($request->product_category) {
+            $query->whereHas('hirePurchase.purchase_product.product', function ($q) use ($request) {
+                $q->where('category_id', $request->product_category);
+            });
+        }
+
+        // // Filter by product group
+        if ($request->product_group) {
+            $query->whereHas('hirePurchase.purchase_product.product', function ($q) use ($request) {
+                $q->where('type_id', $request->product_group);
+            });
+        }
+
+        // // Filter by product model
+        if ($request->product_id) {
+            $query->whereHas('hirePurchase.purchase_product.product', function ($q) use ($request) {
+                $q->where('id', $request->product_id);
+            });
+        }
+
+        // // Filter by brand
+        if ($request->brand_id) {
+            $query->whereHas('hirePurchase.purchase_product.product', function ($q) use ($request) {
+                $q->where('brand_id', $request->brand_id);
+            });
+        }
+
+        // // Filter by incentive type
+        if ($request->incentive_type) {
+            $query->where('type', $request->incentive_type);
+        }
+
+        // // Filter by zone
+        if ($request->zone_id) {
+            $query->whereHas('hirePurchase.show_room', function ($q) use ($request) {
+                $q->where('zone_id', $request->zone_id);
+            });
+        }
+
+        if ($paginate) {
+            return $query->paginate($request->per_page ?? 30);
+        } else {
+            return $query->get();
+        }
     }
 }

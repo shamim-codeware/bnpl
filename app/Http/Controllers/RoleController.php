@@ -80,7 +80,7 @@ class RoleController extends Controller
 
     public function ZoneAssign(Request $request ){
         $user_id = $request->user_id;
-        $ShowRoomPermission = new ZonePermission; 
+        $ShowRoomPermission = new ZonePermission;
         ZonePermission::where('user_id',$user_id)->delete();
         foreach($request->showroom_id as $row){
             $data['user_id'] =  $user_id ;
@@ -140,6 +140,7 @@ class RoleController extends Controller
 
         return  redirect()->back()->with('success', 'Success! Status Change Successfully');
     }
+
     public function menuPermission()
     {
         $title = "Menu Permission";
@@ -156,7 +157,7 @@ class RoleController extends Controller
     public function menuPermissionAssign(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'permission' => 'required|array', 
+            'permission' => 'required|array',
             'role_id'    => 'required|numeric|exists:roles,id',
         ],[
             'role_id.required'    => 'Select role',
@@ -172,7 +173,7 @@ class RoleController extends Controller
                 $permissions[] = ['menu_id' => $key, 'action' => $p];
             }
             MenuPermission::where('role_id', $request->input('role_id'))->delete();
-            // Menu permission    
+            // Menu permission
             foreach($permissions as $per){
                 $permission              = new MenuPermission();
                 $permission->role_id     = $request->input('role_id');
@@ -181,7 +182,7 @@ class RoleController extends Controller
                 $permission->created_by  = Auth::user()->id;
                 $permission->save();
             }
-            
+
             return response()->json(['status' => 1, 'message' => 'Success! Save'], 200);
         }
     }
@@ -195,7 +196,7 @@ class RoleController extends Controller
         //     $menu->parent_id   = 0;
         //     $menu->created_by  = Auth::user()->id;
         //     $menu->save();
-    
+
         //     if ($m['children']){
         //         foreach ($m['children'] as $c){
         //             $me              = new Menu();
@@ -205,7 +206,7 @@ class RoleController extends Controller
         //             $me->parent_id   = $menu->id;
         //             $me->created_by  = Auth::user()->id;
         //             $me->save();
-                
+
         //         }
         //     }
         // }

@@ -22,7 +22,8 @@ class Incentive extends Model
         'incentive_rate',
         'incentive_amount',
         'status',
-        'payment_date'
+        'payment_date',
+        'created_at',
     ];
 
     public function hirePurchase()
