@@ -80,6 +80,7 @@ class HirePurchaseController extends Controller
         $products = Product::latest()->get();
         $showrooms = ShowRoom::latest()->get();
         $banks = Bank::latest()->get();
+        $packages = DB::table('packages')->where('is_active', 1)->get();
 
         $showroom_credit = ShowRoom::where('id', auth()->user()->showroom_id)->first();
         $showroomusers = ShowRoomUser::where('showroom_id', Auth::user()->showroom_id)->latest()->get();
@@ -95,6 +96,7 @@ class HirePurchaseController extends Controller
             'showroomusers',
             'showrooms',
             "brands",
+            "packages",
             "product_type",
             "interestrate",
             "showroom_credit",

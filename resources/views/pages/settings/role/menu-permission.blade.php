@@ -81,6 +81,9 @@
                                             @endforeach
                                         </tbody>
                                     </table>
+                                   <div style="margin: 20px;"> <button type="submit">Submit</button> </div>
+
+
                                 </form>
                             </div>
                         </div>

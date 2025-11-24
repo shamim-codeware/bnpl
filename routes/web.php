@@ -17,6 +17,7 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EnqueryController;
 use App\Http\Controllers\EnquiryController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PenaltyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CreditScorController;
 use App\Http\Controllers\DueEnquiryController;
 use App\Http\Controllers\EnquiryTypeController;
+use App\Http\Controllers\PackageItemController;
 use App\Http\Controllers\ProductTypeController;
 use App\Http\Controllers\CustomerInfoController;
 use App\Http\Controllers\CustomerTypeController;
@@ -129,7 +131,7 @@ Route::group(['middleware' => 'auth'], function () {
     //Route::get('/due-enquery',[DueEnquiryController::class]);
     Route::get('home', [DashboardController::class, 'index'])->name('home');
     Route::match(['get', 'post'], 'marquee-notifications', [DashboardController::class, 'getTransactionMarquee'])
-    ->name('home-notifications');
+        ->name('home-notifications');
     //  Route::get('enquiry', [EnquiryController::class, 'index'])->name('enquiry');
     Route::get('notifications', [NotificationsController::class, 'notifications'])->name('notifications');
     Route::get('clear-all', [NotificationsController::class, 'ClearAll'])->name('clearAll');
@@ -241,6 +243,8 @@ Route::group(['middleware' => 'auth'], function () {
             'customer-profession' => CustomerProfessionController::class,
             'upazila'             => UpazillaController::class,
             'product'             => ProductController::class,
+            'package'             => PackageController::class,
+            'package-product'     => PackageItemController::class,
             'category'            => ProductCategoryController::class,
             'brand'               => BrandController::class,
             'sizes'               => SizeController::class,
@@ -255,6 +259,7 @@ Route::group(['middleware' => 'auth'], function () {
             'interest-rate'       => InterestRateController::class,
             'banks'               => BankController::class,
         ]);
+
         //Report Controller
         Route::get('monthly-report', [ReportController::class, 'MonthlyReport']);
 
@@ -277,7 +282,6 @@ Route::group(['middleware' => 'auth'], function () {
         //Defaulter Report
         Route::get('defaulter-customers', [ExternalReportController::class, 'DefaulterReport'])->name('defaulter-report');
     });
-
 
     Route::get('all-bnpl-sales-action', [ExternalReportController::class, 'AllBnplSaleAction'])->name('all-bnpl-sales-action');
     Route::get('all-bnpl-sales-export', [ExternalReportController::class, 'AllBnplSaleExport'])->name('all-bnpl-sales-export');
@@ -385,3 +389,5 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 Route::post('/api/save-draft', [HirePurchaseController::class, 'saveDraft'])->name('save-draft');
 Route::get('/api/load-draft', [HirePurchaseController::class, 'loadDraft'])->name('load-draft');
+
+Route::get('/api/packages/{id}/items', [PackageItemController::class, 'getPackageItems'])->name('packages.items');

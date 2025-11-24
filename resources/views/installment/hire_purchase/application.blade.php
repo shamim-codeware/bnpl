@@ -740,7 +740,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                              <div class="col-md-5">
+                                                <div class="col-md-5">
                                                     <div class="row align-items-center">
                                                         <div class="col-md-7 pe-0">
                                                             <div class="holder">
@@ -849,7 +849,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                   <div class="col-md-5">
+                                                <div class="col-md-5">
                                                     <div class="row align-items-center">
                                                         <div class="col-md-7 pe-0">
                                                             <div class="holder">
@@ -960,7 +960,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card card-default card-md mb-4 purchase_app">
+                        {{-- <div class="card card-default card-md mb-4 purchase_app">
                             <div class="card-body py-md-30">
                                 <div class="form-group">
                                     <fieldset class="">
@@ -1122,7 +1122,374 @@
                                     </fieldset>
                                 </div>
                             </div>
+                        </div> --}}
+
+                        <div class="card card-default card-md mb-4 purchase_app">
+                            <div class="card-body py-md-30">
+                                <div class="form-group">
+                                    <fieldset class="">
+                                        <legend>Office Use Only:</legend>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <select required name="delivery_showroom_id" id="delivery_showroom_id"
+                                                    class="form-control">
+                                                    <option value="">Select Show Room</option>
+                                                    @foreach ($showrooms as $key => $item)
+                                                        <option @if (Auth::user()->showroom_id == $item->id) selected @endif
+                                                            value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <!-- NEW: Sale Type Selection -->
+                                            <div class="col-md-3">
+                                                <select required name="sale_type" id="sale_type" class="form-control"
+                                                    onchange="toggleSaleType()">
+                                                    <option value="">Select Sale Type</option>
+                                                    <option value="single">Single Product</option>
+                                                    <option value="package">Package</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Package Selection (Hidden by default) -->
+                                            <div class="col-md-3 package-section" style="display:none;">
+                                                <select name="package_id" id="package_id" class="form-control"
+                                                    onchange="loadPackageDetails()">
+                                                    <option value="">Select Package</option>
+                                                    @foreach ($packages as $key => $package)
+                                                        <option value="{{ $package->id }}">{{ $package->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <!-- Single Product Selection Fields -->
+                                            <div class="col-md-3 single-product-section" style="display:none;">
+                                                <select name="product_group_id" onchange="GetCategory()" id="group"
+                                                    class="form-control">
+                                                    <option value="">Product Group</option>
+                                                    @foreach ($product_type as $key => $type)
+                                                        <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Single Product Details Row -->
+                                        <div class="row single-product-section" style="display:none;">
+                                            <div class="col-md-3 mb-25">
+                                                <div class="">
+                                                    <div class="">
+                                                        <select name="product_category_id" id="Select-Model"
+                                                            class="form-control category">
+                                                        </select>
+                                                        <span style="color: red" id="category-require"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select onchange="GetProduct()" name="product_brand_id" id="prod_brand"
+                                                    class="form-control">
+                                                    <option value="">Product Brand</option>
+                                                    @foreach ($brands as $key => $brand)
+                                                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select onchange="GetPrice()" name="product_model_id" id="Select-color"
+                                                    class="form-control">
+                                                    <option value="">Product Model:</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" name="product_size_id" id="product_size"
+                                                    class="form-control" placeholder="Product Size">
+                                            </div>
+                                        </div>
+
+                                        <!-- Package Items Display (Hidden by default) -->
+                                        <div class="row package-section" style="display:none;">
+                                            <div class="col-md-12">
+                                                <div id="package-items-container" class="mt-3">
+                                                    <h6>Package Items:</h6>
+                                                    <table class="table table-bordered" id="package-items-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Product</th>
+                                                                <th>Serial No</th>
+                                                                <th>Price</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="package-items-body">
+                                                            <!-- Package items will be loaded here dynamically -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Common Fields Row -->
+                                        <div class="row mt-3">
+                                            <!-- Serial Number - Only for Single Product -->
+                                            <div class="col-md-3 mb-25 single-product-section" style="display:none;">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <input name="serial_no" id="serial_no" class="input"
+                                                            type="text" placeholder=" " />
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Serial No:<span class="text-danger">*</span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <input required name="cash_price" id="cash_price" class="input"
+                                                            readonly type="number" placeholder=" " />
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Cash Price:<span
+                                                                    class="text-danger">*</span></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <select required onchange="calculate()"
+                                                            name="down_payment_parcentage" id="down_payment_parcentage"
+                                                            class="form-control">
+                                                            <option value="">Down Payment %</option>
+                                                            @foreach ($down_payment_parcentage as $key => $item)
+                                                                <option
+                                                                    @if ($item->payment_percentage == 40) @selected(true) @endif
+                                                                    value="{{ $item->payment_percentage }}">
+                                                                    {{ $item->payment_percentage }}%</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        @foreach ($interestrate as $key => $interest_hid)
+                                                            <input type="hidden"
+                                                                id="interest_rate_{{ $interest_hid->month }}"
+                                                                value="{{ $interest_hid->interest_rate }}">
+                                                        @endforeach
+                                                        <select required onchange="calculate()" name="installment_month"
+                                                            id="installment_month" class="form-control">
+                                                            <option value="">Installment Month</option>
+                                                            @foreach ($interestrate as $key => $interest)
+                                                                <option value="{{ $interest->month }}">
+                                                                    {{ $interest->month }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <input required name="hire_price" id="hire_price" class="input"
+                                                            readonly type="text" placeholder=" " />
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Hire Price:<span
+                                                                    class="text-danger">*</span></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <input readonly required name="down_payment" id="down_payment"
+                                                            class="input" type="text" placeholder=" " />
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Down Payment:<span
+                                                                    class="text-danger">*</span></p>
+                                                        </div>
+                                                        <span id="alert_downpayment" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <input readonly required name="monthly_installment"
+                                                            id="monthly_inst" class="input" type="text"
+                                                            placeholder=" " />
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Monthly Inst. Tk:<span
+                                                                    class="text-danger">*</span></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- EMI Restriction Warning -->
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div id="emi-warning" class="alert alert-warning" style="display:none;">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    <strong>Note:</strong> Single product sales are limited to maximum 3
+                                                    months EMI.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
                         </div>
+
+                        <script>
+                            function toggleSaleType() {
+                                const saleType = document.getElementById('sale_type').value;
+                                const singleSections = document.querySelectorAll('.single-product-section');
+                                const packageSections = document.querySelectorAll('.package-section');
+                                const installmentMonth = document.getElementById('installment_month');
+                                const emiWarning = document.getElementById('emi-warning');
+
+                                // Reset fields
+                                document.getElementById('cash_price').value = '';
+                                document.getElementById('hire_price').value = '';
+                                document.getElementById('down_payment').value = '';
+                                document.getElementById('monthly_inst').value = '';
+
+                                if (saleType === 'single') {
+                                    // Show single product sections
+                                    singleSections.forEach(section => section.style.display = 'block');
+                                    packageSections.forEach(section => section.style.display = 'none');
+
+                                    // Restrict installment months to 3 for single products
+                                    Array.from(installmentMonth.options).forEach(option => {
+                                        if (option.value && parseInt(option.value) > 3) {
+                                            option.disabled = true;
+                                            option.style.display = 'none';
+                                        } else {
+                                            option.disabled = false;
+                                            option.style.display = 'block';
+                                        }
+                                    });
+
+                                    emiWarning.style.display = 'block';
+
+                                    // Make single product fields required
+                                    document.getElementById('serial_no').required = true;
+                                    document.getElementById('package_id').required = false;
+
+                                } else if (saleType === 'package') {
+                                    // Show package sections
+                                    singleSections.forEach(section => section.style.display = 'none');
+                                    packageSections.forEach(section => section.style.display = 'block');
+
+                                    // Enable all installment months for packages
+                                    Array.from(installmentMonth.options).forEach(option => {
+                                        option.disabled = false;
+                                        option.style.display = 'block';
+                                    });
+
+                                    emiWarning.style.display = 'none';
+
+                                    // Make package fields required
+                                    document.getElementById('serial_no').required = false;
+                                    document.getElementById('package_id').required = true;
+
+                                } else {
+                                    // Hide all
+                                    singleSections.forEach(section => section.style.display = 'none');
+                                    packageSections.forEach(section => section.style.display = 'none');
+                                    emiWarning.style.display = 'none';
+                                }
+                            }
+
+                            function loadPackageDetails() {
+                                const packageId = document.getElementById('package_id').value;
+
+                                if (!packageId) {
+                                    document.getElementById('package-items-body').innerHTML = '';
+                                    return;
+                                }
+
+                                // AJAX call to load package items
+                                fetch(`/api/packages/${packageId}/items`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log(data);
+                                        let html = '';
+                                        let totalPrice = 0;
+
+                                        data.items.forEach((item, index) => {
+                                            totalPrice += parseFloat(item.product.cash_price);
+                                            html += `
+                    <tr>
+                        <td>
+                            ${item.product.name}
+                            <input type="hidden" name="package_products[${index}][product_id]" value="${item.product_id}">
+                        </td>
+                        <td>
+                            <input type="text" name="package_products[${index}][serial_no]"
+                                class="form-control form-control-sm" required
+                                placeholder="Enter Serial No">
+                        </td>
+                        <td>${item.product.cash_price}</td>
+                    </tr>
+                `;
+                                        });
+
+                                        document.getElementById('package-items-body').innerHTML = html;
+                                        document.getElementById('cash_price').value = totalPrice.toFixed(2);
+
+                                        // Trigger calculation
+                                        calculate();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error loading package items:', error);
+                                        alert('Failed to load package items');
+                                    });
+                            }
+
+                            // Update existing calculate function to handle both scenarios
+                            function calculate() {
+                                const cashPrice = parseFloat(document.getElementById('cash_price').value) || 0;
+                                const downPaymentPercentage = parseFloat(document.getElementById('down_payment_parcentage').value) || 0;
+                                const installmentMonth = parseInt(document.getElementById('installment_month').value) || 0;
+
+                                if (!cashPrice || !downPaymentPercentage || !installmentMonth) {
+                                    return;
+                                }
+
+                                // Get interest rate
+                                const interestRate = parseFloat(document.getElementById('interest_rate_' + installmentMonth).value) || 0;
+
+                                // Calculate down payment
+                                const downPayment = (cashPrice * downPaymentPercentage) / 100;
+
+                                // Calculate hire price
+                                const principalAmount = cashPrice - downPayment;
+                                const interestAmount = (principalAmount * interestRate) / 100;
+                                const hirePrice = cashPrice + interestAmount;
+
+                                // Calculate monthly installment
+                                const monthlyInstallment = (hirePrice - downPayment) / installmentMonth;
+
+                                // Update fields
+                                document.getElementById('down_payment').value = downPayment.toFixed(2);
+                                document.getElementById('hire_price').value = hirePrice.toFixed(2);
+                                document.getElementById('monthly_inst').value = monthlyInstallment.toFixed(2);
+                            }
+                        </script>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div id="capable_action" class="mb-3 alert alert-danger" style="display: none">
