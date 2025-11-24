@@ -149,7 +149,10 @@ class PaymentCollectionController extends Controller
             $Installment = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 0)->orderby('id', "ASC")->take($number_of_installment)->get();
             foreach ($Installment as $key => $install) {
                 $installment_number = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 1)->count();
-                $response =    $ApiService->CollectionApi($hirepurchase->order_no, $installment_number);
+
+                $paymentRef = "Cash-BNPL-Ins-{$installment_number}";
+
+                $response =    $ApiService->CollectionApi($hirepurchase->order_no, $installment_number, $paymentRef);
 
                 if ($response->error == 1) {
                     $sent = 0;
@@ -157,7 +160,7 @@ class PaymentCollectionController extends Controller
                     $sent = 1;
                 }
                 if ($advance_payment > 0) {
-                    $data =  $ApiService->FineApi($hirepurchase->order_no, $advance_payment, $installment_number);
+                    $data =  $ApiService->FineApi($hirepurchase->order_no, $advance_payment, $installment_number, $paymentRef);
                     // return $data;
                 }
                 $data = [

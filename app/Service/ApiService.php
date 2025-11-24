@@ -52,7 +52,7 @@ class ApiService
             "delivery_from" => $delivery_showroom->ctp_name ? $delivery_showroom->ctp_name : $delivery_showroom->name,
             "delivery_fee" => 0,
             "note" => $data['organization_short_desc'],
-            'payment_ref' => "Cash"
+            'payment_ref' => "Cash-BNPL-DP"
         ]);
 
         // Prepare order details array
@@ -148,7 +148,7 @@ class ApiService
     }
 
 
-    public function CollectionApi($orderNo, $installement)
+    public function CollectionApi($orderNo, $installement, $paymentRef = "Cash")
     {
         // Define the ERP API endpoint
         $url = 'http://202.84.32.120:8527/da/ws';
@@ -165,14 +165,14 @@ class ApiService
         $data = [
             'eorder_no' => $orderNo,
             'ins_no' => $installement,
-            'payment_ref' => "Cash"
+            'payment_ref' => $paymentRef
         ];
         // Send the POST request to the ERP API
         $response = Http::withHeaders($headers)->post($url, $data);
         return json_decode($response, true);
     }
 
-    public function FineApi($orderNo, $panalty_amt, $installment_no)
+    public function FineApi($orderNo, $panalty_amt, $installment_no, $paymentRef = "Cash")
     {
         // API Endpoint
         $url = 'http://202.84.32.120:8527/da/ws';
@@ -186,7 +186,7 @@ class ApiService
         $payload = [
             'eorder_no'   => $orderNo,
             'penalty_amt' => $panalty_amt,
-            'payment_ref' => "Cash", // Default empty if not provided
+            'payment_ref' => $paymentRef, // Default empty if not provided
             'ins_no'      => $installment_no
         ];
         try {
