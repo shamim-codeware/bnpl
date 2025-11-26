@@ -54,7 +54,7 @@ class TransactionExport implements FromCollection, WithHeadings, WithMapping, Wi
             $transaction->hire_purchase->show_room->name ?? 'N/A',
             // Helper::formatDateTimeStandard($transaction->created_at),
             \Carbon\Carbon::parse($transaction->created_at)->format('d F Y'),
-            number_format($transaction->amount, 2),
+            ($transaction->amount),
             $transaction->users->name ?? 'N/A'
         ];
     }

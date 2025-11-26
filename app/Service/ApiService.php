@@ -186,7 +186,7 @@ class ApiService
         $payload = [
             'eorder_no'   => $orderNo,
             'penalty_amt' => $panalty_amt,
-            'payment_ref' => $paymentRef, // Default empty if not provided
+            'payment_ref' => "Cash-BNPL-Fine", // Default empty if not provided
             'ins_no'      => $installment_no
         ];
         try {

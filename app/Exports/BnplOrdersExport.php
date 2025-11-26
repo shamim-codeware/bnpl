@@ -168,25 +168,24 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
 
         // Set conditional values based on status
-        $firstInstallment = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->down_payment, 2) : '0.00');
+        $firstInstallment = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? ($purchase->purchase_product->down_payment) : '0.00');
 
         // $totalPaymentReceived = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00');
         $totalPaymentReceived = $isRejectedOrCancelled
             ? '0.00'
-            : number_format(
+            : (
                 $purchase->installment
                     ->where('status', 1)
                     ->sum(function ($installment) {
                         return $installment->amount + $installment->fine_amount;
-                    }),
-                2
+                    })
             );
         // $outstandingBalanceFormatted = $isRejectedOrCancelled ? '0.00' :
         //     number_format($outstanding_balance, 2);
 
         $outstandingBalanceFormatted = $isRejectedOrCancelled
             ? '0.00'
-            : number_format(max(0, $outstanding_balance), 2);
+            : (max(0, $outstanding_balance));
 
         $paidInstallment = $isRejectedOrCancelled ? '0' : (@$purchase->installment ? $purchase->installment->where('status', 1)->count() : '0');
 
@@ -207,8 +206,8 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
             @$purchase->purchase_product ? (float)($purchase->purchase_product->monthly_installment) : '0.00',
             $totalPaymentReceived, // Conditional: 0.00 if rejected/cancelled
             // @$purchase->late_fee ?? 0.00,
-            $isRejectedOrCancelled ? '0.00' : number_format($purchase->late_fee, 2),
-            $isRejectedOrCancelled ? '0.00' : number_format($paid_fine_amount, 2),
+            $isRejectedOrCancelled ? '0.00' : ($purchase->late_fee),
+            $isRejectedOrCancelled ? '0.00' : ($paid_fine_amount),
             $outstandingBalanceFormatted, // Conditional: 0.00 if rejected/cancelled
             @$purchase->installment ? $purchase->installment->count() : '0',
             $paidInstallment, // Conditional: 0 if rejected/cancelled
