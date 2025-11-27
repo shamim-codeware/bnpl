@@ -1217,6 +1217,9 @@
                                                             <tr>
                                                                 <th>Product</th>
                                                                 <th>Serial No</th>
+                                                                <th>Product Size</th>
+                                                                <th>Product Group</th>
+                                                                <th>Product Category</th>
                                                                 <th>Price</th>
                                                             </tr>
                                                         </thead>
@@ -1367,49 +1370,40 @@
                                 document.getElementById('monthly_inst').value = '';
 
                                 if (saleType === 'single') {
-                                    // Show single product sections
                                     singleSections.forEach(section => section.style.display = 'block');
                                     packageSections.forEach(section => section.style.display = 'none');
 
-                                    // Restrict installment months to 3 for single products
-                                    Array.from(installmentMonth.options).forEach(option => {
-                                        if (option.value && parseInt(option.value) > 3) {
-                                            option.disabled = true;
-                                            option.style.display = 'none';
-                                        } else {
-                                            option.disabled = false;
-                                            option.style.display = 'block';
-                                        }
-                                    });
-
-                                    emiWarning.style.display = 'block';
-
-                                    // Make single product fields required
-                                    document.getElementById('serial_no').required = true;
-                                    document.getElementById('package_id').required = false;
-
-                                } else if (saleType === 'package') {
-                                    // Show package sections
-                                    singleSections.forEach(section => section.style.display = 'none');
-                                    packageSections.forEach(section => section.style.display = 'block');
-
-                                    // Enable all installment months for packages
+                                    // ✅ RESTORE ALL INSTALLMENT OPTIONS (remove restriction)
                                     Array.from(installmentMonth.options).forEach(option => {
                                         option.disabled = false;
                                         option.style.display = 'block';
                                     });
 
-                                    emiWarning.style.display = 'none';
+                                    // Optional: hide or remove EMI warning if no restriction
+                                    if (emiWarning) emiWarning.style.display = 'none';
 
-                                    // Make package fields required
+                                    document.getElementById('serial_no').required = true;
+                                    document.getElementById('package_id').required = false;
+
+                                } else if (saleType === 'package') {
+                                    singleSections.forEach(section => section.style.display = 'none');
+                                    packageSections.forEach(section => section.style.display = 'block');
+
+                                    // ✅ Also restore all options for package (no restriction needed)
+                                    Array.from(installmentMonth.options).forEach(option => {
+                                        option.disabled = false;
+                                        option.style.display = 'block';
+                                    });
+
+                                    if (emiWarning) emiWarning.style.display = 'none';
+
                                     document.getElementById('serial_no').required = false;
                                     document.getElementById('package_id').required = true;
 
                                 } else {
-                                    // Hide all
                                     singleSections.forEach(section => section.style.display = 'none');
                                     packageSections.forEach(section => section.style.display = 'none');
-                                    emiWarning.style.display = 'none';
+                                    if (emiWarning) emiWarning.style.display = 'none';
                                 }
                             }
 
@@ -1434,7 +1428,7 @@
                                             html += `
                     <tr>
                         <td>
-                            ${item.product.name}
+                            ${item.product.product_model}
                             <input type="hidden" name="package_products[${index}][product_id]" value="${item.product_id}">
                         </td>
                         <td>
@@ -1442,6 +1436,13 @@
                                 class="form-control form-control-sm" required
                                 placeholder="Enter Serial No">
                         </td>
+                        <td>
+                          <input type="text" name="package_products[${index}][product_size_id]"
+                                class="form-control form-control-sm"
+                                placeholder="Product Size">
+                        </td>
+                        <td>${item.product.product_group}</td>
+                        <td>${item.product.product_category}</td>
                         <td>${item.product.cash_price}</td>
                     </tr>
                 `;
@@ -1457,36 +1458,6 @@
                                         console.error('Error loading package items:', error);
                                         alert('Failed to load package items');
                                     });
-                            }
-
-                            // Update existing calculate function to handle both scenarios
-                            function calculate() {
-                                const cashPrice = parseFloat(document.getElementById('cash_price').value) || 0;
-                                const downPaymentPercentage = parseFloat(document.getElementById('down_payment_parcentage').value) || 0;
-                                const installmentMonth = parseInt(document.getElementById('installment_month').value) || 0;
-
-                                if (!cashPrice || !downPaymentPercentage || !installmentMonth) {
-                                    return;
-                                }
-
-                                // Get interest rate
-                                const interestRate = parseFloat(document.getElementById('interest_rate_' + installmentMonth).value) || 0;
-
-                                // Calculate down payment
-                                const downPayment = (cashPrice * downPaymentPercentage) / 100;
-
-                                // Calculate hire price
-                                const principalAmount = cashPrice - downPayment;
-                                const interestAmount = (principalAmount * interestRate) / 100;
-                                const hirePrice = cashPrice + interestAmount;
-
-                                // Calculate monthly installment
-                                const monthlyInstallment = (hirePrice - downPayment) / installmentMonth;
-
-                                // Update fields
-                                document.getElementById('down_payment').value = downPayment.toFixed(2);
-                                document.getElementById('hire_price').value = hirePrice.toFixed(2);
-                                document.getElementById('monthly_inst').value = monthlyInstallment.toFixed(2);
                             }
                         </script>
 

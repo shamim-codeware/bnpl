@@ -121,7 +121,7 @@ class PackageItemController extends Controller
 
     public function getPackageItems($id)
     {
-        $package = Package::with('items.product')->findOrFail($id);
+        $package = Package::with('items.product','items.product.types', 'items.product.categories')->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -135,7 +135,9 @@ class PackageItemController extends Controller
                         'id' => $item->product->id,
                         'name' => $item->product->name,
                         'product_model' => $item->product->product_model,
-                        'cash_price' => $item->product->cash_price ?? 0,
+                        'product_group' => $item->product->types?->name,
+                        'product_category' => $item->product->categories?->name,
+                        'cash_price' => $item->product->hire_price ?? 0,
                     ]
                 ];
             })
