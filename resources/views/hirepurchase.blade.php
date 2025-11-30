@@ -136,7 +136,7 @@
             <tr>
                 <table style="width:100%;margin-bottom:3px;" cellspacing="0">
                     <tr>
-                        <td style="width: 30%;">
+                        <td style="width: 42%;">
                             <table style="width:100%;font-size:14px; text-align:left;">
                             <tr>
                                 <td colspan="2" style="background:#e30613; color:#fff; font-weight:600; text-align:center; padding:3px !important; font-size:14px !important;font-family: 'Jost', sans-serif;">
@@ -194,9 +194,14 @@
                                 বাংলা অথবা ইংরেজিতে সম্পূর্ণ আবেদন পত্রটি পূরণ যোগ্য
                             </div>
                         </td>
-                        <td
-                            style="font-size:12px !important;border:1.5px solid #000;vertical-align:middle;width:155px;height:120px;text-align:center;padding:15px !important;">
-                            আবেদনকারীর ২ কপি পাসপোর্ট সাইজের ছবি
+                        <td>
+                            <table style="width:100%;" cellspacing="0">
+                                <tr>
+                                    <td style="font-size:12px !important;border:1.5px solid #000;vertical-align:middle;width:119px;height:200px;text-align:center;padding:15px !important;">
+                                        আবেদনকারীর ২ কপি পাসপোর্ট সাইজের ছবি
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
@@ -508,7 +513,7 @@
                                     <td style="width:27%;font-weight:600;">
                                         (১১)কোন পণ্য/মডেল কিনতে ইচ্ছুক:
                                     </td>
-                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 45%;">
                                         {{ @$hirePurchase->purchase_products->pluck('product.product_model')->implode(', ') }}</td>
                                     <td style="width: 9%;font-weight:600;padding-left:5px !important">
                                         বিক্রয়মূল্য:
