@@ -157,7 +157,7 @@
             <tr>
                 <table style="width:100%;margin-bottom:3px;" cellspacing="0">
                     <tr>
-                        <td style="width: 30%;">
+                        <td style="width: 40%;">
                             <table style="width:100%;font-size:14px; text-align:left;">
                             <tr>
                                 <td colspan="2" style="background:#e30613; color:#fff; font-weight:600; text-align:center; padding:3px !important; font-size:14px !important;">
