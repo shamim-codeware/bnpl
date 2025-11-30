@@ -175,14 +175,14 @@
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Product Model</td>
                                 <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
-                                    {{ $hirepurchase->purchase_product->product->product_model }}
+                                    {{ @$hirepurchase->purchase_products->pluck('product.product_model')->implode(', ') }}
                                 </td>
                             </tr>
 
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Category</td>
                                 <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
-                                    {{ $hirepurchase->purchase_product->product_category->name }}
+                                    {{ @$hirepurchase->purchase_products->pluck('product_category.name')->implode(', ') }}
                                 </td>
                             </tr>
 
@@ -337,7 +337,7 @@
                                 </td>
                                 <td colspan="6">
                                     <div class="userDatatable-content">
-                                  <b>  {{ $hirepurchase->purchase_product->hire_price }}</b>
+                                  <b>  {{ $hirepurchase->hire_price }}</b>
                                     </div>
                                 </td>
                             </tr>

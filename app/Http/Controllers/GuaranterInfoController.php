@@ -16,7 +16,7 @@ class GuaranterInfoController extends Controller
      */
     public function index()
     {
-        
+
         $hire_purchase_id = Session::get('hire_purchase_id');
         $gurantors = GuaranterInfo::where('hire_purchase_id', $hire_purchase_id)->get();
         $title = "Customer Type";
@@ -24,10 +24,10 @@ class GuaranterInfoController extends Controller
 
 
         $customers_professions = CustomerProfession::orderBy('id','DESC')->where('status', 1)->get();
-      
+
         return view('installment.guaranter.guaranter',compact("gurantors","title","description","customers_professions"));
     }
-  
+
     /**
      * Show the form for creating a new resource.
      */
@@ -41,7 +41,7 @@ class GuaranterInfoController extends Controller
      */
     public function store(Request $request)
     {
-      
+
 
         foreach ($request->id as $key => $id) {
             $guarantor = GuaranterInfo::where('id',$id)->first();
@@ -65,22 +65,25 @@ class GuaranterInfoController extends Controller
                 $guarantor->duration_current_profession = $request->duration_current_profession[$key];
                 $guarantor->name_address_office = $request->name_address_office[$key];
                 $guarantor->relation = $request->relation[$key];
-        
+
                 // Save the updated record
                 $guarantor->save();
             }
         }
-        
+
         return  redirect('all-purchase')->with('success', 'Success! Purchase Product ');
 
     }
-    
+
     public function ViewGuarantor($hire_purchase_id){
 
         $guarantor = GuaranterInfo::with(['profession'])->where('hire_purchase_id',$hire_purchase_id)->get();
         $HirePurchaseProduct = HirePurchaseProduct::with(['product_category','brand','product'])->where('hire_purchase_id',$hire_purchase_id)->first();
 
-        $HirePurchase = HirePurchase::findOrFail($hire_purchase_id)->name;
+        $HirePurchase = HirePurchase::with(['purchase_products',
+            'purchase_products.product',
+            'purchase_products.brand',
+        ])->findOrFail($hire_purchase_id);
 
         return view('guarantorinfo',compact("guarantor","HirePurchaseProduct","HirePurchase"));
     }

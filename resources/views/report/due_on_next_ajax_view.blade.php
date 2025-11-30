@@ -75,7 +75,7 @@
                         ->where('status', 1)
                         ->sum('amount');
 
-                    $hire_price = $purchase->purchase_product->hire_price ?? 0;
+                    $hire_price = $purchase->hire_price ?? 0;
 
                     // Late fee via Trait
                     $lateFeeService = app(App\Service\LateFeeService::class);
@@ -105,16 +105,27 @@
                     <td>
                         <div class="userDatatable-content">{{ $purchase->pr_phone }}</div>
                     </td>
-                    <td>
+                    {{-- <td>
                         <div class="userDatatable-content">{{ @$purchase->purchase_product->product_group->name }}</div>
-                    </td>
+                    </td> --}}
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product->product->product_model }}
+                        <div class="userDatatable-content">
+                            @foreach ($purchase->purchase_products as $purchaseProduct)
+                                {{ $purchaseProduct->product_group->name }}@if (!$loop->last)
+                                    ,
+                                @endif
+                            @endforeach
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="userDatatable-content">
+                            {{ @$purchase->purchase_products->pluck('product.product_model')->implode(', ') }}
                         </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->purchase_product ? number_format($purchase->purchase_product->hire_price, 2) : '0.00' }}
+                            {{ @$purchase->hire_price ? number_format(@$purchase->hire_price, 2) : '0.00' }}
                         </div>
                     </td>
                     <td>
@@ -129,7 +140,7 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->purchase_product ? number_format($purchase->purchase_product->monthly_installment, 2) : '0.00' }}
+                            {{ @$purchase->monthly_installment ? number_format($purchase->monthly_installment, 2) : '0.00' }}
                         </div>
                     </td>
                     <td>

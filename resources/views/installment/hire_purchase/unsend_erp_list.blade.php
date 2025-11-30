@@ -42,12 +42,12 @@
                                     <tr>
                                         <td>{{ $hire->order_no }}</td>
                                         <td>{{ $hire->name }}</td>
-                                        <td>{{ $hire->purchase_product->product->product_model ?? 'N/A' }}</td>
+                                        <td>{{ $hire->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A' }}</td>
                                         <td>{{ $hire->show_room->name }}</td>
                                         <td>{{ $hire->approval_date ? date('d M Y', strtotime($hire->approval_date)) : 'N/A' }}</td>
-                                        <td>{{ number_format($hire->purchase_product->hire_price, 2) }}</td>
-                                        <td>{{ number_format($hire->purchase_product->down_payment, 2) }}</td>
-                                        <td>{{ number_format($hire->purchase_product->monthly_installment, 2) }}</td>                                        <td>
+                                        <td>{{ number_format($hire->hire_price, 2) }}</td>
+                                        <td>{{ number_format($hire->down_payment, 2) }}</td>
+                                        <td>{{ number_format($hire->monthly_installment, 2) }}</td>                                        <td>
                                             <a href="{{ url('erp-view/'.($hire->erplog->id ?? '')) }}" class="btn btn-sm btn-info">View</a>
                                             {{-- <a href="javascript:void(0)" onclick="resendToErp({{ $hire->id }})" class="btn btn-sm btn-warning">Resend to ERP</a> --}}
                                         </td>

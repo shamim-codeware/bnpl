@@ -14,7 +14,7 @@
                             <input type="hidden" value="{{ $hirepurchase->id }}" name="hire_purchase_id"
                                 id="hire_purchase_id">
                             <input type="hidden" id="monthly_installment"
-                                value="{{ @$hirepurchase->purchase_product->monthly_installment }}"
+                                value="{{ @$hirepurchase->monthly_installment }}"
                                 name="monthly_installment">
                             <select onchange="CalculateAmount()" name="number_of_instllment" id="number_of_instllment"
                                 class="form-control">
@@ -105,8 +105,8 @@
         <br>
         <h4>
 
-            Full payment for installment of product {{ @$hirepurchase->purchase_product->brand->name }}
-            {{ @$hirepurchase->purchase_product->product->product_model }} from {{ @$hirepurchase->name }}
+            Full payment for installment of product {{ @$hirepurchase->purchase_products->pluck('brand.name')->implode(', ')  }}
+            {{ @$hirepurchase->purchase_products->pluck('product.product_model')->implode(', ') }} from {{ @$hirepurchase->name }}
 
         </h4>
     @endif
@@ -114,27 +114,27 @@
 
 <div class="col-md-7">
     <fieldset>
-        <legend>{{ @$hirepurchase->purchase_product->brand->name }}
-            {{ @$hirepurchase->purchase_product->product->product_model }}</legend>
+        <legend>{{ @$hirepurchase->purchase_products->pluck('brand.name')->implode(', ') }}
+            {{ @$hirepurchase->purchase_products->pluck('product.product_model')->implode(', ') }}</legend>
         <div class="row">
             <div class="col-md-7 mb-15 text-end">
                 <span class="fw-medium">Product's Price:</span>
             </div>
             <div class="col-md-5 mb-15">
-                <span>{{ $hirepurchase->purchase_product->hire_price }} TK</span>
+                <span>{{ $hirepurchase->hire_price }} TK</span>
             </div>
             <div class="col-md-7 mb-15 text-end">
                 <span class="fw-medium">Down payment paid:</span>
             </div>
             <div class="col-md-5 mb-15">
-                <span>{{ $hirepurchase->purchase_product->down_payment }} TK</span>
+                <span>{{ $hirepurchase->down_payment }} TK</span>
             </div>
             <div class="col-md-7 mb-15 text-end">
-                <span class="fw-medium">Total payment ({{ $hirepurchase->purchase_product->installment_month - 1 }}
+                <span class="fw-medium">Total payment ({{ $hirepurchase->installment_month - 1 }}
                     installments) to be made:</span>
             </div>
             <div class="col-md-5 mb-15">
-                <span>{{ $hirepurchase->purchase_product->hire_price - $hirepurchase->purchase_product->down_payment }}
+                <span>{{ $hirepurchase->hire_price - $hirepurchase->down_payment }}
                     TK</span>
             </div>
             {{-- <div class="col-md-7 mb-15 text-end">
@@ -147,7 +147,7 @@
                 <span class="fw-medium">Total paid in installments:</span>
             </div>
             <div class="col-md-5 mb-15">
-                <span> {{ $hirepurchase->purchase_product->total_paid }} TK</span>
+                <span> {{ $hirepurchase->total_paid }} TK</span>
             </div>
             <div class="col-md-7 mb-15 text-end">
                 <span class="fw-medium">Remaining Installments:</span>
@@ -170,7 +170,7 @@
                 <span class="fw-medium">Monthly installment amount:</span>
             </div>
             <div class="col-md-5 mb-15">
-                <span>{{ $hirepurchase->purchase_product->monthly_installment }} TK</span>
+                <span>{{ $hirepurchase->monthly_installment }} TK</span>
             </div>
             <div class="col-md-7 mb-15 mt-15 text-end">
                 <span class="fw-medium">Purchased the product:</span>

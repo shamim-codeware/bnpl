@@ -56,14 +56,41 @@ class ApiService
         ]);
 
         // Prepare order details array
-        $orderDetails = [
-            [
-                "item_model"     => "$product_model",
-                "item_qty"       => 1,
-                "unit_rate"      => $data['hire_price'],
-                "unit_wise_disc" => 0
-            ]
-        ];
+        // $orderDetails = [
+        //     [
+        //         "item_model"     => "$product_model",
+        //         "item_qty"       => 1,
+        //         "unit_rate"      => $data['hire_price'],
+        //         "unit_wise_disc" => 0
+        //     ]
+        // ];
+
+        $orderDetails = [];
+
+        if ($data['sale_type'] === 'package') {
+            foreach ($data['package_products'] ?? [] as $item) {
+                $product = Product::find($item['product_id']);
+                if ($product) {
+                    $orderDetails[] = [
+                        "item_model" => $product->product_model,
+                        "item_qty" => 1,
+                        "unit_rate" => $product->hire_price, // base price per item
+                        "unit_wise_disc" => 0
+                    ];
+                }
+            }
+        } else {
+            // Single product
+            $product = Product::find($data['product_model_id']);
+            if ($product) {
+                $orderDetails[] = [
+                    "item_model" => $product->product_model,
+                    "item_qty" => 1,
+                    "unit_rate" => $data['hire_price'], // includes interest — your choice
+                    "unit_wise_disc" => 0
+                ];
+            }
+        }
 
         // Full data for the API request
         $requestData = [

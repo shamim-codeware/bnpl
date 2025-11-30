@@ -104,7 +104,7 @@ class DashboardController extends Controller
             });
         $current_month_forcast = Installment::where('status', 0)->whereBetween('loan_start_date', [$startOfMonth, $endOfMonth]);
         //last 5 transaction
-        $query = Transaction::with(['hire_purchase:id,name,pr_phone,showroom_id', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room']);
+        $query = Transaction::with(['hire_purchase:id,name,pr_phone,showroom_id', 'users', 'hire_purchase.purchase_products.product', 'hire_purchase.show_room']);
 
         // Base query for dashboard statistics
         $statsQuery = HirePurchase::query(); // Approved status

@@ -135,14 +135,14 @@ class HirePurchase extends Model
     {
 
         $query = self::with([
-            'purchase_product',
+            'purchase_products',
             'show_room.zone',
             'transaction',
-            'purchase_product.brand',
-            'purchase_product.product',
+            'purchase_products.brand',
+            'purchase_products.product',
             'installment',
-            'purchase_product.product_category',
-            'purchase_product.product_group',
+            'purchase_products.product_category',
+            'purchase_products.product_group',
             'guaranter_info'
         ]);
 
@@ -208,10 +208,16 @@ class HirePurchase extends Model
 
 
 
-    public function purchase_product()
+    // public function purchase_product()
+    // {
+    //     return $this->hasOne(HirePurchaseProduct::class, 'hire_purchase_id');
+    // }
+
+    public function purchase_products()
     {
-        return $this->hasOne(HirePurchaseProduct::class, 'hire_purchase_id');
+        return $this->hasMany(HirePurchaseProduct::class, 'hire_purchase_id');
     }
+
     public function product_type()
     {
         return $this->hasOne(HirePurchaseProduct::class, 'hire_purchase_id');

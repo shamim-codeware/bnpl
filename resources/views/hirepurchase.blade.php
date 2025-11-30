@@ -151,33 +151,33 @@
 
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Product Model</td>
-                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->product->product_model }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_products->pluck('product.product_model')->implode(', ') }}</td>
                             </tr>
 
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Category</td>
-                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->product_category->name }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_products->pluck('product_category.name')->implode(', ') }}</td>
                             </tr>
 
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Hire Price</td>
-                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->hire_price }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->hire_price }}</td>
                             </tr>
 
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">1st Installment</td>
-                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->down_payment }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->down_payment }}</td>
                             </tr>
 
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Monthly Installment</td>
-                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->purchase_product->monthly_installment }}</td>
+                                <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">{{ @$hirePurchase->monthly_installment }}</td>
                             </tr>
 
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #F2F2F2; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Total Installment</td>
                                 <td style="border:1px solid #000; padding:6px; background: #F2F2F2;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
-                                {{ @$hirePurchase->purchase_product->installment_month }}
+                                {{ @$hirePurchase->installment_month }}
                                 </td>
                             </tr>
                             </table>
@@ -509,12 +509,12 @@
                                         (১১)কোন পণ্য/মডেল কিনতে ইচ্ছুক:
                                     </td>
                                     <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
-                                        {{ @$hirePurchase->purchase_product->product->product_model }}</td>
+                                        {{ @$hirePurchase->purchase_products->pluck('product.product_model')->implode(', ') }}</td>
                                     <td style="width: 9%;font-weight:600;padding-left:5px !important">
                                         বিক্রয়মূল্য:
                                     </td>
                                     <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">
-                                        {{ @$hirePurchase->purchase_product->hire_price }}
+                                        {{ @$hirePurchase->hire_price }}
                                     </td>
                                 </tr>
                             </table>
@@ -539,7 +539,7 @@
                                         যদি কিনে থাকেন তবে কি কিনেছেন?:
                                     </td>
                                     <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 40%;">
-                                        {{ $hirePurchase->pre_b_product_id == 'others' ? $hirePurchase->type_product : @$hirePurchase->pre_purchase_product->product_model }}
+                                        {{ $hirePurchase->pre_b_product_id == 'others' ? $hirePurchase->type_product : @$hirePurchase->pre_purchase_products->pluck('product.product_model')->implode(', ') }}
                                     </td>
                                     <td style="width: 11%;">
                                         ক্রয়ের তারিখ:
@@ -729,22 +729,22 @@
 
 $numberToWords = new NumberToWords\NumberToWords();
 $numberTransformer = $numberToWords->getNumberTransformer('en'); // 'en' for English
-$hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->purchase_product->hire_price);
+$hirePriceInWords = $numberTransformer->toWords(@$hirePurchase->hire_price);
 @endphp
-    <p>১ । কিস্তিতে পণ্য গ্রহণকারী কর্তৃক ১ম কিস্তি <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->down_payment }} </span> টাকা এবং
-        অবশিষ্ট <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->hire_price - @$hirePurchase->purchase_product->down_payment }} </span> টাকা ভবিষ্যতে <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->installment_month - 1 }}</span> টি কিস্তিতে
-        মাসিক <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->monthly_installment }}</span> টাকা হারে প্রদানের অঙ্গীকারের ভিত্তিতে ও প্রতিনিধিগণের অনুরোধে র‌্যাংগ্স ইলেকট্রনিকস
-        লিমিটেড কিস্তিতে পণ্য গ্রহণকারীকে একটি  <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->product_category->name }}</span>
-        মডেল <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->product->product_model }}</span> সিরিয়াল
-        নম্বর <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_product->serial_no }}</span> (অতঃপর কিস্তিকৃত পণ্য হিসেবে গণ্য হবে) যার
-        সর্বমোট মূল্য <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->hire_price }}</span> টাকা
+    <p>১ । কিস্তিতে পণ্য গ্রহণকারী কর্তৃক ১ম কিস্তি <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->down_payment }} </span> টাকা এবং
+        অবশিষ্ট <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->hire_price - @$hirePurchase->down_payment }} </span> টাকা ভবিষ্যতে <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->installment_month - 1 }}</span> টি কিস্তিতে
+        মাসিক <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->monthly_installment }}</span> টাকা হারে প্রদানের অঙ্গীকারের ভিত্তিতে ও প্রতিনিধিগণের অনুরোধে র‌্যাংগ্স ইলেকট্রনিকস
+        লিমিটেড কিস্তিতে পণ্য গ্রহণকারীকে <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_products->pluck('product_category.name')->implode(', ') }}</span>
+        মডেল <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{@$hirePurchase->purchase_products->pluck('product.product_model')->implode(', ') }}</span> সিরিয়াল
+        নম্বর <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;"> {{ @$hirePurchase->purchase_products->pluck('serial_no')->implode(', ') }}</span> (অতঃপর কিস্তিকৃত পণ্য হিসেবে গণ্য হবে) যার
+        সর্বমোট মূল্য <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->hire_price }}</span> টাকা
         কথায় <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ $hirePriceInWords }}</span>
         প্রদান করতে (কিস্তিতে পণ্য গ্রহণকারী ক্রয় করার অধিকার সাপেক্ষে) সম্মত হলেন।</p>
 
 
     <p><span style="display: block;font-weight:600;">২। কিস্তি চলাকালীন সময়ে কিস্তি গ্রহণকারী নিম্নবর্ণিত শর্তসমূহ মেনে চলতে বাধ্য থাকবেন।</span>
 
-        (ক) কিস্তি গ্রহণকারী মাসিক কিস্তি <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->purchase_product->monthly_installment }}</span> টাকা, প্রতি মাসের <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{  date('d', strtotime($hirePurchase->created_at))  }}</span> তারিখ এর
+        (ক) কিস্তি গ্রহণকারী মাসিক কিস্তি <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{ @$hirePurchase->monthly_installment }}</span> টাকা, প্রতি মাসের <span style="border: 1px solid #000;background: #F2F2F2;padding: 1px 3px;margin-bottom: 1px;display: inline-block;font-family: 'Jost', sans-serif;">{{  date('d', strtotime($hirePurchase->created_at))  }}</span> তারিখ এর
         মধ্যে যে শোরুম থেকে কিস্তিতে পণ্য গ্রহণ করেছেন, সেখানে নগদে পরিশোধ করবেন।</p>
 
     <p>(খ) কিস্তিতে পণ্য গ্রহণকারী, কিস্তিকৃত পণ্যটি ভাল, ত্রুটিমুক্ত ও কর্মক্ষম রাখবেন এবং র‌্যাংগ্স ইলেকট্রনিকস

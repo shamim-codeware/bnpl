@@ -70,45 +70,70 @@
                         <div class="userDatatable-content">{{ $purchase->order_no }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product->product_group->name }}</div>
-                    </td>
-                    <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product->product_category->name }}
+                        <div class="userDatatable-content">
+                            @foreach ($purchase->purchase_products as $purchaseProduct)
+                                {{ $purchaseProduct->product_group->name }}@if (!$loop->last)
+                                    ,
+                                @endif
+                            @endforeach
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product->brand->name }}</div>
-                    </td>
-                    <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product->product->product_model }}
+                        <div class="userDatatable-content">
+                            @foreach ($purchase->purchase_products as $purchaseProduct)
+                                {{ $purchaseProduct->product_category->name }}@if (!$loop->last)
+                                    ,
+                                @endif
+                            @endforeach
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00' }}</div>
-                    </td>
-                    <td>
-                        <div class="userDatatable-content">{{ $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : 'N/A' }}
+                        <div class="userDatatable-content">
+                            @foreach ($purchase->purchase_products as $purchaseProduct)
+                                {{ $purchaseProduct->brand->name }}@if (!$loop->last)
+                                    ,
+                                @endif
+                            @endforeach
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y') : 'N/A' }}</div>
+                        <div class="userDatatable-content">
+                            {{ @$purchase->purchase_products->pluck('product.product_model')->implode(', ') }}
+                        </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A' }}</div>
+                        <div class="userDatatable-content">
+                            {{ @$purchase->total_paid ? number_format($purchase->total_paid, 2) : '0.00' }}</div>
+                    </td>
+                    <td>
+                        <div class="userDatatable-content">
+                            {{ $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : 'N/A' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="userDatatable-content">
+                            {{ $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y') : 'N/A' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="userDatatable-content">
+                            {{ $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A' }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ number_format($last_paid_amount, 2) }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content"><a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}" target="_blank">Product Details</a></div>
+                        <div class="userDatatable-content"><a class="btn btn-info"
+                                href="{{ url('product_details', $purchase->id) }}" target="_blank">Product Details</a>
+                        </div>
                     </td>
                 </tr>
             @endforeach
 
         </tbody>
     </table>
-    @if(empty($hirepurchase))
-    <p class="text-center">Data Not Found</p>
+    @if (empty($hirepurchase))
+        <p class="text-center">Data Not Found</p>
     @endif
     <div class="pt-2">
         {{ $hirepurchase->links() }}

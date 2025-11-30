@@ -157,7 +157,7 @@ class ExternalReportController extends Controller
                 $query->whereBetween('approval_date', [$from_date, $to_date]);
             }
             if ($request->product_model) {
-                $query->whereHas('purchase_product', function ($q) use ($product_model) {
+                $query->whereHas('purchase_products', function ($q) use ($product_model) {
                     $q->whereIn('product_id', $product_model);
                 });
             }
@@ -173,17 +173,17 @@ class ExternalReportController extends Controller
                 $query->whereIn('showroom_id', $showrooms);
             }
             if ($request->product_category) {
-                $query->whereHas('purchase_product.product', function ($q) use ($product_category) {
+                $query->whereHas('purchase_products.product', function ($q) use ($product_category) {
                     $q->whereIn('category_id', $product_category);
                 });
             }
             if ($request->product_group) {
-                $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+                $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
                     $q->whereIn('product_group_id', $product_group_ids);
                 });
             }
             if ($request->brand_id) {
-                $query->whereHas('purchase_product.product', function ($q) use ($brand) {
+                $query->whereHas('purchase_products.product', function ($q) use ($brand) {
                     $q->whereIn('brand_id', $brand);
                 });
             }
@@ -230,7 +230,7 @@ class ExternalReportController extends Controller
                 $query->whereBetween('approval_date', [$from_date, $to_date]);
             }
             if ($request->product_model) {
-                $query->whereHas('purchase_product', function ($q) use ($product_model) {
+                $query->whereHas('purchase_products', function ($q) use ($product_model) {
                     $q->whereIn('product_id', $product_model);
                 });
             }
@@ -246,17 +246,17 @@ class ExternalReportController extends Controller
                 $query->whereIn('showroom_id', $showrooms);
             }
             if ($request->product_category) {
-                $query->whereHas('purchase_product.product', function ($q) use ($product_category) {
+                $query->whereHas('purchase_products.product', function ($q) use ($product_category) {
                     $q->whereIn('category_id', $product_category);
                 });
             }
             if ($request->product_group) {
-                $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+                $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
                     $q->whereIn('product_group_id', $product_group_ids);
                 });
             }
             if ($request->brand_id) {
-                $query->whereHas('purchase_product.product', function ($q) use ($brand) {
+                $query->whereHas('purchase_products.product', function ($q) use ($brand) {
                     $q->whereIn('brand_id', $brand);
                 });
             }
@@ -289,14 +289,14 @@ class ExternalReportController extends Controller
 
         $query = HirePurchase::select('hire_purchases.*')
             ->with([
-                'purchase_product',
+                'purchase_products',
                 'show_room.zone',
                 'transaction',
-                'purchase_product.brand',
-                'purchase_product.product',
+                'purchase_products.brand',
+                'purchase_products.product',
                 'installment',
-                'purchase_product.product_category',
-                'purchase_product.product_group'
+                'purchase_products.product_category',
+                'purchase_products.product_group'
             ])
             ->where('is_paid', 0) // Not fully paid
             ->where('status', 3)  // Confirmed sale
@@ -318,7 +318,7 @@ class ExternalReportController extends Controller
                 $query->whereBetween('approval_date', [$from_date, $to_date]);
             }
             if ($request->product_model) {
-                $query->whereHas('purchase_product', function ($q) use ($product_model) {
+                $query->whereHas('purchase_products', function ($q) use ($product_model) {
                     $q->whereIn('product_id', $product_model);
                 });
             }
@@ -334,17 +334,17 @@ class ExternalReportController extends Controller
                 $query->whereIn('showroom_id', $showrooms);
             }
             if ($request->product_category) {
-                $query->whereHas('purchase_product.product', function ($q) use ($product_category) {
+                $query->whereHas('purchase_products.product', function ($q) use ($product_category) {
                     $q->whereIn('category_id', $product_category);
                 });
             }
             if ($request->product_group) {
-                $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+                $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
                     $q->whereIn('product_group_id', $product_group_ids);
                 });
             }
             if ($request->brand_id) {
-                $query->whereHas('purchase_product.product', function ($q) use ($brand) {
+                $query->whereHas('purchase_products.product', function ($q) use ($brand) {
                     $q->whereIn('brand_id', $brand);
                 });
             }
@@ -425,8 +425,8 @@ class ExternalReportController extends Controller
 
             foreach ($incentives as $key => $incentive) {
                 $customer_name = $incentive->hirePurchase->name ?? '';
-                $product_group = $incentive->hirePurchase->purchase_product->product->types->name ?? '';
-                $product_model = $incentive->hirePurchase->purchase_product->product->product_model ?? '';
+                $product_group = $incentive->hirePurchase->purchase_products->product->types->name ?? '';
+                $product_model = $incentive->hirePurchase->purchase_products->product->product_model ?? '';
                 $incentive_category = '';
 
                 if ($incentive->sure_shot_type == 'category') {
@@ -487,8 +487,8 @@ class ExternalReportController extends Controller
 
         $query = Incentive::with([
             'hirePurchase.show_room',
-            'hirePurchase.purchase_product.product',
-            'hirePurchase.purchase_product.product.types',
+            'hirePurchase.purchase_products.product',
+            'hirePurchase.purchase_products.product.types',
             'hirePurchase.users'
         ])->orderBy('id', 'DESC');
 
@@ -506,28 +506,28 @@ class ExternalReportController extends Controller
 
         // // Filter by product category
         if ($request->product_category) {
-            $query->whereHas('hirePurchase.purchase_product.product', function ($q) use ($request) {
+            $query->whereHas('hirePurchase.purchase_products.product', function ($q) use ($request) {
                 $q->where('category_id', $request->product_category);
             });
         }
 
         // // Filter by product group
         if ($request->product_group) {
-            $query->whereHas('hirePurchase.purchase_product.product', function ($q) use ($request) {
+            $query->whereHas('hirePurchase.purchase_products.product', function ($q) use ($request) {
                 $q->where('type_id', $request->product_group);
             });
         }
 
         // // Filter by product model
         if ($request->product_id) {
-            $query->whereHas('hirePurchase.purchase_product.product', function ($q) use ($request) {
+            $query->whereHas('hirePurchase.purchase_products.product', function ($q) use ($request) {
                 $q->where('id', $request->product_id);
             });
         }
 
         // // Filter by brand
         if ($request->brand_id) {
-            $query->whereHas('hirePurchase.purchase_product.product', function ($q) use ($request) {
+            $query->whereHas('hirePurchase.purchase_products.product', function ($q) use ($request) {
                 $q->where('brand_id', $request->brand_id);
             });
         }

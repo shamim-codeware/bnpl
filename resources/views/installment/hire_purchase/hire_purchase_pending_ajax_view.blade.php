@@ -65,11 +65,17 @@
                                 {{ $hire->pr_phone }}
                             </div>
                         </td>
-                        <td>
+                        {{-- <td>
                             <div class="userDatatable-content">
                                 {{ @$hire->purchase_product->product->product_model }}
                             </div>
+                        </td> --}}
+                        <td>
+                            <div class="userDatatable-content">
+                                {{ $hire->purchase_products->pluck('product.product_model')->implode(', ') }}
+                            </div>
                         </td>
+
                         <td>
                             <div class="userDatatable-content">
                                 {{ @$hire->show_room->name }}
@@ -86,17 +92,17 @@
                         </td>
                         <td>
                             <div class="userDatatable-content">
-                                {{ @$hire->purchase_product->hire_price }}
+                                {{ @$hire->hire_price }}
                             </div>
                         </td>
                         <td>
                             <div class="userDatatable-content">
-                                {{ @$hire->purchase_product->down_payment }}
+                                {{ @$hire->down_payment }}
                             </div>
                         </td>
                         <td>
                             <div class="userDatatable-content">
-                                {{ @$hire->purchase_product->monthly_installment }}
+                                {{ @$hire->monthly_installment }}
                             </div>
                         </td>
                         <td>

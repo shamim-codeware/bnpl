@@ -72,7 +72,7 @@
                         ->sum('amount');
 
                     // Hire price
-                    $hire_price = $customer->purchase_product->hire_price ?? 0;
+                    $hire_price = $customer->hire_price ?? 0;
 
                     // Late fee from Trait
                     $lateFeeService = app(App\Service\LateFeeService::class);
@@ -94,7 +94,8 @@
                         <div class="userDatatable-content">{{ $customer->name }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $customer->purchase_product->product->product_model }}
+                        <div class="userDatatable-content">
+                            {{ @$customer->purchase_products->pluck('product.product_model')->implode(', ') }}
                         </div>
                     </td>
                     <td>
@@ -102,7 +103,7 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$customer->purchase_product ? (float) $customer->purchase_product->hire_price : '0.00' }}
+                            {{ @$customer->hire_price ? (float) $customer->hire_price : '0.00' }}
                         </div>
                     </td>
                     <td>

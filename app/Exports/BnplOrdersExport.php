@@ -99,7 +99,7 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
         $isRejectedOrCancelled = in_array($purchase->status, [2, 4]);
 
         $installment_paid = $purchase->installment->where('status', 1)->sum('amount');
-        $hire_price = $purchase->purchase_product->hire_price ?? 0;
+        $hire_price = $purchase->hire_price ?? 0;
 
         // Trait use করা class instance আনতে হবে
         $lateFeeService = app(LateFeeService::class);
@@ -168,7 +168,7 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
 
         // Set conditional values based on status
-        $firstInstallment = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? ($purchase->purchase_product->down_payment) : '0.00');
+        $firstInstallment = $isRejectedOrCancelled ? '0.00' : (@$purchase->down_payment ? ($purchase->down_payment) : '0.00');
 
         // $totalPaymentReceived = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00');
         $totalPaymentReceived = $isRejectedOrCancelled
@@ -198,12 +198,12 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
             $purchase->order_no,
             $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : 'N/A',
             $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y')  : 'N/A',
-            @$purchase->purchase_product->brand->name ?? 'N/A',
-            @$purchase->purchase_product->product->product_model ?? 'N/A',
-            @$purchase->purchase_product->product_size_id ?? 'N/A',
-            @$purchase->purchase_product ? (float)($purchase->purchase_product->hire_price) : '0.00',
+            @$purchase->purchase_products->pluck('brand.name')->implode(', ') ?? 'N/A',
+            @$purchase->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
+            @$purchase->purchase_products->pluck('product_size_id')->implode(', ') ?? 'N/A',
+            @$purchase->hire_price ? (float)($purchase->hire_price) : '0.00',
             $firstInstallment, // Conditional: 0.00 if rejected/cancelled
-            @$purchase->purchase_product ? (float)($purchase->purchase_product->monthly_installment) : '0.00',
+            @$purchase->monthly_installment ? (float)($purchase->monthly_installment) : '0.00',
             $totalPaymentReceived, // Conditional: 0.00 if rejected/cancelled
             // @$purchase->late_fee ?? 0.00,
             $isRejectedOrCancelled ? '0.00' : ($purchase->late_fee),

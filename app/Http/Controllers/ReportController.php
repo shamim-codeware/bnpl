@@ -84,8 +84,8 @@ class ReportController extends Controller
             'transaction' => function ($q) {
                 $q->where('status', 1)->orderBy('updated_at', 'desc');
             },
-            'purchase_product.product_group',
-            'purchase_product.product',
+            'purchase_products.product_group',
+            'purchase_products.product',
             'show_room.zone'
         ])
             ->where('status', 3) // Only confirmed sales
@@ -100,7 +100,7 @@ class ReportController extends Controller
             $query->where('order_no', $request->order_no);
         } else {
             if ($request->product_group) {
-                $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+                $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
                     $q->whereIn('product_group_id', $product_group_ids);
                 });
             }
@@ -319,7 +319,7 @@ class ReportController extends Controller
 
         // Product group filtering
         if (!empty($product_group_ids)) {
-            $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+            $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
                 $q->whereIn('product_group_id', $product_group_ids);
             });
         }
@@ -327,11 +327,11 @@ class ReportController extends Controller
         $hirePurchases = $query->get();
 
         $total_hirepurchase = $hirePurchases->sum(function ($data) {
-            return $data->purchase_product ? $data->purchase_product->hire_price : 0;
+            return $data->hire_price ? $data->hire_price : 0;
         });
 
         $total_paid = $hirePurchases->sum(function ($data) {
-            return $data->purchase_product ? $data->purchase_product->total_paid : 0;
+            return $data->total_paid ? $data->total_paid : 0;
         });
 
         $total_remaining = $total_hirepurchase - $total_paid;
@@ -396,17 +396,17 @@ class ReportController extends Controller
                 $query->whereBetween('approval_date', [$from_date, $to_date]);
             }
             if ($request->product_model) {
-                $query->whereHas('purchase_product', function ($q) use ($product_model) {
+                $query->whereHas('purchase_products', function ($q) use ($product_model) {
                     $q->whereIn('product_model_id', $product_model);
                 });
             }
             if ($request->product_category) {
-                $query->whereHas('purchase_product', function ($q) use ($product_category) {
+                $query->whereHas('purchase_products', function ($q) use ($product_category) {
                     $q->whereIn('product_category_id', $product_category);
                 });
             }
             if ($request->brand_id) {
-                $query->whereHas('purchase_product', function ($q) use ($brand) {
+                $query->whereHas('purchase_products', function ($q) use ($brand) {
                     $q->whereIn('product_brand_id', $brand);
                 });
             }
@@ -423,7 +423,7 @@ class ReportController extends Controller
                 $query->whereIn('showroom_id', $showrooms);
             }
             if ($request->product_group) {
-                $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+                $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
                     $q->whereIn('product_group_id', $product_group_ids);
                 });
             }

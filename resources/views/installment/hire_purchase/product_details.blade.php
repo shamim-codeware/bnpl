@@ -23,31 +23,31 @@
                                                         <span class="fw-medium">Category:</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15">
-                                                        <span>{{ @$product_details->purchase_product->product_category->name }}</span>
+                                                        <span>{{ @$product_details->purchase_products->pluck('product_category.name')->implode(', ') }}</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15 text-end">
                                                         <span class="fw-medium">Serial Number:</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15">
-                                                        <span>{{ @$product_details->purchase_product->serial_no }}</span>
+                                                        <span>{{ @$product_details->purchase_products->pluck('serial_no')->implode(', ') }}</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15 text-end">
                                                         <span class="fw-medium">Model:</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15">
-                                                        <span>{{ @$product_details->purchase_product->product->product_model }}</span>
+                                                        <span>{{ @$product_details->purchase_products->pluck('product.product_model')->implode(', ') }}</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15 text-end">
                                                         <span class="fw-medium">Brand:</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15">
-                                                        <span>{{ @$product_details->purchase_product->brand->name  }}</span>
+                                                        <span>{{ @$product_details->purchase_products->pluck('brand.name')->implode(', ')  }}</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15 text-end">
                                                         <span class="fw-medium">Price:</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15">
-                                                        <span>BDT {{ @$product_details->purchase_product->hire_price }}</span>
+                                                        <span>BDT {{ @$product_details->hire_price }}</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15 text-end">
                                                         <span class="fw-medium">Showroom Name:</span>
@@ -134,7 +134,7 @@
                                                         <span class="fw-medium">Down Payment:</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15">
-                                                        <span>{{ @$product_details->purchase_product->down_payment }} TK</span>
+                                                        <span>{{ @$product_details->down_payment }} TK</span>
                                                     </div>
                                                     {{-- <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Discount Amount:</span>
@@ -146,13 +146,13 @@
                                                         <span class="fw-medium">Installment Amount:</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15">
-                                                        <span>{{ @$product_details->purchase_product->monthly_installment }} TK</span>
+                                                        <span>{{ @$product_details->monthly_installment }} TK</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Number of installments:</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15">
-                                                        <span>{{ @$product_details->purchase_product->installment_month }}</span>
+                                                        <span>{{ @$product_details->installment_month }}</span>
                                                     </div>
                                                     {{-- <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Overpay Amount:</span>

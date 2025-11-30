@@ -170,9 +170,9 @@ class ErpController extends Controller
         $description = "List of BNPL orders that need to be sent to ERP";
 
         $hirePurchases = HirePurchase::with([
-            'purchase_product.product_category',
-            'purchase_product.brand',
-            'purchase_product.product',
+            'purchase_products.product_category',
+            'purchase_products.brand',
+            'purchase_products.product',
             'show_room',
             'show_room_user',
             'erplog'

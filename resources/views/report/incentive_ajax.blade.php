@@ -42,8 +42,14 @@
                 @php
                     $order_no = $incentive->hire_purchase->order_no ?? '';
                     $customer_name = $incentive->hirePurchase->name ?? '';
-                    $product_group = $incentive->hirePurchase->purchase_product->product->types->name ?? '';
-                    $product_model = $incentive->hirePurchase->purchase_product->product->product_model ?? '';
+                    $product_group = $incentive->hirePurchase->purchase_products
+                        ? $incentive->hirePurchase->purchase_products->pluck('product_group.name')->implode(', ')
+                        : '';
+
+                    $product_model = $incentive->hirePurchase->purchase_products
+                        ? $incentive->hirePurchase->purchase_products->pluck('product.product_model')->implode(', ')
+                        : '';
+
                     $showroom_name = $incentive->hirePurchase->show_room->name ?? '';
                     $created_by = $incentive->hirePurchase->users->name ?? '';
 
@@ -83,12 +89,12 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            @if($incentive->type == 'down_payment')
+                            @if ($incentive->type == 'down_payment')
                                 <span class="badge bg-primary">Down Payment</span>
                             @elseif($incentive->type == 'collection')
                                 <span class="badge bg-info">Collection</span>
                             @elseif($incentive->type == 'sure_shot')
-                                @if($incentive->sure_shot_type == 'category')
+                                @if ($incentive->sure_shot_type == 'category')
                                     <span class="badge bg-success">Category Wise</span>
                                 @elseif($incentive->sure_shot_type == 'model')
                                     <span class="badge bg-danger">Model Wise</span>

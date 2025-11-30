@@ -87,7 +87,7 @@ class PaymentCollectionController extends Controller
     }
     public function LoanDetails($id)
     {
-        $hirepurchase = HirePurchase::with(['purchase_product', 'purchase_product.brand', 'purchase_product.product', 'show_room'])->where('order_no', $id)->first();
+        $hirepurchase = HirePurchase::with(['purchase_products', 'purchase_products.brand', 'purchase_products.product', 'show_room'])->where('order_no', $id)->first();
 
         if ($hirepurchase) {
             // Check if manager is trying to access BNPL from different CTP/showroom
@@ -277,7 +277,7 @@ class PaymentCollectionController extends Controller
     public function TransactionListShow(Request $request)
     {
 
-        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id,status', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room'])
+        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id,status', 'users', 'hire_purchase.purchase_products.product', 'hire_purchase.show_room'])
             ->where('status', 1)->whereHas('hire_purchase', function ($q) {
                 $q->where('status', 3);
             });
@@ -345,7 +345,7 @@ class PaymentCollectionController extends Controller
     }
     public function TransactionListExport(Request $request)
     {
-        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id,status', 'users', 'hire_purchase.purchase_product.product', 'hire_purchase.show_room'])
+        $query = Transaction::with(['hire_purchase:id,order_no,name,pr_phone,showroom_id,status', 'users', 'hire_purchase.purchase_products.product', 'hire_purchase.show_room'])
             ->where('status', 1)->whereHas('hire_purchase', function ($q) {
                 $q->where('status', 3);
             });

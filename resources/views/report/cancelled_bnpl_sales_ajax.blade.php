@@ -60,8 +60,8 @@
                     }
 
                     if ($purchase->purchase_product) {
-                        $hire_price = floatval($purchase->purchase_product->hire_price);
-                        $total_paid = floatval($purchase->purchase_product->total_paid);
+                        $hire_price = floatval($purchase->hire_price);
+                        $total_paid = floatval($purchase->total_paid);
                         $outstanding_balance = $hire_price - $total_paid;
                     }
 
@@ -87,20 +87,22 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->purchase_product->product->types->name }}
+                            {{ $purchase->purchase_products->pluck('product_group.name')->implode(', ') }}
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="userDatatable-content">
+                            {{ @$purchase->purchase_products->pluck('product.product_model')->implode(', ') }}
                         </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->purchase_product->product->product_model }}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? (float)(floatval($purchase->purchase_product->hire_price)) : '0.00' }}</div>
+                            {{ @$purchase->hire_price ? (float) floatval($purchase->hire_price) : '0.00' }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->approval_date ? \Carbon\Carbon::parse($purchase->approval_date)->format('d F Y')  : '' }}
+                            {{ @$purchase->approval_date ? \Carbon\Carbon::parse($purchase->approval_date)->format('d F Y') : '' }}
                         </div>
                     </td>
                     <td>
@@ -109,10 +111,11 @@
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product ? (float)(floatval($purchase->purchase_product->total_paid)) : '0.00' }}</div>
+                        <div class="userDatatable-content">
+                            {{ @$purchase->total_paid ? (float) floatval($purchase->total_paid) : '0.00' }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ (float)(floatval($outstanding_balance)) }}</div>
+                        <div class="userDatatable-content">{{ (float) floatval($outstanding_balance) }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->pr_phone }}</div>
@@ -124,7 +127,7 @@
                         <div class="userDatatable-content">
                             @php
                                 $statusText = '';
-                                switch($purchase->status) {
+                                switch ($purchase->status) {
                                     case 0:
                                         $statusText = 'Pending';
                                         break;

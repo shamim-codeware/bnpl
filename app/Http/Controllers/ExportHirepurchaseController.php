@@ -18,7 +18,7 @@ class ExportHirepurchaseController extends Controller
     public function export(Request $request)
     {
 
-        $query = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'users'])->where('status', 3)->where('is_paid', 1);
+        $query = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'show_room', 'show_room_user', 'users'])->where('status', 3)->where('is_paid', 1);
         if ($request->from_date && $request->to_date) {
             // Date query
             $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
@@ -65,7 +65,7 @@ class ExportHirepurchaseController extends Controller
     public function Allexport(Request $request)
     {
 
-        $query = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'users', 'installment'])->where('status', 3);
+        $query = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'show_room', 'show_room_user', 'users', 'installment'])->where('status', 3);
         // if ($request->from_date && $request->to_date) {
         //     // Date query
         //     $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
@@ -165,28 +165,28 @@ class ExportHirepurchaseController extends Controller
 
         if ($request->product_model) {
             $product_model = explode(',', $request->product_model);
-            $query->whereHas('purchase_product', function ($q) use ($product_model) {
+            $query->whereHas('purchase_products', function ($q) use ($product_model) {
                 $q->whereIn('product_model_id', $product_model);
             });
         }
 
         if ($request->product_category) {
             $product_category = explode(',', $request->product_category);
-            $query->whereHas('purchase_product', function ($q) use ($product_category) {
+            $query->whereHas('purchase_products', function ($q) use ($product_category) {
                 $q->whereIn('product_category_id', $product_category);
             });
         }
 
         if ($request->brand_id) {
             $brand = explode(',', $request->brand_id);
-            $query->whereHas('purchase_product', function ($q) use ($brand) {
+            $query->whereHas('purchase_products', function ($q) use ($brand) {
                 $q->whereIn('product_brand_id', $brand);
             });
         }
 
         if ($request->product_group) {
             $product_group_ids = explode(',', $request->product_group);
-            $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+            $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
                 $q->whereIn('product_group_id', $product_group_ids);
             });
         }
@@ -232,8 +232,8 @@ class ExportHirepurchaseController extends Controller
             'transaction' => function ($q) {
                 $q->where('status', 1)->orderBy('updated_at', 'desc');
             },
-            'purchase_product.product_group',
-            'purchase_product.product',
+            'purchase_products.product_group',
+            'purchase_products.product',
             'show_room.zone'
         ])
             ->where('status', 3) // Only confirmed sales
@@ -248,7 +248,7 @@ class ExportHirepurchaseController extends Controller
             $query->where('order_no', $request->order_no);
         } else {
             if ($request->product_group) {
-                $query->whereHas('purchase_product', function ($q) use ($product_group_ids) {
+                $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
                     $q->whereIn('product_group_id', $product_group_ids);
                 });
             }

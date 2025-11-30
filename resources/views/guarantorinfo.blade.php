@@ -320,9 +320,9 @@
                                     <td style="width:34%;">
                                         ৭) র‌্যাংগস ইলেকট্রনিক্স লিমিটেড এর বাজারজাতকৃত
                                     </td>
-                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ @$HirePurchaseProduct->brand->name }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ @$HirePurchase->purchase_products->pluck('brand.name')->implode(', ') }}</td>
                                     <td style="width: 13%;">ব্র্যান্ডের,মডেল নং:</td>
-                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ @$HirePurchaseProduct->product->product_model }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;">{{ @$HirePurchase->purchase_products->pluck('product.product_model')->implode(', ') }}</td>
                                 </tr>
                             </table>
                         </td>
@@ -332,9 +332,9 @@
                             <table style="width:100%;" cellspacing="0">
                                 <tr>
                                     <td style="width: 4%;">মূল্য:</td>
-                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 20%;">{{ @$HirePurchaseProduct->hire_price }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 20%;">{{ @$HirePurchase->hire_price }}</td>
                                     <td>কিস্তিতে কেনার জন্য</td>
-                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 44%;">{{ @$HirePurchase }}</td>
+                                    <td style="border: 1px solid #000;background: #F2F2F2;padding-left:3px !important;font-family: 'Jost', sans-serif;;width: 44%;">{{ @$HirePurchase->name }}</td>
                                     <td>
                                         কে নিশ্চয়তা দেয়া হলো।
                                     </td>

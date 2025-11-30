@@ -66,7 +66,7 @@ class DueOnNextMonthExport implements FromCollection, WithHeadings, WithMapping,
             ->where('status', 1)
             ->sum('amount');
 
-        $hire_price = $purchase->purchase_product->hire_price ?? 0;
+        $hire_price = $purchase->hire_price ?? 0;
 
         $lateFeeService = app(LateFeeService::class);
 
@@ -83,12 +83,12 @@ class DueOnNextMonthExport implements FromCollection, WithHeadings, WithMapping,
             $purchase->order_no ?? 'N/A',
             $purchase->name ?? 'N/A',
             $purchase->pr_phone ?? 'N/A',
-            @$purchase->purchase_product->product_group->name ?? 'N/A',
-            @$purchase->purchase_product->product->product_model ?? 'N/A',
-            @$purchase->purchase_product ? (float)($purchase->purchase_product->hire_price) : '0.00',
+            @$purchase->purchase_products->pluck('product_group.name')->implode(', ') ?? 'N/A',
+            @$purchase->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
+            @$purchase->hire_price ? (float)($purchase->hire_price) : '0.00',
             // $nextDueInstallment ? Helper::formatDateStandard($nextDueInstallment->loan_start_date) : 'N/A',
             $nextDueInstallment ? \Carbon\Carbon::parse($nextDueInstallment->loan_start_date)->format('d F Y') : 'N/A',
-            @$purchase->purchase_product ? (float) $purchase->purchase_product->monthly_installment : '0.00',
+            @$purchase->monthly_installment ? (float) $purchase->monthly_installment : '0.00',
             $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A',
             (float) $purchase->late_fee ?? 0.00,
             (float) $last_paid_amount,

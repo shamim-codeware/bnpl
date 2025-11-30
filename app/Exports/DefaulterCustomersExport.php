@@ -66,7 +66,7 @@ class DefaulterCustomersExport implements FromCollection, WithHeadings, WithMapp
             ->sum('amount');
 
         // Hire price
-        $hire_price = $customer->purchase_product->hire_price ?? 0;
+        $hire_price = $customer->hire_price ?? 0;
 
         // Late fee from Trait
         $lateFeeService = app(\App\Service\LateFeeService::class);
@@ -86,7 +86,7 @@ class DefaulterCustomersExport implements FromCollection, WithHeadings, WithMapp
             $customer->order_no,
             $customer->name,
             $customer->pr_phone,
-            $customer->purchase_product ? (float)($customer->purchase_product->hire_price) : '0.00',
+            $customer->hire_price ? (float)($customer->hire_price) : '0.00',
             (float)($customer->late_fee ?? 0.00),
             (float)($outstanding_balance),
             $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A',

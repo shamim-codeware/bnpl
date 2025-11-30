@@ -51,7 +51,7 @@
                 @endphp
                 @foreach ($hirepurchase as $key => $hire)
                     @php
-                        $total += @$hire->purchase_product->monthly_installment;
+                        $total += @$hire->monthly_installment;
                     @endphp
                     <tr>
                         <td>
@@ -66,11 +66,19 @@
                                 {{ $hire->pr_phone }}
                             </div>
                         </td>
-                        <td>
+                        {{-- <td>
                             <div class="userDatatable-content">
                                 {{ @$hire->purchase_product->product->product_model }}
                             </div>
+                        </td> --}}
+                        <td>
+                            <div class="userDatatable-content">
+                                @foreach ($hire->purchase_products as $purchaseProduct)
+                                    {{ $purchaseProduct->product->product_model }}<br>
+                                @endforeach
+                            </div>
                         </td>
+
                         <td>
                             <div class="userDatatable-content">
                                 {{ @$hire->show_room->name }}
@@ -87,17 +95,17 @@
                         </td>
                         <td>
                             <div class="userDatatable-content">
-                                {{ @$hire->purchase_product->hire_price }}
+                                {{ @$hire->hire_price }}
                             </div>
                         </td>
                         <td>
                             <div class="userDatatable-content">
-                                {{ @$hire->purchase_product->down_payment }}
+                                {{ @$hire->down_payment }}
                             </div>
                         </td>
                         <td>
                             <div class="userDatatable-content">
-                                {{ @$hire->purchase_product->monthly_installment }}
+                                {{ @$hire->monthly_installment }}
                             </div>
                         </td>
                         <td>
@@ -115,7 +123,7 @@
 
                             <a style="white-space: nowrap" class="btn btn-info"
                                 href="{{ url('product_details/' . $hire->id) }}" target="_blank">Product Details</a>
-                            @if (Auth::user()->role_id == 1 && $hire->status != 3 && $hire->status = 0 )
+                            @if (Auth::user()->role_id == 1 && $hire->status != 3 && ($hire->status = 0))
                                 <a style="white-space: nowrap" class="btn btn-success"
                                     href="{{ url('hire-purchase-product-edit/' . $hire->id) }}">Product Edit</a>
                             @endif

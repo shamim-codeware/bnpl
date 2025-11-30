@@ -1175,35 +1175,37 @@
                                         </div>
 
                                         <!-- Single Product Details Row -->
-                                        <div class="row single-product-section" style="display:none;">
-                                            <div class="col-md-3 mb-25">
-                                                <div class="">
+                                        <div class="single-product-section" style="display:none;">
+                                            <div class="row mt-3" >
+                                                <div class="col-md-3 mb-25">
                                                     <div class="">
-                                                        <select name="product_category_id" id="Select-Model"
-                                                            class="form-control category">
-                                                        </select>
-                                                        <span style="color: red" id="category-require"></span>
+                                                        <div class="">
+                                                            <select name="product_category_id" id="Select-Model"
+                                                                class="form-control category">
+                                                            </select>
+                                                            <span style="color: red" id="category-require"></span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <select onchange="GetProduct()" name="product_brand_id" id="prod_brand"
-                                                    class="form-control">
-                                                    <option value="">Product Brand</option>
-                                                    @foreach ($brands as $key => $brand)
-                                                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <select onchange="GetPrice()" name="product_model_id" id="Select-color"
-                                                    class="form-control">
-                                                    <option value="">Product Model:</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <input type="text" name="product_size_id" id="product_size"
-                                                    class="form-control" placeholder="Product Size">
+                                                <div class="col-md-3">
+                                                    <select onchange="GetProduct()" name="product_brand_id" id="prod_brand"
+                                                        class="form-control">
+                                                        <option value="">Product Brand</option>
+                                                        @foreach ($brands as $key => $brand)
+                                                            <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select onchange="GetPrice()" name="product_model_id" id="Select-color"
+                                                        class="form-control">
+                                                        <option value="">Product Model:</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="text" name="product_size_id" id="product_size"
+                                                        class="form-control" placeholder="Product Size">
+                                                </div>
                                             </div>
                                         </div>
 

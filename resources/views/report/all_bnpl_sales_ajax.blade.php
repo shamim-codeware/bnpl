@@ -74,7 +74,7 @@
                     $total_paid = $installment_paid;
 
                     $just_installment_paid = $purchase->installment->where('status', 1)->sum('amount');
-                    $hire_price = $purchase->purchase_product->hire_price ?? 0;
+                    $hire_price = $purchase->hire_price ?? 0;
 
                     $late_fee = $lateFeeService->calculateLateFine($purchase->id);
 
@@ -116,11 +116,11 @@
                     </td> --}}
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->purchase_product->product->product_model }}
+                            {{ @$purchase->purchase_products->pluck('product.product_model')->implode(', ') }}
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->purchase_product->hire_price }}</div>
+                        <div class="userDatatable-content">{{ @$purchase->hire_price }}</div>
                     </td>
                     <td>
                         <div class="userDatatable-content">

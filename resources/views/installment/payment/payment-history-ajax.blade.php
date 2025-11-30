@@ -60,7 +60,7 @@
                 </td>
                 <td>
                     <div class="userDatatable-content">
-                        {{ @$item->hire_purchase->purchase_product->product->product_model }}
+                        {{ @$item->hire_purchase->purchase_products->pluck('product.product_model')->implode(', ')}}
                     </div>
                 </td>
                 <td>

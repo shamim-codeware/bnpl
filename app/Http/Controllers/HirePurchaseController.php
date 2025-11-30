@@ -479,7 +479,7 @@ class HirePurchaseController extends Controller
 
     public function PendingSaleView(Request $request)
     {
-        $query = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'users'])->whereIn('status', [0]);
+        $query = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'show_room', 'show_room_user', 'users'])->whereIn('status', [0]);
         if ($request->zone_id) {
             $zone_id = $request->zone_id;
             // Zone
@@ -663,7 +663,7 @@ class HirePurchaseController extends Controller
     {
         $title = "Product Details";
         $description = "Some description for the page";
-        $product_details = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'transaction', 'installment', 'erplog'])->findOrFail($id);
+        $product_details = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'show_room', 'show_room_user', 'transaction', 'installment', 'erplog'])->findOrFail($id);
 
         $total_installment_paid = Installment::where('hire_purchase_id', $id)
             ->where('status', 1)
@@ -676,14 +676,14 @@ class HirePurchaseController extends Controller
         $total_loan_paid_amount = $total_installment_paid + $paid_fine_amount;
 
 
-        $hire_price = $product_details->purchase_product->hire_price ?? 0;
+        $hire_price = $product_details->hire_price ?? 0;
 
         $totalFine = $this->calculateLateFine($id);
 
         $out_standing_amount = ($hire_price - $total_installment_paid) + $totalFine;
         // dd($out_standing_amount);
 
-        $installments = Transaction::with(['hire_purchase:id,name,pr_phone', 'users', 'hire_purchase.purchase_product.product'])->where('hire_purchase_id', $id)->get();
+        $installments = Transaction::with(['hire_purchase:id,name,pr_phone', 'users', 'hire_purchase.purchase_products.product'])->where('hire_purchase_id', $id)->get();
         $installment_date = Installment::where('hire_purchase_id', $id)->orderBy('id', 'DESC')->first();
 
 
@@ -712,9 +712,9 @@ class HirePurchaseController extends Controller
     public function AllPurchaseAction(Request $request)
     {
         $query = HirePurchase::with([
-            'purchase_product.product_category',
-            'purchase_product.brand',
-            'purchase_product.product',
+            'purchase_products.product_category',
+            'purchase_products.brand',
+            'purchase_products.product',
             'show_room',
             'show_room_user',
             'users'
@@ -885,9 +885,17 @@ class HirePurchaseController extends Controller
             }
             //guarantor info
             $HirePurchase = new HirePurchase;
-            $HirePurchase->fill($personal_info)->save();
+            $HirePurchase = new HirePurchase();
+            $HirePurchase->fill($personal_info);
+            $HirePurchase->cash_price = $request->cash_price;
+            $HirePurchase->hire_price = $request->hire_price;
+            $HirePurchase->down_payment = $request->down_payment;
+            $HirePurchase->monthly_installment = $request->monthly_installment;
+            $HirePurchase->installment_month = $request->installment_month;
+            $HirePurchase->total_paid = $request->down_payment;
+            $HirePurchase->save();
             //Erp Service
-            // $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
+            $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
             //guarantor info
             $GuaranterInfo = new GuaranterInfo;
             foreach ($request->guarater_name as $key => $name) {
@@ -918,8 +926,32 @@ class HirePurchaseController extends Controller
 
 
             $HirePurchaseProduct = new HirePurchaseProduct;
-            $HirePurchaseProduct->fill($hirePurchase_productdata)->save();
 
+            if ($request->sale_type === 'single') {
+            $HirePurchaseProduct->fill($hirePurchase_productdata)->save();
+            }
+            // For PACKAGE
+            else {
+                foreach ($request->package_products as $item) {
+                    $product = Product::find($item['product_id']);
+                    HirePurchaseProduct::create([
+                        'hire_purchase_id' => $HirePurchase->id,
+                        'credit_id' => Session::get('credit_id'),
+                        'product_group_id' => $product->type_id,
+                        'product_category_id' => $product->category_id,
+                        'product_brand_id' => $product->brand_id,
+                        'product_model_id' => $product->id,
+                        'product_size_id' => $item['product_size_id'] ?? null,
+                        'serial_no' => $item['serial_no'],
+                        'cash_price' => $product->hire_price,
+                        'hire_price' => 0,
+                        'down_payment' => 0,
+                        'monthly_installment' => 0,
+                        'installment_month' => $request->installment_month,
+                        'total_paid' => 0,
+                    ]);
+                }
+            }
             // transaction and installment
 
             $Installment = new Installment;
@@ -954,26 +986,6 @@ class HirePurchaseController extends Controller
 
             $transaction->fill($transactionData)->save();
 
-            // if ($request->down_payment > 0) {
-            //     // Calculate down payment incentive (0.50% if down payment >= 40% of hire price)
-            //     $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
-
-            //     if ($down_payment_percentage >= 40) {
-            //         $down_payment_incentive_rate = 0.50; // 0.50%
-            //         $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;
-
-            //         Incentive::create([
-            //             'hire_purchase_id' => $HirePurchase->id,
-            //             'showroom_user_id' => $showroom_user,
-            //             'type' => 'down_payment',
-            //             'amount' => $request->down_payment,
-            //             'incentive_rate' => $down_payment_incentive_rate,
-            //             'incentive_amount' => $down_payment_incentive_amount,
-            //             'status' => 'pending'
-            //         ]);
-            //     }
-            // }
-
             if ($request->down_payment > 0) {
                 // Get dynamic values from configuration
                 $down_payment_threshold = GeneralIncentiveConfig::getDownPaymentThreshold();
@@ -997,50 +1009,125 @@ class HirePurchaseController extends Controller
                 }
             }
 
-            $product_category_id = $request->product_category_id;
-            $product_model_id = $request->product_model_id;
+            // $product_category_id = $request->product_category_id;
+            // $product_model_id = $request->product_model_id;
 
-            // Check for Sure Shot Incentive (Model first, then Category - as per your requirement)
-            $model_incentive_config = IncentiveConfiguration::where('type', 'model')
-                ->where('reference_id', $product_model_id)
-                ->where('is_active', true)
-                ->first();
+            // // Check for Sure Shot Incentive (Model first, then Category - as per your requirement)
+            // $model_incentive_config = IncentiveConfiguration::where('type', 'model')
+            //     ->where('reference_id', $product_model_id)
+            //     ->where('is_active', true)
+            //     ->first();
 
-            if ($model_incentive_config) {
-                // Model-wise incentive applies (Tk 1000 example)
-                Incentive::create([
-                    'hire_purchase_id' => $HirePurchase->id,
-                    'showroom_user_id' => $showroom_user,
-                    'type' => 'sure_shot',
-                    'sure_shot_type' => 'model',
-                    'product_model_id' => $product_model_id,
-                    'product_model_name' => $model_incentive_config->name,
-                    'amount' => 0, // Or the model amount
-                    'incentive_rate' => 0, // Fixed amount, no rate
-                    'incentive_amount' => $model_incentive_config->incentive_amount, // Tk 1000
-                    'status' => 'pending'
-                ]);
+            // if ($model_incentive_config) {
+            //     // Model-wise incentive applies (Tk 1000 example)
+            //     Incentive::create([
+            //         'hire_purchase_id' => $HirePurchase->id,
+            //         'showroom_user_id' => $showroom_user,
+            //         'type' => 'sure_shot',
+            //         'sure_shot_type' => 'model',
+            //         'product_model_id' => $product_model_id,
+            //         'product_model_name' => $model_incentive_config->name,
+            //         'amount' => 0, // Or the model amount
+            //         'incentive_rate' => 0, // Fixed amount, no rate
+            //         'incentive_amount' => $model_incentive_config->incentive_amount, // Tk 1000
+            //         'status' => 'pending'
+            //     ]);
+            // } else {
+            //     // Check category-wise incentive
+            //     $category_incentive_config = IncentiveConfiguration::where('type', 'category')
+            //         ->where('reference_id', $product_category_id)
+            //         ->where('is_active', true)
+            //         ->first();
+
+            //     if ($category_incentive_config) {
+            //         // Category-wise incentive applies (Tk 500 example)
+            //         Incentive::create([
+            //             'hire_purchase_id' => $HirePurchase->id,
+            //             'showroom_user_id' => $showroom_user,
+            //             'type' => 'sure_shot',
+            //             'sure_shot_type' => 'category',
+            //             'category_id' => $product_category_id,
+            //             'product_category_name' => $category_incentive_config->name,
+            //             'amount' => 0, // Or the category amount
+            //             'incentive_rate' => 0, // Fixed amount, no rate
+            //             'incentive_amount' => $category_incentive_config->incentive_amount, // Tk 500
+            //             'status' => 'pending'
+            //         ]);
+            //     }
+            // }
+
+            // =============== SURE SHOT INCENTIVES ===============
+            // Handle both single and package
+            $processedIncentives = [];
+
+            if ($request->sale_type === 'single') {
+                // Single product: use request data
+                $productsForIncentive = [
+                    [
+                        'product_id' => $request->product_model_id,
+                        'category_id' => $request->product_category_id,
+                    ]
+                ];
             } else {
-                // Check category-wise incentive
-                $category_incentive_config = IncentiveConfiguration::where('type', 'category')
-                    ->where('reference_id', $product_category_id)
+                // Package: get all product IDs from hire_purchase_products
+                $productsForIncentive = HirePurchaseProduct::where('hire_purchase_id', $HirePurchase->id)
+                    ->select('product_model_id AS product_id', 'product_category_id AS category_id')
+                    ->get()
+                    ->toArray();
+            }
+
+            // Process each product for model/category incentives
+            foreach ($productsForIncentive as $item) {
+                $productId = $item['product_id'];
+                $categoryId = $item['category_id'];
+
+                // Skip if already processed (avoid duplicate incentives for same model/category in one order)
+                $modelKey = 'model_' . $productId;
+                $categoryKey = 'category_' . $categoryId;
+
+                // Check Model-wise incentive
+                $modelIncentive = IncentiveConfiguration::where('type', 'model')
+                    ->where('reference_id', $productId)
                     ->where('is_active', true)
                     ->first();
 
-                if ($category_incentive_config) {
-                    // Category-wise incentive applies (Tk 500 example)
+                if ($modelIncentive && !in_array($modelKey, $processedIncentives)) {
+                    Incentive::create([
+                        'hire_purchase_id' => $HirePurchase->id,
+                        'showroom_user_id' => $showroom_user,
+                        'type' => 'sure_shot',
+                        'sure_shot_type' => 'model',
+                        'amount' => 0,
+                        'incentive_rate' => 0,
+                        'product_model_id' => $productId,
+                        'product_model_name' => $modelIncentive->name,
+                        'incentive_amount' => $modelIncentive->incentive_amount,
+                        'status' => 'pending'
+                    ]);
+                    $processedIncentives[] = $modelKey;
+                    continue; // Skip category if model incentive applied (as per your original logic)
+                }
+
+                // Check Category-wise incentive
+                $categoryIncentive = IncentiveConfiguration::where('type', 'category')
+                    ->where('reference_id', $categoryId)
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($categoryIncentive && !in_array($categoryKey, $processedIncentives)) {
                     Incentive::create([
                         'hire_purchase_id' => $HirePurchase->id,
                         'showroom_user_id' => $showroom_user,
                         'type' => 'sure_shot',
                         'sure_shot_type' => 'category',
-                        'category_id' => $product_category_id,
-                        'product_category_name' => $category_incentive_config->name,
-                        'amount' => 0, // Or the category amount
-                        'incentive_rate' => 0, // Fixed amount, no rate
-                        'incentive_amount' => $category_incentive_config->incentive_amount, // Tk 500
+                        'category_id' => $categoryId,
+                        'amount' => 0,
+                        'incentive_rate' => 0,
+                        'product_category_name' => $categoryIncentive->name,
+                        'incentive_amount' => $categoryIncentive->incentive_amount,
                         'status' => 'pending'
                     ]);
+                    $processedIncentives[] = $categoryKey;
                 }
             }
 
@@ -1072,8 +1159,8 @@ class HirePurchaseController extends Controller
     {
         $hirepurchase = HirePurchase::findOrfail($id);
         $total_installment_amount = $hirepurchase->installment->where('status', 1)->sum('amount');
-        $advance_amount = $hirepurchase->purchase_product->advance_pay;
-        $hire_price = $hirepurchase->purchase_product->hire_price;
+        $advance_amount = $hirepurchase->advance_pay;
+        $hire_price = $hirepurchase->hire_price;
         $installments = Installment::where('hire_purchase_id', $id)->get();
 
         foreach ($installments as $installment) {
@@ -1099,7 +1186,7 @@ class HirePurchaseController extends Controller
      */
     public function show($id)
     {
-        $hirePurchase = HirePurchase::with(['purchase_product', 'purchase_product.product_category', 'purchase_product.brand', 'purchase_product.product', 'show_room', 'show_room_user', 'districtpr', 'upazilapr', 'districtpa', 'upazilapa', 'pre_purchase_product', 'ppshow_room', 'customer_profession'])->findOrFail($id);
+        $hirePurchase = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'show_room', 'show_room_user', 'districtpr', 'upazilapr', 'districtpa', 'upazilapa', 'pre_purchase_product', 'ppshow_room', 'customer_profession'])->findOrFail($id);
 
 
         $guarantor = GuaranterInfo::where('hire_purchase_id', $id)->get();

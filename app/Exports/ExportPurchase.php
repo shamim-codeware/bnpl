@@ -56,7 +56,7 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             : 0;
 
         // Hire price
-        $hire_price = $filter_data->purchase_product->hire_price ?? 0;
+        $hire_price = $filter_data->hire_price ?? 0;
 
         // Late fee via Trait (assume LateFeeService class exists)
         $lateFeeService = app(LateFeeService::class);
@@ -98,14 +98,13 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             // $lastLoanEndDate,
             $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : '',
             $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y') : '',
-            @$filter_data->purchase_product->brand->name,
-            @$filter_data->purchase_product->product->product_model,
-            // @$filter_data->purchase_product->product_size->name,
-            @$filter_data->purchase_product->product_size_id,
-            @$filter_data->purchase_product->hire_price ? (float) ($filter_data->purchase_product->hire_price) : '0.00',
-            @$filter_data->purchase_product->down_payment,
-            @$filter_data->purchase_product->monthly_installment,
-            @$filter_data->purchase_product->total_paid,
+            @$filter_data->purchase_products->pluck('brand.name')->implode(', ') ?? 'N/A',
+            @$filter_data->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
+            @$filter_data->purchase_products->pluck('product_size_id')->implode(', ') ?? 'N/A',
+            @$filter_data->hire_price ? (float) ($filter_data->hire_price) : '0.00',
+            @$filter_data->down_payment,
+            @$filter_data->monthly_installment,
+            @$filter_data->total_paid,
             // @$late_fee ?? 0.00,
             ($late_fee) ?? 0.00,
             ($paid_fine_amount),
