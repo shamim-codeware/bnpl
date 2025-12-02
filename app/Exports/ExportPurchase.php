@@ -37,9 +37,15 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
         $last_paid_amount = 0;
 
         // Safely get installment dates
+        // if ($filter_data->installment && count($filter_data->installment) > 0) {
+        //     $firstLoanStartDate = $filter_data->installment[0]->loan_start_date;
+        //     $lastLoanEndDate = $filter_data->installment[count($filter_data->installment) - 1]->loan_end_date;
+        // }
         if ($filter_data->installment && count($filter_data->installment) > 0) {
-            $firstLoanStartDate = $filter_data->installment[0]->loan_start_date;
-            $lastLoanEndDate = $filter_data->installment[count($filter_data->installment) - 1]->loan_end_date;
+            // earliest due date = loan start date
+            $firstLoanStartDate = $filter_data->installment->min('loan_start_date');
+            // latest due date = loan end date
+            $lastLoanEndDate = $filter_data->installment->max('loan_start_date');
         }
 
         // Safely get transaction details

@@ -20,6 +20,7 @@ use App\Models\HirePurchaseProduct;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\GeneralIncentiveConfig;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -131,6 +132,13 @@ class PaymentCollectionController extends Controller
             $total_pay_amount = $monthly_installment * $number_of_installment;
             $advance_payment = (float) $request->amount - $total_pay_amount;
             $data['number_of_instllment'] = $number_of_installment;
+
+            Log::info('Payment calculations', [
+                'amount' => $amount,
+                'monthly_installment' => $monthly_installment,
+                'number_of_installment' => $number_of_installment,
+                'advance_payment' => $advance_payment
+            ]);
             //            }
             // If no Installment records have status 0, update HirePurchase
             $hirepurchase = HirePurchase::find($request->hire_purchase_id);
@@ -142,17 +150,26 @@ class PaymentCollectionController extends Controller
             $transaction = new Transaction;
             $transaction->fill($data)->save();
             $transaction_id = $transaction->id;
+
+            $hirepurchase->total_paid += (float) $request->amount;
+            $hirepurchase->save();
+
             $HirePurchaseProduct = HirePurchaseProduct::where('hire_purchase_id', $request->hire_purchase_id)->first();
-            $HirePurchaseProduct->total_paid += (float) $request->amount;
+            // $HirePurchaseProduct->total_paid += (float) $request->amount;
             $HirePurchaseProduct->advance_pay += $advance_payment;
             $HirePurchaseProduct->save();
             $Installment = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 0)->orderby('id', "ASC")->take($number_of_installment)->get();
+
+
+
             foreach ($Installment as $key => $install) {
                 $installment_number = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 1)->count();
 
                 $paymentRef = "Cash-BNPL-Ins-{$installment_number}";
 
+
                 $response =    $ApiService->CollectionApi($hirepurchase->order_no, $installment_number, $paymentRef);
+
 
                 if ($response->error == 1) {
                     $sent = 0;
@@ -215,7 +232,7 @@ class PaymentCollectionController extends Controller
 
             //     Incentive::create([
             //         'hire_purchase_id' => $request->hire_purchase_id,
-            //         'showroom_user_id' => $hirepurchase->showroom_user_id, // অথবা showroom_user_id from hirepurchase
+            //         'showroom_user_id' => $hirepurchase->showroom_user_id, // à¦…à¦¥à¦¬à¦¾ showroom_user_id from hirepurchase
             //         'type' => 'collection',
             //         'amount' => $totalCollected,
             //         'incentive_rate' => $incentiveRate,

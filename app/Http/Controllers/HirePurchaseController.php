@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\Bank;
 use App\Models\User;
@@ -559,7 +560,7 @@ class HirePurchaseController extends Controller
     public function ApproveSale($id, ApiService $ApiService)
     {
         date_default_timezone_set('Asia/Dhaka');
-        $HirePurchase = HirePurchase::with(['purchase_product'])->findOrFail($id);
+        $HirePurchase = HirePurchase::with(['purchase_products'])->findOrFail($id);
         if (Auth::user()->role_id == User::RETAIL) {
             $notification = Notification::where('hire_id', $HirePurchase->id)->first();
             if (empty($notification)) {
@@ -589,7 +590,7 @@ class HirePurchaseController extends Controller
             $Transaction = Transaction::where('hire_purchase_id', $id)->first();
             $Transaction->status = 1;
             $Transaction->save();
-            $remaining_amount = $HirePurchase->purchase_product->hire_price - $HirePurchase->purchase_product->down_payment;
+            $remaining_amount = $HirePurchase->hire_price - $HirePurchase->down_payment;
             $ShowRoom = ShowRoom::where('id', $HirePurchase->showroom_id)->first();
             $ShowRoom->remaining_credit = $ShowRoom->remaining_credit - $remaining_amount;
             $ShowRoom->save();
@@ -629,7 +630,7 @@ class HirePurchaseController extends Controller
             $Transaction = Transaction::where('hire_purchase_id', $id)->first();
             $Transaction->status = 1;
             $Transaction->save();
-            $remaining_amount = $HirePurchase->purchase_product->hire_price - $HirePurchase->purchase_product->down_payment;
+            $remaining_amount = $HirePurchase->hire_price - $HirePurchase->down_payment;
             $ShowRoom = ShowRoom::where('id', $HirePurchase->showroom_id)->first();
             $ShowRoom->remaining_credit = $ShowRoom->remaining_credit - $remaining_amount;
             $ShowRoom->save();
@@ -658,7 +659,6 @@ class HirePurchaseController extends Controller
         $HirePurchase->save();
         return redirect()->back()->with('success', 'Approve Successfully ');
     }
-
     public function ProductDetails($id)
     {
         $title = "Product Details";
@@ -928,7 +928,7 @@ class HirePurchaseController extends Controller
             $HirePurchaseProduct = new HirePurchaseProduct;
 
             if ($request->sale_type === 'single') {
-            $HirePurchaseProduct->fill($hirePurchase_productdata)->save();
+                $HirePurchaseProduct->fill($hirePurchase_productdata)->save();
             }
             // For PACKAGE
             else {

@@ -50,9 +50,13 @@
                     $last_paid_amount = 0;
 
                     // Safely get first and last installment dates
+                    // if ($purchase->installment && count($purchase->installment) > 0) {
+                    //     $firstLoanStartDate = $purchase->installment[0]->loan_start_date;
+                    //     $lastLoanEndDate = $purchase->installment[count($purchase->installment) - 1]->loan_end_date;
+                    // }
                     if ($purchase->installment && count($purchase->installment) > 0) {
-                        $firstLoanStartDate = $purchase->installment[0]->loan_start_date;
-                        $lastLoanEndDate = $purchase->installment[count($purchase->installment) - 1]->loan_end_date;
+                        $firstLoanStartDate = $purchase->installment->min('loan_start_date');
+                        $lastLoanEndDate = $purchase->installment->max('loan_start_date');
                     }
 
                     // Safely get last transaction details
