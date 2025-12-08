@@ -18,4 +18,8 @@ class Installment extends Model
     public function hire_purchase(){
         return $this->belongsTo(HirePurchase::class, 'hire_purchase_id');
     }
+
+    public function penalty(){
+        return $this->hasMany(Penalty::class, 'installment_id');
+    }
 }

@@ -266,6 +266,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('due-on-next-month', [ReportController::class, 'DueOnNextmonth']);
         Route::get('installment-penalty', [PenaltyController::class, 'index'])->name('penalty.index');
         Route::post('installment-penalty/post', [PenaltyController::class, 'store'])->name('penalty.store');
+        //@sabbir Penalty
+        Route::get('penalty-list', [PenaltyController::class, 'PenaltyList'])->name('penalty.list');
+        Route::get('penalty-status/{id}/{status}',[PenaltyController::class, 'status'])->name('penalty-status');
+        Route::get('penalty-export', [PenaltyController::class, 'export'])->name('penalty.export');
+        Route::get('penalty-notice/{id}', [PenaltyController::class, 'download'])->name('penalty.notice');
         //Full Paid Customer
         Route::get('full-paid-customer',          [ReportController::class, 'fullPaidCustomer']);
         Route::get('current-outstanding',         [ReportController::class, 'currentOutstanding']);
@@ -290,12 +295,15 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('defaulter-report-action', [ExternalReportController::class, 'DefaulterReportAction'])->name('defaulter-report-action');
     Route::get('defaulter-report-export', [ExternalReportController::class, 'DefaulterReportExport'])->name('defaulter-report-export');
 
-
     Route::get('cancelled-bnpl-sales-action', [ExternalReportController::class, 'CancelBnplSaleAction'])->name('cancelled-bnpl-sales-action');
     Route::get('cancelled-bnpl-sales-export', [ExternalReportController::class, 'CancelBnplSaleExport'])->name('cancelled-bnpl-sales-export');
 
     Route::get('incentive-report-action', [ExternalReportController::class, 'IncentiveReportAction'])->name('incentive-report-action');
     Route::get('incentive-report-export', [ExternalReportController::class, 'IncentiveReportExport'])->name('incentive-report-export');
+
+    // @Sabbir Penalty
+    Route::get('all-penalty-action', [PenaltyController::class, 'AllPenaltyAction']);
+
     //Report Action
     Route::get('monthly-report', function () {
         $title = "Monthly Report";

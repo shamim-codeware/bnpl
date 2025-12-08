@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Penalty extends Model
 {
     use HasFactory;
+    protected $guarded = [];
+
+    public function installment()
+    {
+        return $this->belongsTo(Installment::class);
+    }
+
 }
