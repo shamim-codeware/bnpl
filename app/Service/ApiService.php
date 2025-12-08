@@ -52,7 +52,7 @@ class ApiService
             "delivery_from" => $delivery_showroom->ctp_name ? $delivery_showroom->ctp_name : $delivery_showroom->name,
             "delivery_fee" => 0,
             "note" => $data['organization_short_desc'],
-            'payment_ref' => "Cash-BNPL-DP"
+            'payment_ref' => "Cash"
         ]);
 
         // Prepare order details array
@@ -192,7 +192,7 @@ class ApiService
         $data = [
             'eorder_no' => $orderNo,
             'ins_no' => $installement,
-            'payment_ref' => $paymentRef
+            'payment_ref' => "Cash"
         ];
         // Send the POST request to the ERP API
         $response = Http::withHeaders($headers)->post($url, $data);
@@ -213,7 +213,7 @@ class ApiService
         $payload = [
             'eorder_no'   => $orderNo,
             'penalty_amt' => $panalty_amt,
-            'payment_ref' => "Cash-BNPL-Fine", // Default empty if not provided
+            'payment_ref' => "Cash", // Default empty if not provided
             'ins_no'      => $installment_no
         ];
         try {

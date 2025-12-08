@@ -11,12 +11,17 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DueOnNextMonthExport;
 use App\Traits\LateFeeCalculationTrait;
+use Illuminate\Support\Facades\Artisan;
 
 class ExportHirepurchaseController extends Controller
 {
     use LateFeeCalculationTrait;
     public function export(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
 
         $query = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'show_room', 'show_room_user', 'users'])->where('status', 3)->where('is_paid', 1);
         if ($request->from_date && $request->to_date) {
@@ -64,6 +69,10 @@ class ExportHirepurchaseController extends Controller
     }
     public function Allexport(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
 
         $query = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'show_room', 'show_room_user', 'users', 'installment'])->where('status', 3);
         // if ($request->from_date && $request->to_date) {
@@ -132,6 +141,11 @@ class ExportHirepurchaseController extends Controller
 
     public function currentOutstandingExport(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+
         // Use the same query structure as the getCurrentOutstanding method
         $query = HirePurchase::selectEntities(0, 3); // 0 means unpaid (current outstanding), 3 means status sale confirm
 
@@ -220,6 +234,11 @@ class ExportHirepurchaseController extends Controller
     }
     public function dueOnNextMonthExport(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+        
         $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
         $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
 

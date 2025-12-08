@@ -40,7 +40,7 @@
         <tbody>
             @foreach ($incentives as $key => $incentive)
                 @php
-                    $order_no = $incentive->hire_purchase->order_no ?? '';
+                    $order_no = $incentive->hirePurchase->order_no ?? '';
                     $customer_name = $incentive->hirePurchase->name ?? '';
                     $product_group = $incentive->hirePurchase->purchase_products
                         ? $incentive->hirePurchase->purchase_products->pluck('product_group.name')->implode(', ')

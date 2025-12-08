@@ -19,6 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DueOnNextMonthExport;
 
 use App\Traits\LateFeeCalculationTrait;
+use Illuminate\Support\Facades\Artisan;
 
 class ReportController extends Controller
 {
@@ -132,6 +133,11 @@ class ReportController extends Controller
 
     public function DueOnNextmonthExport(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+
         // Calculate next month date range
         $nextMonthStart = date('Y-m-01', strtotime('first day of next month'));
         $nextMonthEnd = date('Y-m-t', strtotime('last day of next month'));

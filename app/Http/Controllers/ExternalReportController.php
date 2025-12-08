@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Traits\LateFeeCalculationTrait;
+use Illuminate\Support\Facades\Artisan;
 use App\Exports\DefaulterCustomersExport;
 
 class ExternalReportController extends Controller
@@ -49,6 +50,11 @@ class ExternalReportController extends Controller
 
     public function AllBnplSaleExport(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+
         $hirepurchase = $this->filterBnplOrders($request, false); // false means no pagination
 
         // Calculate late fees for each hire purchase
@@ -77,6 +83,11 @@ class ExternalReportController extends Controller
 
     public function CancelBnplSaleExport(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+
         $hirepurchase = $this->filterCancelledBnplOrders($request, false);
         return Excel::download(new BnplOrdersExport($hirepurchase), 'Cancelled_BNPL_Orders_' . Helper::formatDateTimeFilename() . '.xlsx');
     }
@@ -106,6 +117,11 @@ class ExternalReportController extends Controller
 
     public function DefaulterReportExport(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+        
         $customers = $this->filterDefaulterCustomers($request, false);
 
         // Calculate late fees for each hire purchase
