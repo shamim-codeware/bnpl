@@ -67,9 +67,15 @@
                                 <li class="d-flex align-items-center flex-column gap-1">
                                     <a style="white-space: nowrap" class="btn btn-info btn-sm w-100 d-block" href="{{ route('penalty.notice' , $value->id) }}" title="View details" target="_blank">Download</a>
                                 </li>
-                                <li class="d-flex align-items-center flex-column gap-1">
-                                    <a style="white-space: nowrap" class="btn btn-primary btn-sm w-100 d-block" href="{{ url('product_details/' . $value->installment->hire_purchase->id) }}" title="View details" target="_blank">View details</a>
-                                </li>
+                                @if(optional(optional($value->installment)->hire_purchase)->id)
+                                    <li class="d-flex align-items-center flex-column gap-1">
+                                        <a style="white-space: nowrap" class="btn btn-primary btn-sm w-100 d-block"
+                                        href="{{ url('product_details/' . $value->installment->hire_purchase->id) }}"
+                                        title="View details" target="_blank">
+                                            View details
+                                        </a>
+                                    </li>
+                                @endif
                             </ul>
                         </td>
                     </tr>
