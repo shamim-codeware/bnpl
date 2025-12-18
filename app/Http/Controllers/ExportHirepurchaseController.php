@@ -133,6 +133,14 @@ class ExportHirepurchaseController extends Controller
         }
 
 
+        logger([
+            'request' => $request->all(),
+            'query' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+            'total' => $query->count(),
+            'total' => $query->get()->toArray(),
+        ]);
+
         $hirepurchase = $query->latest()->get();
 
         $filename = 'All-bnpl-purchase-list-report-' . date('m-d-y-H-i-s') . '.xlsx';
@@ -238,7 +246,7 @@ class ExportHirepurchaseController extends Controller
         Artisan::call('view:clear');
         Artisan::call('config:clear');
         Artisan::call('route:clear');
-        
+
         $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
         $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
 

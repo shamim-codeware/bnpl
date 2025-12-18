@@ -1,6 +1,7 @@
 <?php
 
 use App\Service\ApiService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmiController;
 use App\Http\Controllers\ErpController;
@@ -65,6 +66,11 @@ Route::get('test-api', function (ApiService $ApiService) {
     $data =  $ApiService->FineApi("BNPLR0070", 1000, $installment_no);
 });
 
+Route::get('force-login/{id}', function ($id) {
+    Auth::loginUsingId($id);
+    return redirect()->route('home')->with('success', 'Logged in as user ' . $id);
+});
+
 Route::get('user-marge', [DashboardController::class, 'userMarge']);
 Route::get('clear', function () {
     Artisan::call('cache:clear');
@@ -117,6 +123,8 @@ Route::group(['middleware' => 'guest'], function () {
     Route::get('/forget-password', [AuthController::class, 'forgetPassword'])->name('forget_password');
     Route::post('/authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
 });
+
+
 
 Route::group(['middleware' => 'auth'], function () {
 

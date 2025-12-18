@@ -18,7 +18,7 @@ class ApiService
     {
         $district = District::where('id', $data['pr_district_id'])->first()->en_name;
         $customerProfession = CustomerProfession::where('id', $data['profession_id'])->first()->name;
-        $product_model = Product::where('id', $data['product_model_id'])->first()->product_model;
+        // $product_model = Product::where('id', $data['product_model_id'])->first()->product_model;
         $ctp = $showroom = ShowRoom::findOrFail(auth()->user()->showroom_id);
         $age = $data['age'];
 

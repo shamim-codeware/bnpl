@@ -17,6 +17,11 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
     public function __construct($data)
     {
+        logger([
+            'BnplOrdersExport' => $data->count(),
+            'user_id' => auth()->user()->id,
+        ]);
+
         $this->data = $data;
     }
 
@@ -68,167 +73,173 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
     public function map($purchase): array
     {
-        // Get loan dates
-        $firstLoanStartDate = null;
-        $lastLoanEndDate = null;
-        $next_due_date = null;
+        try {
+            // Get loan dates
+            $firstLoanStartDate = null;
+            $lastLoanEndDate = null;
+            $next_due_date = null;
 
-        if ($purchase->installment && count($purchase->installment) > 0) {
-            $firstLoanStartDate = $purchase->installment[0]->loan_start_date;
-            $lastLoanEndDate = $purchase->installment[count($purchase->installment) - 1]->loan_end_date;
+            if ($purchase->installment && count($purchase->installment) > 0) {
+                $firstLoanStartDate = $purchase->installment[0]->loan_start_date;
+                $lastLoanEndDate = $purchase->installment[count($purchase->installment) - 1]->loan_end_date;
 
-            // Find next due date
-            $next_installment = Installment::where('hire_purchase_id', $purchase->id)
-                ->where('status', 0)
-                ->orderby('id', "ASC")
-                ->first();
-            if ($next_installment) {
-                $next_due_date = $next_installment->loan_start_date;
-            }
-        }
-
-        // Get last transaction details
-        $last_paid_amount = 0;
-        $last_payment_date = null;
-        if ($purchase->transaction && count($purchase->transaction) > 0) {
-            $last_paid_amount = $purchase->transaction[count($purchase->transaction) - 1]->amount;
-            $last_payment_date = $purchase->transaction[count($purchase->transaction) - 1]->updated_at;
-        }
-
-        // Check if status is 2 (Rejected) or 4 (Sale Cancel)
-        $isRejectedOrCancelled = in_array($purchase->status, [2, 4]);
-
-        $installment_paid = $purchase->installment->where('status', 1)->sum('amount');
-        $hire_price = $purchase->hire_price ?? 0;
-
-        // Trait use করা class instance আনতে হবে
-        $lateFeeService = app(LateFeeService::class);
-        $late_fee = $lateFeeService->calculateLateFine($purchase->id);
-        $paid_fine_amount = $purchase->installment->sum('fine_amount');
-
-
-
-        // মোট বাকি = (hire_price - paid) + late_fee
-        $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
-
-
-        // Get status text
-        $status_text = '';
-        switch ($purchase->status) {
-            case 0:
-                $status_text = 'Pending';
-                break;
-            case 1:
-                $status_text = 'Approved';
-                break;
-            case 2:
-                $status_text = 'Rejected';
-                break;
-            case 3:
-                $status_text = 'Sale Confirm';
-                break;
-            case 4:
-                $status_text = 'Sale Cancel';
-                break;
-            default:
-                $status_text = 'Unknown';
-        }
-
-        static $slNo = 0;
-        $slNo++;
-
-        // Get guarantor information
-        $guarantor1_name = 'N/A';
-        $guarantor1_relation = 'N/A';
-        $guarantor1_phone = 'N/A';
-        $guarantor1_nid = 'N/A';
-        $guarantor2_name = 'N/A';
-        $guarantor2_relation = 'N/A';
-        $guarantor2_phone = 'N/A';
-        $guarantor2_nid = 'N/A';
-
-        if ($purchase->guaranter_info && count($purchase->guaranter_info) > 0) {
-            // First guarantor (index 0)
-            if (isset($purchase->guaranter_info[0])) {
-                $guarantor1_name = $purchase->guaranter_info[0]->guarater_name ?? 'N/A';
-                $guarantor1_relation = $purchase->guaranter_info[0]->guarater_relation ?? 'N/A';
-                $guarantor1_phone = $purchase->guaranter_info[0]->guarater_phone ?? 'N/A';
-                $guarantor1_nid = $purchase->guaranter_info[0]->guarater_nid ?? 'N/A';
+                // Find next due date
+                $next_installment = Installment::where('hire_purchase_id', $purchase->id)
+                    ->where('status', 0)
+                    ->orderby('id', "ASC")
+                    ->first();
+                if ($next_installment) {
+                    $next_due_date = $next_installment->loan_start_date;
+                }
             }
 
-            // Second guarantor (index 1)
-            if (isset($purchase->guaranter_info[1])) {
-                $guarantor2_name = $purchase->guaranter_info[1]->guarater_name ?? 'N/A';
-                $guarantor2_relation = $purchase->guaranter_info[1]->guarater_relation ?? 'N/A';
-                $guarantor2_phone = $purchase->guaranter_info[1]->guarater_phone ?? 'N/A';
-                $guarantor2_nid = $purchase->guaranter_info[1]->guarater_nid ?? 'N/A';
+            // Get last transaction details
+            $last_paid_amount = 0;
+            $last_payment_date = null;
+            if ($purchase->transaction && count($purchase->transaction) > 0) {
+                $last_paid_amount = $purchase->transaction[count($purchase->transaction) - 1]->amount;
+                $last_payment_date = $purchase->transaction[count($purchase->transaction) - 1]->updated_at;
             }
-        }
+
+            // Check if status is 2 (Rejected) or 4 (Sale Cancel)
+            $isRejectedOrCancelled = in_array($purchase->status, [2, 4]);
+
+            $installment_paid = $purchase->installment->where('status', 1)->sum('amount');
+            $hire_price = $purchase->hire_price ?? 0;
+
+            // Trait use করা class instance আনতে হবে
+            $lateFeeService = app(LateFeeService::class);
+            $late_fee = $lateFeeService->calculateLateFine($purchase->id);
+            $paid_fine_amount = $purchase->installment->sum('fine_amount');
 
 
 
-        // Set conditional values based on status
-        $firstInstallment = $isRejectedOrCancelled ? '0.00' : (@$purchase->down_payment ? ($purchase->down_payment) : '0.00');
+            // মোট বাকি = (hire_price - paid) + late_fee
+            $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
 
-        // $totalPaymentReceived = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00');
-        $totalPaymentReceived = $isRejectedOrCancelled
-            ? '0.00'
-            : (
-                $purchase->installment
+
+            // Get status text
+            $status_text = '';
+            switch ($purchase->status) {
+                case 0:
+                    $status_text = 'Pending';
+                    break;
+                case 1:
+                    $status_text = 'Approved';
+                    break;
+                case 2:
+                    $status_text = 'Rejected';
+                    break;
+                case 3:
+                    $status_text = 'Sale Confirm';
+                    break;
+                case 4:
+                    $status_text = 'Sale Cancel';
+                    break;
+                default:
+                    $status_text = 'Unknown';
+            }
+
+            static $slNo = 0;
+            $slNo++;
+
+            // Get guarantor information
+            $guarantor1_name = 'N/A';
+            $guarantor1_relation = 'N/A';
+            $guarantor1_phone = 'N/A';
+            $guarantor1_nid = 'N/A';
+            $guarantor2_name = 'N/A';
+            $guarantor2_relation = 'N/A';
+            $guarantor2_phone = 'N/A';
+            $guarantor2_nid = 'N/A';
+
+            if ($purchase->guaranter_info && count($purchase->guaranter_info) > 0) {
+                // First guarantor (index 0)
+                if (isset($purchase->guaranter_info[0])) {
+                    $guarantor1_name = $purchase->guaranter_info[0]->guarater_name ?? 'N/A';
+                    $guarantor1_relation = $purchase->guaranter_info[0]->guarater_relation ?? 'N/A';
+                    $guarantor1_phone = $purchase->guaranter_info[0]->guarater_phone ?? 'N/A';
+                    $guarantor1_nid = $purchase->guaranter_info[0]->guarater_nid ?? 'N/A';
+                }
+
+                // Second guarantor (index 1)
+                if (isset($purchase->guaranter_info[1])) {
+                    $guarantor2_name = $purchase->guaranter_info[1]->guarater_name ?? 'N/A';
+                    $guarantor2_relation = $purchase->guaranter_info[1]->guarater_relation ?? 'N/A';
+                    $guarantor2_phone = $purchase->guaranter_info[1]->guarater_phone ?? 'N/A';
+                    $guarantor2_nid = $purchase->guaranter_info[1]->guarater_nid ?? 'N/A';
+                }
+            }
+
+
+
+            // Set conditional values based on status
+            $firstInstallment = $isRejectedOrCancelled ? '0.00' : (@$purchase->down_payment ? ($purchase->down_payment) : '0.00');
+
+            // $totalPaymentReceived = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00');
+            $totalPaymentReceived = $isRejectedOrCancelled
+                ? '0.00'
+                : (
+                    $purchase->installment
                     ->where('status', 1)
                     ->sum(function ($installment) {
                         return $installment->amount + $installment->fine_amount;
                     })
-            );
-        // $outstandingBalanceFormatted = $isRejectedOrCancelled ? '0.00' :
-        //     number_format($outstanding_balance, 2);
+                );
+            // $outstandingBalanceFormatted = $isRejectedOrCancelled ? '0.00' :
+            //     number_format($outstanding_balance, 2);
 
-        $outstandingBalanceFormatted = $isRejectedOrCancelled
-            ? '0.00'
-            : (max(0, $outstanding_balance));
+            $outstandingBalanceFormatted = $isRejectedOrCancelled
+                ? '0.00'
+                : (max(0, $outstanding_balance));
 
-        $paidInstallment = $isRejectedOrCancelled ? '0' : (@$purchase->installment ? $purchase->installment->where('status', 1)->count() : '0');
+            $paidInstallment = $isRejectedOrCancelled ? '0' : (@$purchase->installment ? $purchase->installment->where('status', 1)->count() : '0');
 
-        $dueInstallment = $isRejectedOrCancelled ? '0' : (@$purchase->installment ? $purchase->installment->where('status', 0)->count() : '0');
+            $dueInstallment = $isRejectedOrCancelled ? '0' : (@$purchase->installment ? $purchase->installment->where('status', 0)->count() : '0');
 
-        return [
-            $slNo,
-            @$purchase->show_room->name ?? 'N/A',
-            @$purchase->show_room->zone->name ?? 'N/A',
-            $purchase->order_no,
-            $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : 'N/A',
-            $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y')  : 'N/A',
-            @$purchase->purchase_products->pluck('brand.name')->implode(', ') ?? 'N/A',
-            @$purchase->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
-            @$purchase->purchase_products->pluck('product_size_id')->implode(', ') ?? 'N/A',
-            @$purchase->hire_price ? (float)($purchase->hire_price) : '0.00',
-            $firstInstallment, // Conditional: 0.00 if rejected/cancelled
-            @$purchase->monthly_installment ? (float)($purchase->monthly_installment) : '0.00',
-            $totalPaymentReceived, // Conditional: 0.00 if rejected/cancelled
-            // @$purchase->late_fee ?? 0.00,
-            $isRejectedOrCancelled ? '0.00' : ($purchase->late_fee),
-            $isRejectedOrCancelled ? '0.00' : ($paid_fine_amount),
-            $outstandingBalanceFormatted, // Conditional: 0.00 if rejected/cancelled
-            @$purchase->installment ? $purchase->installment->count() : '0',
-            $paidInstallment, // Conditional: 0 if rejected/cancelled
-            $dueInstallment, // Conditional: 0 if rejected/cancelled
-            (float)($last_paid_amount),
-            $last_payment_date ? \Carbon\Carbon::parse($last_payment_date)->format('d F Y') : 'N/A',
-            $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A',
-            $purchase->name ?? 'N/A',
-            $purchase->pr_phone ?? 'N/A',
-            @$purchase->show_room_user->name ?? 'N/A',
-            @$purchase->users->name ?? 'N/A',
-            $status_text,
-            $guarantor1_name,
-            $guarantor1_relation,
-            $guarantor1_phone,
-            $guarantor1_nid,
-            $guarantor2_name,
-            $guarantor2_relation,
-            $guarantor2_phone,
-            $guarantor2_nid
-        ];
+            return [
+                $slNo,
+                @$purchase->show_room->name ?? 'N/A',
+                @$purchase->show_room->zone->name ?? 'N/A',
+                $purchase->order_no,
+                $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : 'N/A',
+                $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y')  : 'N/A',
+                @$purchase->purchase_products->pluck('brand.name')->implode(', ') ?? 'N/A',
+                @$purchase->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
+                @$purchase->purchase_products->pluck('product_size_id')->implode(', ') ?? 'N/A',
+                @$purchase->hire_price ? (float)($purchase->hire_price) : '0.00',
+                $firstInstallment, // Conditional: 0.00 if rejected/cancelled
+                @$purchase->monthly_installment ? (float)($purchase->monthly_installment) : '0.00',
+                $totalPaymentReceived, // Conditional: 0.00 if rejected/cancelled
+                // @$purchase->late_fee ?? 0.00,
+                $isRejectedOrCancelled ? '0.00' : ($purchase->late_fee),
+                $isRejectedOrCancelled ? '0.00' : ($paid_fine_amount),
+                $outstandingBalanceFormatted, // Conditional: 0.00 if rejected/cancelled
+                @$purchase->installment ? $purchase->installment->count() : '0',
+                $paidInstallment, // Conditional: 0 if rejected/cancelled
+                $dueInstallment, // Conditional: 0 if rejected/cancelled
+                (float)($last_paid_amount),
+                $last_payment_date ? \Carbon\Carbon::parse($last_payment_date)->format('d F Y') : 'N/A',
+                $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A',
+                $purchase->name ?? 'N/A',
+                $purchase->pr_phone ?? 'N/A',
+                @$purchase->show_room_user->name ?? 'N/A',
+                @$purchase->users->name ?? 'N/A',
+                $status_text,
+                $guarantor1_name,
+                $guarantor1_relation,
+                $guarantor1_phone,
+                $guarantor1_nid,
+                $guarantor2_name,
+                $guarantor2_relation,
+                $guarantor2_phone,
+                $guarantor2_nid
+            ];
+        } catch (\Exception $e) {
+
+            logger()->error('BnplOrdersExport error: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public function registerEvents(): array
