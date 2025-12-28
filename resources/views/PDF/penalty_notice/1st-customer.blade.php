@@ -183,22 +183,19 @@
                     </table>
                 </td>
                 <td style="text-align: center; vertical-align: middle; width: 38%; padding: 10px;">
-                    {{-- <div style="background-color: #ec2026; color: white; padding: 5px 22px; border-radius: 16px; display: inline-block; font-weight: bold; font-size: 18px; text-align: center;">
-                        বকেয়া কিস্তি পরিশোধের<br>প্রথম রিমাইন্ডার
-                    </div> --}}
-                        <table style="background-color: #ec2026; display: inline-block; border-collapse: separate; border-spacing: 0;">
-        <tr>
-            <td style="background-color: #ec2026;
-                       color: white;
-                       padding: 8px 25px;
-                       font-weight: 600;
-                       font-size: 18px;
-                       text-align: center;
-                       border: 2px solid #ec2026;">
-                বকেয়া কিস্তি পরিশোধের<br>প্রথম রিমাইন্ডার
-            </td>
-        </tr>
-    </table>
+                    <table style="background-color: #ec2026; display: inline-block; border-collapse: separate; border-spacing: 0;">
+                        <tr>
+                            <td style="background-color: #ec2026;
+                                    color: white;
+                                    padding: 8px 25px;
+                                    font-weight: 600;
+                                    font-size: 18px;
+                                    text-align: center;
+                                    border: 2px solid #ec2026;">
+                                বকেয়া কিস্তি পরিশোধের<br>প্রথম রিমাইন্ডার
+                            </td>
+                        </tr>
+                    </table>
                 </td>
                 <td style="width: 26%;">
                     <table style="width:100%;" cellspacing="0">
