@@ -121,7 +121,7 @@ class ExternalReportController extends Controller
         Artisan::call('view:clear');
         Artisan::call('config:clear');
         Artisan::call('route:clear');
-        
+
         $customers = $this->filterDefaulterCustomers($request, false);
 
         // Calculate late fees for each hire purchase
@@ -331,7 +331,11 @@ class ExternalReportController extends Controller
             $query->where('order_no', $request->order_no);
         } else {
             if ($request->from_date && $request->to_date) {
-                $query->whereBetween('approval_date', [$from_date, $to_date]);
+                // $query->whereBetween('approval_date', [$from_date, $to_date]);
+                $query->whereHas('installment', function ($q) use ($from_date, $to_date) {
+                    $q->where('status', 0)
+                        ->whereBetween('loan_start_date', [$from_date, $to_date]);
+                });
             }
             if ($request->product_model) {
                 $query->whereHas('purchase_products', function ($q) use ($product_model) {

@@ -36,22 +36,53 @@
             <tbody>
                 @foreach ($penalties as $key => $value)
                     <tr>
-                        <td><div class="userDatatable-content">{{ $key + 1 }}</div></td>
+                        <td>
+                            <div class="userDatatable-content">{{ $key + 1 }}</div>
+                        </td>
                         <td>{{ $value->order_no ?? 'N/A' }}</td>
                         <td>{{ $value->installment_no ?? 'N/A' }}</td>
-                        <td><div class="userDatatable-content">{{ $value->notice_no ?? 'N/A' }}</div></td>
-                        <td><div class="userDatatable-content">{{ $value->due_date ? Carbon\Carbon::parse($value->due_date)->format('d F Y') : 'N/A' }}</div></td>
-                        <td><div class="userDatatable-content">{{ $value->type ?? 'N/A' }}</div></td>
+                        {{-- <td><div class="userDatatable-content">{{ $value->notice_no ?? 'N/A' }}</div></td> --}}
+                        <td>
+                            <div
+                                class="userDatatable-content
+        @if (
+            ($value->notice_no == '3rd' && $value->type == 'customer') ||
+                ($value->notice_no == '2nd' && $value->type == 'granter')) text-white bg-danger fw-bold @endif">
+                                {{ $value->notice_no ?? 'N/A' }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="userDatatable-content">
+                                {{ $value->due_date ? Carbon\Carbon::parse($value->due_date)->format('d F Y') : 'N/A' }}
+                            </div>
+                        </td>
+                        {{-- <td>
+                            <div class="userDatatable-content">{{ $value->type ?? 'N/A' }}</div>
+                        </td> --}}
+                        <td>
+                            <div
+                                class="userDatatable-content
+        @if (
+            ($value->notice_no == '3rd' && $value->type == 'customer') ||
+                ($value->notice_no == '2nd' && $value->type == 'granter')) text-white bg-danger fw-bold @endif">
+                                {{ $value->type ?? 'N/A' }}
+                            </div>
+                        </td>
+
                         <td>
                             <div class="userDatatable-content--subject status-check">
-                                @if($value->action == 0)
-                                <select name="status" class="form-control status" data-id="{{ $value->id }}">
-                                    <option value="pending" {{ $value->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="yes" {{ $value->status == 'yes' ? 'selected' : '' }}>Yes</option>
-                                    <option value="no" {{ $value->status == 'no' ? 'selected' : '' }}>No</option>
-                                </select>
+                                @if ($value->action == 0)
+                                    <select name="status" class="form-control status" data-id="{{ $value->id }}">
+                                        <option value="pending" {{ $value->status == 'pending' ? 'selected' : '' }}>
+                                            Pending</option>
+                                        <option value="yes" {{ $value->status == 'yes' ? 'selected' : '' }}>Yes
+                                        </option>
+                                        <option value="no" {{ $value->status == 'no' ? 'selected' : '' }}>No
+                                        </option>
+                                    </select>
                                 @else
-                                    @if($value->status == 'pending')
+                                    @if ($value->status == 'pending')
                                         <p class="bg-warning">Pending</p>
                                     @elseif($value->status == 'yes')
                                         <p class="bg-primary" style="opacity: 0.65;">Yes</p>
@@ -61,17 +92,23 @@
                                 @endif
                             </div>
                         </td>
-                        <td><div class="userDatatable-content">{{ $value->status_date ? Carbon\Carbon::parse($value->status_date)->format('d F Y') : 'N/A' }}</div></td>
+                        <td>
+                            <div class="userDatatable-content">
+                                {{ $value->status_date ? Carbon\Carbon::parse($value->status_date)->format('d F Y') : 'N/A' }}
+                            </div>
+                        </td>
                         <td>
                             <ul class="mb-0 d-flex flex-wrap justify-content-center gap-1">
                                 <li class="d-flex align-items-center flex-column gap-1">
-                                    <a style="white-space: nowrap" class="btn btn-info btn-sm w-100 d-block" href="{{ route('penalty.notice' , $value->id) }}" title="View details" target="_blank">Download</a>
+                                    <a style="white-space: nowrap" class="btn btn-info btn-sm w-100 d-block"
+                                        href="{{ route('penalty.notice', $value->id) }}" title="View details"
+                                        target="_blank">Download</a>
                                 </li>
-                                @if(optional(optional($value->installment)->hire_purchase)->id)
+                                @if (optional(optional($value->installment)->hire_purchase)->id)
                                     <li class="d-flex align-items-center flex-column gap-1">
                                         <a style="white-space: nowrap" class="btn btn-primary btn-sm w-100 d-block"
-                                        href="{{ url('product_details/' . $value->installment->hire_purchase->id) }}"
-                                        title="View details" target="_blank">
+                                            href="{{ url('product_details/' . $value->installment->hire_purchase->id) }}"
+                                            title="View details" target="_blank">
                                             View details
                                         </a>
                                     </li>
@@ -83,6 +120,7 @@
             </tbody>
         </table>
         <div class="pt-2">
+            {{ $penalties->links() }}
         </div>
     </div>
 </div>

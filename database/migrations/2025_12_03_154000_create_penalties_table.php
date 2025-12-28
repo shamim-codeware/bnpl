@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('notice_no',['1st', '2nd', '3rd']);
             $table->enum('type', ['customer', 'granter']);
             $table->enum('status', ['pending', 'yes', 'no'])->default('pending');
+            $table->float('installment_amount')->default(0);
             $table->enum('action', [1, 0])->default(0);
             $table->timestamp('status_date')->nullable();
             $table->timestamp('due_date');

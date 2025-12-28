@@ -172,8 +172,8 @@
                 product_group: $('#product_group').val(),
                 product_model: $('#product_id').val(),
                 order_no: $('#order_no').val(),
-                // from_date: $('#from_date').val(),
-                // to_date: $('#to_date').val(),
+                from_date: $('input[name=from_date]').val() || '',
+                to_date: $('input[name=to_date]').val() || '',
                 per_page: $('#per_page').val()
             };
 

@@ -269,8 +269,6 @@ Route::group(['middleware' => 'auth'], function () {
         //@sabbir Penalty
         Route::get('penalty-list', [PenaltyController::class, 'PenaltyList'])->name('penalty.list');
         Route::get('penalty-status/{id}/{status}',[PenaltyController::class, 'status'])->name('penalty-status');
-        Route::get('penalty-export', [PenaltyController::class, 'export'])->name('penalty.export');
-        Route::get('penalty-notice/{id}', [PenaltyController::class, 'download'])->name('penalty.notice');
         //Full Paid Customer
         Route::get('full-paid-customer',          [ReportController::class, 'fullPaidCustomer']);
         Route::get('current-outstanding',         [ReportController::class, 'currentOutstanding']);
@@ -287,6 +285,9 @@ Route::group(['middleware' => 'auth'], function () {
         //Defaulter Report
         Route::get('defaulter-customers', [ExternalReportController::class, 'DefaulterReport'])->name('defaulter-report');
     });
+
+    Route::get('penalty-notice/{id}', [PenaltyController::class, 'download'])->name('penalty.notice');
+    Route::get('penalty-export', [PenaltyController::class, 'export'])->name('penalty.export');
 
     Route::get('all-bnpl-sales-action', [ExternalReportController::class, 'AllBnplSaleAction'])->name('all-bnpl-sales-action');
     Route::get('all-bnpl-sales-export', [ExternalReportController::class, 'AllBnplSaleExport'])->name('all-bnpl-sales-export');
