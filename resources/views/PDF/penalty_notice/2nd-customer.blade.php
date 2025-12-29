@@ -362,7 +362,7 @@
             যেকোন তথ্যের জন্য আপনাকে কোম্পানির মনোনীত প্রতিনিধির নিকট অথবা কোম্পানির নির্ধারিত কার্যালয়ে যোগাযোগ করার জন্য অনুরোধ করা যাচ্ছে।
         </p>
 
-        <table style="width:100%; margin-top:30px;" cellspacing="0">
+        <table style="width:100%; margin-top:35px;" cellspacing="0">
             <tbody>
                 <tr>
                     <td style="width: 70%;"></td>

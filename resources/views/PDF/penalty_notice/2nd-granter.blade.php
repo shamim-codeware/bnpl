@@ -43,8 +43,8 @@
         }
 
         @page {
-            margin-top: 40px;
-            margin-bottom: 50px;
+            margin-top: 30px;
+            margin-bottom: 30px;
 
             @bottom-right {
                 content: "পৃষ্ঠা - " counter(page) "/" counter(pages);
@@ -56,18 +56,18 @@
 
         @media print {
             body {
-                font-size: 14px !important;
+                font-size: 13px !important;
             }
 
             p {
-                line-height: 22px;
+                line-height: 21px;
                 margin-top: 2px;
                 margin-bottom: 3px !important;
             }
 
             table th,
             table td {
-                font-size: 14px;
+                font-size: 13px;
             }
 
             html,
@@ -98,7 +98,7 @@
             </tr>
         </table>
 
-        <table style="margin-bottom: 25px;" cellspacing="0">
+        <table style="margin-bottom: 15px;" cellspacing="0">
             <tr>
                 {{-- <td style="width: 36%;">
                     <table style="width:100%; font-size:14px; text-align:left; border: 1px solid #000;">
@@ -273,10 +273,19 @@
                 </td>
 
                 <td style="text-align: center; vertical-align: middle; width: 38%; padding: 10px;">
-                    <div
-                        style="background-color: #ec2026; color: white; padding: 5px 22px; border-radius: 16px; display: inline-block; font-weight: bold; font-size: 18px; text-align: center;">
-                        বকেয়া কিস্তি পরিশোধের<br>গ্যারান্টর চূড়ান্ত নোটিশ
-                    </div>
+                    <table style="background-color: #ec2026; display: inline-block; border-collapse: separate; border-spacing: 0;">
+                        <tr>
+                            <td style="background-color: #ec2026;
+                                    color: white;
+                                    padding: 8px 25px;
+                                    font-weight: 600;
+                                    font-size: 18px;
+                                    text-align: center;
+                                    border: 2px solid #ec2026;">
+                                বকেয়া কিস্তি পরিশোধের<br>গ্যারান্টর চূড়ান্ত নোটিশ
+                            </td>
+                        </tr>
+                    </table>
                 </td>
                 <td style="width: 26%;">
                     <table style="width:100%;" cellspacing="0">
@@ -301,7 +310,7 @@
         </table>
 
         <!-- LETTER BODY -->
-        <p style="margin-top:18px;">জনাব/জনাবা,</p>
+        <p style="margin-top:14px;">জনাব/জনাবা,</p>
 
         {{-- <p style="margin-bottom: 15px;">
             আপনার অবগতির জন্য জানানো যাচ্ছে যে,
@@ -336,7 +345,7 @@
             $formattedName = implode(' ', $words);
         @endphp
 
-        <p style="margin-bottom: 15px;">
+        <p style="margin-bottom: 14px;">
             আপনার অবগতির জন্য জানানো যাচ্ছে যে,
             জনাব/জনাবা
             <strong>{{ $formattedName }}</strong>
@@ -353,7 +362,7 @@
             কিস্তিতে ক্রয় করেছেন।
         </p>
 
-        <p style="margin-bottom: 15px;">
+        <p style="margin-bottom: 14px;">
             বর্তমানে গ্রাহকের নামে কোম্পানির সাথে বিক্রয় চুক্তি অনুসারে
             <strong>কিস্তির তালিকা (সংযুক্ত) অনুযায়ী,
                 কয়েকটি কিস্তি বকেয়া রয়েছে,</strong>
@@ -363,7 +372,7 @@
             কিন্তু গ্রাহক তা পরিশোধে ব্যর্থ হয়েছেন।
         </p>
 
-        <p style="margin-bottom: 15px;">
+        <p style="margin-bottom: 14px;">
             আপনি র‍্যাংগস ইলেকট্রনিক্স লিমিটেড থেকে কিস্তিতে ক্রয়কৃত পণ্যের
             <strong>গ্যারান্টর</strong> হিসেবে সম্মতি প্রদান করেছেন
             এবং গ্রাহক কিস্তি পরিশোধে ব্যর্থ হলে,
@@ -371,7 +380,7 @@
             সম্মত হয়েছেন।
         </p>
 
-        <p style="margin-bottom: 15px;">
+        <p style="margin-bottom: 14px;">
             উল্লিখিত চুক্তি অনুযায়ী গ্যারান্টর হিসেবে আপনি
             জনাব <strong>{{ $formattedName }}</strong>
             কে অবিলম্বে টাকা পরিশোধ করতে অনুরোধ করুন।
@@ -387,22 +396,22 @@
             এবং দ্রুত বকেয়া নিষ্পত্তিতে সহায়তা করেন।
         </p>
 
-        <p style="margin-top:15px;">
+        <p style="margin-top:14px;">
             <span style="font-weight: bold;">ধন্যবাদান্তে,</span><br>
             র‍্যাংগস ইলেকট্রনিক্স লিমিটেড
         </p>
 
         <!-- CC -->
-        <p style="margin-top:15px; font-weight: bold;">অনুলিপি:</p>
+        <p style="margin-top:14px; font-weight: bold;">অনুলিপি:</p>
         <p style="margin-bottom: 7px;">১. সিটিপির নাম</p>
         <p style="margin-bottom: 7px; margin-top: 0;">২. জোনাল ম্যানেজার</p>
         <p style="margin-top: 0;">৪. অন্যান্য সংশ্লিষ্ট বিভাগ</p>
 
         <!-- ATTACHMENT -->
-        <p style="margin-top:15px;"><span style="font-weight: bold;">সংযুক্তি :</span> কিস্তির তালিকা</p>
+        <p style="margin-top:14px;"><span style="font-weight: bold;">সংযুক্তি :</span> কিস্তির তালিকা</p>
 
         <!-- FOOT NOTE -->
-        <p style="margin-top:15px; font-size:14px;">
+        <p style="margin-top:14px; font-size:14px;">
             <span style="font-weight: bold;">বি:দ্র:</span> এই পত্রটি কম্পিউটারাইজড বলে স্বাক্ষরের প্রয়োজন নেই।
             এই চিঠিটি পাওয়ার পূর্বে বকেয়া টাকা পরিশোধিত হলে এই চিঠিটি আমলে নেওয়ার প্রয়োজন নেই।
             যেকোন তথ্যের জন্য আপনাকে কোম্পানির মনোনীত প্রতিনিধির নিকট অথবা কোম্পানির নির্ধারিত কার্যালয়ে যোগাযোগ করার
@@ -410,7 +419,7 @@
         </p>
 
         <!-- SIGNATURE -->
-        <table style="margin-top:30px;">
+        <table style="margin-top:27px;">
             <tr>
                 <td style="width: 70%;"></td>
                 <td

@@ -42,8 +42,8 @@
         }
 
         @page {
-            margin-top: 40px;
-            margin-bottom: 50px;
+            margin-top: 30px;
+            margin-bottom: 30px;
 
             @bottom-right {
                 content: "পৃষ্ঠা - " counter(page) "/" counter(pages);
@@ -55,7 +55,7 @@
 
         @media print {
             body {
-                font-size: 14px !important;
+                font-size: 13px !important;
             }
 
             p {
@@ -96,7 +96,7 @@
             </tr>
         </table>
 
-        <table style="margin-bottom: 30px;" cellspacing="0">
+        <table style="margin-bottom: 20px;" cellspacing="0">
             <tr>
                 {{-- <td style="width: 36%;">
                     <table style="width:100%; font-size:14px; text-align:left; border: 1px solid #000;">
@@ -263,9 +263,19 @@
                 </td>
 
                 <td style="text-align: center; vertical-align: middle; width: 38%; padding: 10px;">
-                    <div style="background-color: #ec2026; color: white; padding: 5px 22px; border-radius: 16px; display: inline-block; font-weight: bold; font-size: 18px; text-align: center;">
-                        চেক জমাকরণের<br>চূড়ান্ত নোটিশ
-                    </div>
+                    <table style="background-color: #ec2026; display: inline-block; border-collapse: separate; border-spacing: 0;">
+                        <tr>
+                            <td style="background-color: #ec2026;
+                                    color: white;
+                                    padding: 8px 25px;
+                                    font-weight: 600;
+                                    font-size: 18px;
+                                    text-align: center;
+                                    border: 2px solid #ec2026;">
+                                চেক জমাকরণের<br>চূড়ান্ত নোটিশ
+                            </td>
+                        </tr>
+                    </table>
                 </td>
                 <td style="width: 26%;">
                     <table style="width:100%;" cellspacing="0">
@@ -289,7 +299,7 @@
         </table>
 
         <!-- LETTER BODY -->
-        <p style="margin-top:18px;">জনাব/জনাবা,</p>
+        <p style="margin-top:15px;">জনাব/জনাবা,</p>
 
         {{-- <p style="margin-bottom: 15px;">
             আপনার অবগতির জন্য জানানো যাচ্ছে যে, আপনি র‍্যাংগস ইলেকট্রনিক্স থেকে
@@ -350,14 +360,14 @@
         </p>
 
         <!-- CC -->
-        <p style="margin-top:20px; font-weight: bold;">অনুলিপি:</p>
+        <p style="margin-top:15px; font-weight: bold;">অনুলিপি:</p>
         <p style="margin-bottom: 7px;">১. শোরুমের নাম</p>
         <p style="margin-bottom: 7px; margin-top: 0;">২. জোনাল ম্যানেজার</p>
         <p style="margin-bottom: 7px; margin-top: 0;">৩. ইস্ট / ওয়েস্ট / নর্থ / সাউথ</p>
         <p style="margin-top: 0;">৪. অন্যান্য সংশ্লিষ্ট বিভাগ</p>
 
         <!-- ATTACHMENT -->
-        <p style="margin-top:18px;"><span style="font-weight: bold;">সংযুক্তি :</span> কিস্তির তালিকা</p>
+        <p style="margin-top:15px;"><span style="font-weight: bold;">সংযুক্তি :</span> কিস্তির তালিকা</p>
 
         <!-- FOOT NOTE -->
         <p style="margin-top:15px; font-size:14px;">
@@ -367,7 +377,7 @@
         </p>
 
         <!-- SIGNATURE -->
-        <table style="margin-top:35px;">
+        <table style="margin-top:30px;">
             <tr>
                 <td style="width: 70%;"></td>
                 <td style="text-align: center; padding-top:5px; border-top:1.5px dashed #000; vertical-align:bottom; padding-bottom: 20px;">

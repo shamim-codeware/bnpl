@@ -44,7 +44,7 @@
 
         @page {
             margin-top: 40px;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
 
             @bottom-right {
                 content: "পৃষ্ঠা - " counter(page) "/" counter(pages);
@@ -98,7 +98,7 @@
             </tr>
         </table>
 
-        <table style="margin-bottom: 30px;" cellspacing="0">
+        <table style="margin-bottom: 20px;" cellspacing="0">
             <tr>
                 {{-- <td style="width: 36%;">
                     <table style="width:100%; font-size:14px; text-align:left; border: 1px solid #000;">
@@ -273,10 +273,19 @@
                 </td>
 
                 <td style="text-align: center; vertical-align: middle; width: 38%; padding: 10px;">
-                    <div
-                        style="background-color: #ec2026; color: white; padding: 5px 22px; border-radius: 16px; display: inline-block; font-weight: bold; font-size: 18px; text-align: center;">
-                        বকেয়া কিস্তি পরিশোধের<br>গ্যারান্টর রিমাইন্ডার
-                    </div>
+                    <table style="background-color: #ec2026; display: inline-block; border-collapse: separate; border-spacing: 0;">
+                        <tr>
+                            <td style="background-color: #ec2026;
+                                    color: white;
+                                    padding: 8px 25px;
+                                    font-weight: 600;
+                                    font-size: 18px;
+                                    text-align: center;
+                                    border: 2px solid #ec2026;">
+                                বকেয়া কিস্তি পরিশোধের<br>গ্যারান্টর রিমাইন্ডার
+                            </td>
+                        </tr>
+                    </table>
                 </td>
                 <td style="width: 26%;">
                     <table style="width:100%;" cellspacing="0">
@@ -301,7 +310,7 @@
         </table>
 
         <!-- LETTER BODY -->
-        <p style="margin-top:18px;">জনাব/জনাবা,</p>
+        <p style="margin-top:15px;">জনাব/জনাবা,</p>
 
         {{-- <p style="margin-bottom: 15px;">
             আপনার অবগতির জন্য জানানো যাচ্ছে যে,
