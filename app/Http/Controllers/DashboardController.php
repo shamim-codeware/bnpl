@@ -22,6 +22,7 @@ use App\Models\EnquirySource;
 
 
 use App\Models\ZonePermission;
+use App\Service\LateFeeService;
 use Illuminate\Support\Facades\DB;
 use App\Models\HirePurchaseProduct;
 use Illuminate\Support\Facades\Log;
@@ -102,6 +103,12 @@ class DashboardController extends Controller
                 $q->where('status', 3) // Only approved hire purchases
                     ->where('is_paid', 0); // Only unpaid hire purchases
             });
+
+        $collectionQuery = Installment::where('status', 1)
+            ->whereHas('hire_purchase', function ($q) {
+                $q->where('status', 3); // Approved only
+            });
+
         $current_month_forcast = Installment::where('status', 0)->whereBetween('loan_start_date', [$startOfMonth, $endOfMonth]);
         //last 5 transaction
         $query = Transaction::with(['hire_purchase:id,name,pr_phone,showroom_id', 'users', 'hire_purchase.purchase_products.product', 'hire_purchase.show_room']);
@@ -131,6 +138,9 @@ class DashboardController extends Controller
                 $q->where('zone_id', $zone_id);
             });
             $overdue->whereHas('hire_purchase.show_room', function ($q) use ($zone_id) {
+                $q->where('zone_id', $zone_id);
+            });
+            $collectionQuery->whereHas('hire_purchase.show_room', function ($q) use ($zone_id) {
                 $q->where('zone_id', $zone_id);
             });
 
@@ -177,6 +187,10 @@ class DashboardController extends Controller
                 $q->where('showroom_id',  $showroom_id);
             });
 
+            $collectionQuery->whereHas('hire_purchase', function ($q) use ($showroom_id) {
+                $q->where('showroom_id', $showroom_id);
+            });
+
             $current_month_forcast->whereHas('hire_purchase', function ($q) use ($showroom_id) {
                 $q->where('showroom_id',  $showroom_id);
             });
@@ -213,6 +227,10 @@ class DashboardController extends Controller
                 $q->where('zone_id', $zone_id);
             });
             $overdue->whereHas('hire_purchase.show_room', function ($q) use ($zone_id) {
+                $q->where('zone_id', $zone_id);
+            });
+
+            $collectionQuery->whereHas('hire_purchase.show_room', function ($q) use ($zone_id) {
                 $q->where('zone_id', $zone_id);
             });
 
@@ -258,6 +276,9 @@ class DashboardController extends Controller
 
             $overdue->whereHas('hire_purchase', function ($q) use ($showroom_id) {
                 $q->where('showroom_id',  $showroom_id);
+            });
+            $collectionQuery->whereHas('hire_purchase', function ($q) use ($showroom_id) {
+                $q->where('showroom_id', $showroom_id);
             });
 
             $counttodaysales->where('showroom_id',  $showroom_id);
@@ -309,6 +330,10 @@ class DashboardController extends Controller
                 $q->whereIn('zone_id', $permission);
             });
 
+            $collectionQuery->whereHas('hire_purchase.show_room', function ($q) use ($permission) {
+                $q->whereIn('zone_id', $permission);
+            });
+
             $todays_collection->whereHas('hire_purchase.show_room', function ($q) use ($permission) {
                 $q->whereIn('zone_id', $permission);
             });
@@ -325,14 +350,141 @@ class DashboardController extends Controller
         // $notApproved = HirePurchase::where('status', '!=', 3)->count(); // Same as totalSale since we're filtering by status=3
 
         // Dashboard stats
-        $totalSale = (clone $statsQuery)->where('status', 3)->count(); // Approved
+        // $totalSale = (clone $statsQuery)->where('status', 3)->count(); // Approved
+
+        // Clone the filtered stats query (already respects zone/showroom/user permissions)
+        $salesQuery = (clone $statsQuery)->where('status', 3);
+
+        // 1. Total Sales – Since Beginning
+        $totalSalesSinceBeginning = $salesQuery->count();
+
+        // 2. Total Sales – Current Month
+        $currentMonthSales = (clone $salesQuery)
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->count();
+
+        // 3. Total Sales – Fiscal Year (Assume FY starts on July 1)
+        $today = now();
+        $fiscalStartMonth = 7; // July
+        $fiscalStartYear = $today->month >= $fiscalStartMonth ? $today->year : $today->year - 1;
+        $fiscalEndYear = $fiscalStartYear + 1;
+
+        $fiscalStartDate = "$fiscalStartYear-07-01 00:00:00";
+        $fiscalEndDate = "$fiscalEndYear-06-30 23:59:59";
+
+        $fiscalYearSales = (clone $salesQuery)
+            ->whereBetween('created_at', [$fiscalStartDate, $fiscalEndDate])
+            ->count();
+
+        // Clone the already-filtered overdue query (from your existing logic)
+        $overdueBase = (clone $overdue); // This has: status=0, loan_end_date < today, and all role/zone/showroom filters
+
+        // 1. Overdue Since Beginning → already in $overdueBase
+        $totalOverdueSinceBeginning = $overdueBase->sum('amount');
+
+        // 2. Overdue in Current Month → installments whose due date (loan_end_date) is in current month AND overdue
+        $currentMonthOverdue = (clone $overdueBase)
+            ->whereBetween('loan_end_date', [$startOfMonth, $endOfMonth])
+            ->sum('amount');
+
+        // 3. Overdue in Fiscal Year (July 1 – June 30)
+        $today = now();
+        $fiscalStartYear = $today->month >= 7 ? $today->year : $today->year - 1;
+        $fiscalEndDate = Carbon::create($fiscalStartYear + 1, 6, 30, 23, 59, 59)->format('Y-m-d H:i:s');
+        $fiscalStartDate = "$fiscalStartYear-07-01 00:00:00";
+
+        $fiscalYearOverdue = (clone $overdueBase)
+            ->whereBetween('loan_end_date', [$fiscalStartDate, $fiscalEndDate])
+            ->sum('amount');
+
+
+
+
+        // Clone your main stats query (already filtered by role/zone/showroom)
+        $outstandingQuery = (clone $statsQuery)
+            ->where('status', 3)
+            ->where('is_paid', 0);
+
+        $lateFeeService = app(LateFeeService::class);
+
+        // Helper: get total outstanding for a given hire purchase collection
+        $getOutstandingSum = function ($query) use ($lateFeeService) {
+            $total = 0;
+            foreach ($query->cursor() as $hp) {
+                $paid = Installment::where('hire_purchase_id', $hp->id)
+                    ->where('status', 1)
+                    ->sum('amount');
+                $lateFee = $lateFeeService->calculateLateFine($hp->id);
+                $total += ($hp->hire_price - $paid) + $lateFee;
+            }
+            return $total;
+        };
+
+        // Since Beginning: all unpaid approved
+        $totalOutstandingSinceBeginning = $getOutstandingSum($outstandingQuery);
+
+        // Current Month: approved in current month
+        $currentMonthOutstanding = $getOutstandingSum(
+            (clone $outstandingQuery)->whereBetween('approval_date', [$startOfMonth, $endOfMonth])
+        );
+
+        // Fiscal Year: July 1 to June 30
+        $today = now();
+        $fiscalStartYear = $today->month >= 7 ? $today->year : $today->year - 1;
+        $fiscalStartDate = "$fiscalStartYear-07-01";
+        $fiscalEndDate = Carbon::create($fiscalStartYear + 1, 6, 30)->endOfDay()->format('Y-m-d H:i:s');
+
+        $fiscalYearOutstanding = $getOutstandingSum(
+            (clone $outstandingQuery)->whereBetween('approval_date', [$fiscalStartDate, $fiscalEndDate])
+        );
+
+
+
+
+
+        // Helper: get total (amount + fine_amount)
+        $getCollection = function ($q) {
+            return $q->sum(DB::raw('amount + COALESCE(fine_amount, 0)'));
+        };
+
+        // Since Beginning
+        $totalCollectionSinceBeginning = $getCollection($collectionQuery);
+
+        // Current Month — use updated_at as payment date
+        $currentMonthCollection = $getCollection(
+            (clone $collectionQuery)->whereBetween('updated_at', [$startOfMonth, $endOfMonth])
+        );
+
+        // Fiscal Year (July 1 – June 30)
+        $fiscalStartYear = now()->month >= 7 ? now()->year : now()->year - 1;
+        $fiscalStartDate = "$fiscalStartYear-07-01 00:00:00";
+        $fiscalEndDate = Carbon::create($fiscalStartYear + 1, 6, 30, 23, 59, 59)->format('Y-m-d H:i:s');
+
+        $fiscalYearCollection = $getCollection(
+            (clone $collectionQuery)->whereBetween('updated_at', [$fiscalStartDate, $fiscalEndDate])
+        );
+
+
+
+
         $fullPaid = (clone $statsQuery)->where('status', 3)->where('is_paid', 1)->count();
         $customerWithDue = (clone $statsQuery)->where('status', 3)->where('is_paid', 0)->count();
         $pending = (clone $statsQuery)->where('status', '0')->count();
 
         // Add to data array
         $data['dashboard_stats'] = [
-            'total_sale' => $totalSale,
+            'total_sales_since_beginning' => $totalSalesSinceBeginning,
+            'total_sales_current_month' => $currentMonthSales,
+            'total_sales_fiscal_year' => $fiscalYearSales,
+            'total_overdue_since_beginning' => $totalOverdueSinceBeginning,
+            'total_overdue_current_month' => $currentMonthOverdue,
+            'total_overdue_fiscal_year' => $fiscalYearOverdue,
+            'total_outstanding_since_beginning' => $totalOutstandingSinceBeginning,
+            'total_outstanding_current_month' => $currentMonthOutstanding,
+            'total_outstanding_fiscal_year' => $fiscalYearOutstanding,
+            'total_collection_since_beginning' => $totalCollectionSinceBeginning,
+            'total_collection_current_month' => $currentMonthCollection,
+            'total_collection_fiscal_year' => $fiscalYearCollection,
             'full_paid' => $fullPaid,
             'customer_with_due' => $customerWithDue,
             'pending' => $pending

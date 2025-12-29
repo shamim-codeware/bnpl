@@ -62,6 +62,12 @@ class ExternalReportController extends Controller
             $hire->late_fee = $this->calculateLateFine($hire->id);
         }
 
+        logger([
+            'hirepurchase' => $hirepurchase->count(),
+            'user_id' => Auth::user()->id,
+            'request' => $request->all(),
+        ]);
+
         return Excel::download(new BnplOrdersExport($hirepurchase), 'All_BNPL_Orders_' . Helper::formatDateTimeFilename() . '.xlsx');
     }
 
@@ -222,6 +228,17 @@ class ExternalReportController extends Controller
         $query = $query->latest();
 
         $per_page = $request->per_page ?? 30;
+
+        logger([
+            'request' => $request->all(),
+            'query' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+            'total' => $query->count(),
+            'total' => $query->get()->toArray(),
+            'user_id' => Auth::user()->id,
+            'page' => $paginate,
+        ]);
+
         return $paginate ? $query->paginate($per_page) : $query->get();
     }
 

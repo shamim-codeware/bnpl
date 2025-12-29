@@ -1,7 +1,7 @@
 <div class="col-xxl-12">
     <div class="row g-4 mb-3">
         <!-- Total Bookings -->
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        {{-- <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div
                 class="d-flex align-items-center gap-3 p-3 border border-primary-subtle rounded-3 bg-blue-50 border border-blue-200">
                 <div class="d-flex align-items-center justify-content-center rounded-circle bg-blue-100 text-blue-600"
@@ -13,10 +13,40 @@
                     <p class="mb-0 fs-5 fw-bold text-blue-600">{{ $data['dashboard_stats']['total_sale'] }}</p>
                 </div>
             </div>
+        </div> --}}
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="p-3 border border-primary-subtle rounded-3 bg-blue-50 shadow-sm h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-blue-100 text-blue-600 me-3"
+                        style="width:40px; height:40px;">
+                        <i class="fas fa-shopping-cart fs-5"></i>
+                    </div>
+                    <h6 class="mb-0 fw-bold text-gray-800">Total Sales</h6>
+                </div>
+
+                <div class="small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Since Beginning:</span>
+                        <span
+                            class="fw-bold text-blue-700">{{ $data['dashboard_stats']['total_sales_since_beginning'] }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Fiscal Year:</span>
+                        <span
+                            class="fw-bold text-blue-700">{{ $data['dashboard_stats']['total_sales_fiscal_year'] }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-0">
+                        <span class="text-muted">Current Month:</span>
+                        <span
+                            class="fw-bold text-blue-700">{{ $data['dashboard_stats']['total_sales_current_month'] }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Confirmed -->
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        {{-- <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div
                 class="d-flex align-items-center gap-3 p-3 border border-success-subtle rounded-3 bg-green-50 border border-green-200">
                 <div class="d-flex align-items-center justify-content-center rounded-circle bg-green-100 text-green-600"
@@ -28,10 +58,40 @@
                     <p class="mb-0 fs-5 fw-bold text-green-600">{{ $data['dashboard_stats']['full_paid'] }}</p>
                 </div>
             </div>
+        </div> --}}
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="p-3 border border-success-subtle rounded-3 bg-green-50 shadow-sm h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-green-100 text-green-600 me-3"
+                        style="width:40px; height:40px;">
+                        <i class="fa fa-check fs-5"></i>
+                    </div>
+                    <h6 class="mb-0 fw-bold text-gray-800">Total Outstanding</h6>
+                </div>
+
+                <div class="small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Since Beginning:</span>
+                        <span
+                            class="fw-bold text-green-700">৳{{ number_format($data['dashboard_stats']['total_outstanding_since_beginning'], 0) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Fiscal Year:</span>
+                        <span
+                            class="fw-bold text-green-700">৳{{ number_format($data['dashboard_stats']['total_outstanding_fiscal_year'], 0) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-0">
+                        <span class="text-muted">Current Month:</span>
+                        <span
+                            class="fw-bold text-green-700">৳{{ number_format($data['dashboard_stats']['total_outstanding_current_month'], 0) }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Awaiting -->
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        {{-- <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div
                 class="d-flex align-items-center gap-3 p-3 border border-warning-subtle rounded-3 bg-yellow-50 border border-yellow-200">
                 <div class="d-flex align-items-center justify-content-center rounded-circle bg-yellow-100 text-yellow-600"
@@ -41,6 +101,36 @@
                 <div>
                     <p class="mb-0 fs-6 text-gray-600 fw-600">Customer With Due</p>
                     <p class="mb-0 fs-5 fw-bold text-warning">{{ $data['dashboard_stats']['customer_with_due'] }}</p>
+                </div>
+            </div>
+        </div> --}}
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="p-3 border border-danger-subtle rounded-3 bg-red-50 shadow-sm h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-red-100 text-red-600 me-3"
+                        style="width:40px; height:40px;">
+                        <i class="fas fa-file-invoice-dollar fs-5"></i>
+                    </div>
+                    <h6 class="mb-0 fw-bold text-gray-800">Total Overdue</h6>
+                </div>
+
+                <div class="small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Since Beginning:</span>
+                        <span
+                            class="fw-bold text-red-700">৳{{ number_format($data['dashboard_stats']['total_overdue_since_beginning'], 0) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Fiscal Year:</span>
+                        <span
+                            class="fw-bold text-red-700">৳{{ number_format($data['dashboard_stats']['total_overdue_fiscal_year'], 0) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-0">
+                        <span class="text-muted">Current Month:</span>
+                        <span
+                            class="fw-bold text-red-700">৳{{ number_format($data['dashboard_stats']['total_overdue_current_month'], 0) }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,7 +162,7 @@
             </div>
         </div> --}}
 
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        {{-- <div class="col-12 col-sm-6 col-md-4 col-lg-3">
             <div class="d-flex align-items-center gap-3 p-3 rounded-3"
                 style="background-color: #f3e8ff; border: 1px solid #d8b4fe;">
                 <div class="d-flex align-items-center justify-content-center rounded-circle"
@@ -86,9 +176,38 @@
                     </p>
                 </div>
             </div>
+        </div> --}}
+
+        {{-- Total Collection Card --}}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="p-3 border border-teal-subtle rounded-3 bg-teal-50 border border-teal-200 shadow-sm h-10 h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-teal-100 text-teal-600 me-3"
+                        style="width:40px; height:40px;">
+                        <i class="fas fa-wallet fs-5"></i>
+                    </div>
+                    <h6 class="mb-0 fw-bold text-gray-800">Total Collection</h6>
+                </div>
+
+                <div class="small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Since Beginning:</span>
+                        <span
+                            class="fw-bold text-teal-700">৳{{ number_format($data['dashboard_stats']['total_collection_since_beginning'], 0) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Fiscal Year:</span>
+                        <span
+                            class="fw-bold text-teal-700">৳{{ number_format($data['dashboard_stats']['total_collection_fiscal_year'], 0) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-0">
+                        <span class="text-muted">Current Month:</span>
+                        <span
+                            class="fw-bold text-teal-700">৳{{ number_format($data['dashboard_stats']['total_collection_current_month'], 0) }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
-
-
     </div>
 
 
@@ -200,7 +319,8 @@
                                 <a href="#">
                                     <div class="card">
                                         <div class="d-flex p-2 box-header gap-3 align-items-center">
-                                            <span class="enquiry-icon-2"><i class="uil uil-usd-circle fs-5"></i></span>
+                                            <span class="enquiry-icon-2"><i
+                                                    class="uil uil-usd-circle fs-5"></i></span>
                                             <p class="m-0 fw-600">Today's Sale</p>
                                         </div>
                                         <div class="card-box-value d-flex align-items-end px-2 py-3 gap-1">
