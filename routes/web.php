@@ -268,7 +268,6 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('installment-penalty/post', [PenaltyController::class, 'store'])->name('penalty.store');
         //@sabbir Penalty
         Route::get('penalty-list', [PenaltyController::class, 'PenaltyList'])->name('penalty.list');
-        Route::get('penalty-status/{id}/{status}',[PenaltyController::class, 'status'])->name('penalty-status');
         //Full Paid Customer
         Route::get('full-paid-customer',          [ReportController::class, 'fullPaidCustomer']);
         Route::get('current-outstanding',         [ReportController::class, 'currentOutstanding']);
@@ -288,6 +287,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('penalty-notice/{id}', [PenaltyController::class, 'download'])->name('penalty.notice');
     Route::get('penalty-export', [PenaltyController::class, 'export'])->name('penalty.export');
+    Route::get('penalty-status/{id}/{status}',[PenaltyController::class, 'status'])->name('penalty-status');
 
     Route::get('all-bnpl-sales-action', [ExternalReportController::class, 'AllBnplSaleAction'])->name('all-bnpl-sales-action');
     Route::get('all-bnpl-sales-export', [ExternalReportController::class, 'AllBnplSaleExport'])->name('all-bnpl-sales-export');
