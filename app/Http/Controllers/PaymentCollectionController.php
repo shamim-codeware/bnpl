@@ -243,20 +243,29 @@ class PaymentCollectionController extends Controller
             // }
 
             if ($allPaid && $withinDeadline) {
-                $incentiveRate = GeneralIncentiveConfig::getCollectionIncentiveRate();
-                $totalCollected = Transaction::where('hire_purchase_id', $request->hire_purchase_id)->sum('amount');
-                $incentiveAmount = ($totalCollected * $incentiveRate) / 100;
 
-                Incentive::create([
-                    'hire_purchase_id' => $request->hire_purchase_id,
-                    'showroom_user_id' => $hirepurchase->showroom_user_id,
-                    'type' => 'collection',
-                    'amount' => $totalCollected,
-                    'incentive_rate' => $incentiveRate,
-                    'incentive_amount' => $incentiveAmount,
-                    'status' => 'pending',
-                    'payment_date' => null,
-                ]);
+                $incentiveStartDate = Carbon::create(2025, 12, 1);
+
+                Incentive::where('hire_purchase_id', $request->hire_purchase_id)
+                    ->whereIn('type', ['down_payment', 'sure_shot'])
+                    ->update(['status' => 'approved']);
+                if ($hirepurchase->created_at->gte($incentiveStartDate)) {
+
+                    $incentiveRate = GeneralIncentiveConfig::getCollectionIncentiveRate();
+                    $totalCollected = Transaction::where('hire_purchase_id', $request->hire_purchase_id)->sum('amount');
+                    $incentiveAmount = ($totalCollected * $incentiveRate) / 100;
+
+                    Incentive::create([
+                        'hire_purchase_id' => $request->hire_purchase_id,
+                        'showroom_user_id' => $hirepurchase->showroom_user_id,
+                        'type' => 'collection',
+                        'amount' => $totalCollected,
+                        'incentive_rate' => $incentiveRate,
+                        'incentive_amount' => $incentiveAmount,
+                        'status' => 'pending',
+                        'payment_date' => null,
+                    ]);
+                }
             }
 
             if ($response->error == 1) {

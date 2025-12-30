@@ -275,7 +275,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('installment-penalty', [PenaltyController::class, 'index'])->name('penalty.index');
         Route::post('installment-penalty/post', [PenaltyController::class, 'store'])->name('penalty.store');
         //@sabbir Penalty
-        Route::get('penalty-list', [PenaltyController::class, 'PenaltyList'])->name('penalty.list');
+        Route::get('notice-list', [PenaltyController::class, 'PenaltyList'])->name('notice.list');
         //Full Paid Customer
         Route::get('full-paid-customer',          [ReportController::class, 'fullPaidCustomer']);
         Route::get('current-outstanding',         [ReportController::class, 'currentOutstanding']);

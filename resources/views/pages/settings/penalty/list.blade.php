@@ -9,7 +9,7 @@
                 <div class="col-lg-12 mb-4">
                     <div class="card">
                         <div class="card-header">
-                            <h2>{{ __('Penalty List') }}</h2>
+                            <h2>{{ __('Notice List') }}</h2>
                             <div id="export"></div>
                         </div>
                         <div class="card-body p-3" dir="ltr">
