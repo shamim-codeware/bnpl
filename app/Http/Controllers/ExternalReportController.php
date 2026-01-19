@@ -18,6 +18,8 @@ use App\Exports\BnplOrdersExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\IncentiveReportExport;
+use App\Exports\OverdueCustomersExport;
 use App\Traits\LateFeeCalculationTrait;
 use Illuminate\Support\Facades\Artisan;
 use App\Exports\DefaulterCustomersExport;
@@ -98,6 +100,45 @@ class ExternalReportController extends Controller
         return Excel::download(new BnplOrdersExport($hirepurchase), 'Cancelled_BNPL_Orders_' . Helper::formatDateTimeFilename() . '.xlsx');
     }
 
+    public function OverdueReport()
+    {
+        $title = "Overdue Customers Report";
+        $description = "List of all overdue customers for BNPL orders";
+        $data = $this->prepareDataForBnplReport();
+        return view('report.overdue_customers', compact('title', 'description', 'data'));
+    }
+
+    public function OverdueReportAction(Request $request)
+    {
+        $customers = $this->filterOverdueCustomers($request, true);
+
+        $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
+        $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
+
+        // Calculate late fees for each hire purchase
+        foreach ($customers as $customer) {
+            $customer->late_fee = $this->calculateLateFine($customer->id);
+        }
+
+        return view('report.overdue_customers_ajax', compact("customers", "from_date", 'to_date'));
+    }
+
+    public function OverdueReportExport(Request $request)
+    {
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+
+        $customers = $this->filterOverdueCustomers($request, false);
+
+        // Calculate late fees for each hire purchase
+        foreach ($customers as $customer) {
+            $customer->late_fee = $this->calculateLateFine($customer->id);
+        }
+
+        return Excel::download(new OverdueCustomersExport($customers), 'Overdue_Customers_Report_' . Helper::formatDateTimeFilename() . '.xlsx');
+    }
     public function DefaulterReport()
     {
         $title = "Defaulter Customers Report";
@@ -315,7 +356,7 @@ class ExternalReportController extends Controller
         return $paginate ? $query->paginate($per_page) : $query->get();
     }
 
-    private function filterDefaulterCustomers($request, $paginate = true)
+    private function filterOverdueCustomers($request, $paginate = true)
     {
         $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
         $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
@@ -336,6 +377,11 @@ class ExternalReportController extends Controller
             ->whereHas('installment', function ($q) {
                 $q->where('status', 0) // Unpaid installment
                     ->whereDate('loan_start_date', '<', now()); // Overdue (loan_start_date is past current date)
+            })
+            ->whereDoesntHave('installment', function ($q) {
+                $q->where('status', 0)
+                    ->whereRaw('loan_start_date = (SELECT MAX(loan_start_date) FROM installments i2 WHERE i2.hire_purchase_id = installments.hire_purchase_id)')
+                    ->whereRaw('loan_start_date < DATE_SUB(NOW(), INTERVAL 30 DAY)');
             });
 
         $product_group_ids = explode(',', $request->product_group);
@@ -411,6 +457,206 @@ class ExternalReportController extends Controller
         $per_page = $request->per_page ?? 30;
         return $paginate ? $query->paginate($per_page) : $query->get();
     }
+    // private function filterDefaulterCustomers($request, $paginate = true)
+    // {
+    //     $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
+    //     $to_date = date('Y-m-d 23:59:59', strtotime($request->to_date));
+
+    //     $query = HirePurchase::select('hire_purchases.*')
+    //         ->with([
+    //             'purchase_products',
+    //             'show_room.zone',
+    //             'transaction',
+    //             'purchase_products.brand',
+    //             'purchase_products.product',
+    //             'installment',
+    //             'purchase_products.product_category',
+    //             'purchase_products.product_group'
+    //         ])
+    //         ->where('is_paid', 0) // Not fully paid
+    //         ->where('status', 3)  // Confirmed sale
+    //         ->whereHas('installment', function ($q) {
+    //             $q->where('status', 0) // Unpaid installment
+    //                 ->whereDate('loan_start_date', '<', now()); // Overdue (loan_start_date is past current date)
+    //         })
+    //         ->whereDoesntHave('installment', function ($q) {
+    //             $q->where('status', 0)
+    //                 ->whereRaw('loan_start_date = (SELECT MAX(loan_start_date) FROM installments i2 WHERE i2.hire_purchase_id = installments.hire_purchase_id)')
+    //                 ->whereRaw('loan_start_date < DATE_SUB(NOW(), INTERVAL 30 DAY)');
+    //         });
+
+    //     $product_group_ids = explode(',', $request->product_group);
+    //     $showrooms = explode(',', $request->showroom_ctp);
+    //     $product_model = explode(',', $request->product_model);
+    //     $product_category = explode(',', $request->product_category);
+    //     $brand = explode(',', $request->brand_id);
+
+    //     if ($request->order_no) {
+    //         $query->where('order_no', $request->order_no);
+    //     } else {
+    //         if ($request->from_date && $request->to_date) {
+    //             // $query->whereBetween('approval_date', [$from_date, $to_date]);
+    //             $query->whereHas('installment', function ($q) use ($from_date, $to_date) {
+    //                 $q->where('status', 0)
+    //                     ->whereBetween('loan_start_date', [$from_date, $to_date]);
+    //             });
+    //         }
+    //         if ($request->product_model) {
+    //             $query->whereHas('purchase_products', function ($q) use ($product_model) {
+    //                 $q->whereIn('product_id', $product_model);
+    //             });
+    //         }
+    //         if ($request->store_type !== null && $request->store_type !== '') {
+    //             $query->where('store_type', $request->store_type);
+    //         }
+    //         if ($request->zone_id) {
+    //             $query->whereHas('show_room', function ($q) use ($request) {
+    //                 $q->where('zone_id', $request->zone_id);
+    //             });
+    //         }
+    //         if ($request->showroom_ctp) {
+    //             $query->whereIn('showroom_id', $showrooms);
+    //         }
+    //         if ($request->product_category) {
+    //             $query->whereHas('purchase_products.product', function ($q) use ($product_category) {
+    //                 $q->whereIn('category_id', $product_category);
+    //             });
+    //         }
+    //         if ($request->product_group) {
+    //             $query->whereHas('purchase_products', function ($q) use ($product_group_ids) {
+    //                 $q->whereIn('product_group_id', $product_group_ids);
+    //             });
+    //         }
+    //         if ($request->brand_id) {
+    //             $query->whereHas('purchase_products.product', function ($q) use ($brand) {
+    //                 $q->whereIn('brand_id', $brand);
+    //             });
+    //         }
+    //     }
+
+    //     if (Auth::user()->role_id == 2) {
+    //         $zone_id = Auth::user()->zone_id;
+    //         $query->whereHas('show_room', function ($q) use ($zone_id) {
+    //             $q->where('zone_id', $zone_id);
+    //         });
+    //     } elseif (Auth::user()->role_id == 3) {
+    //         $query->where('showroom_id', Auth::user()->showroom_id);
+    //     } elseif (Auth::user()->role_id == 6) {
+    //         $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
+    //         $query->whereHas('show_room', function ($q) use ($permission) {
+    //             $q->whereIn('zone_id', $permission);
+    //         });
+    //     }
+
+    //     // Add the days_overdue and last_payment_date as additional selected fields
+    //     $query->addSelect([
+    //         DB::raw('COALESCE(DATEDIFF(NOW(), (SELECT MIN(loan_start_date) FROM installments WHERE hire_purchase_id = hire_purchases.id AND status = 0 AND loan_start_date < NOW())), 0) as days_overdue'),
+    //         DB::raw('(SELECT MAX(updated_at) FROM installments WHERE hire_purchase_id = hire_purchases.id AND status = 1) as last_payment_date')
+    //     ]);
+
+    //     $query = $query->latest();
+    //     $per_page = $request->per_page ?? 30;
+    //     return $paginate ? $query->paginate($per_page) : $query->get();
+    // }
+
+    private function filterDefaulterCustomers($request, $paginate = true)
+    {
+        $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date ?? 'now'));
+        $to_date   = date('Y-m-d 23:59:59', strtotime($request->to_date ?? 'now'));
+
+        $query = HirePurchase::select('hire_purchases.*')
+            ->with([
+                'purchase_products',
+                'show_room.zone',
+                'transaction',
+                'purchase_products.brand',
+                'purchase_products.product',
+                'installment',
+                'purchase_products.product_category',
+                'purchase_products.product_group'
+            ])
+            ->where('is_paid', 0)           // Not fully paid
+            ->where('status', 3)            // Confirmed sale
+            ->whereHas('installment', function ($q) {
+                // কমপক্ষে একটা unpaid আছে (সাধারণ overdue চেক)
+                $q->where('status', 0)
+                    ->whereDate('loan_start_date', '<', now());
+            });
+
+        // ★★★ সবচেয়ে গুরুত্বপূর্ণ শর্ত — শুধু defaulter (শেষ কিস্তি ৩০+ দিন overdue) ★★★
+        $query->whereHas('installment', function ($q) {
+            $q->where('status', 0)
+                ->whereRaw('loan_start_date = (
+              SELECT MAX(loan_start_date)
+              FROM installments i2
+              WHERE i2.hire_purchase_id = installments.hire_purchase_id
+          )')
+                ->whereRaw('loan_start_date < DATE_SUB(NOW(), INTERVAL 30 DAY)');
+        });
+
+        $product_group_ids = explode(',', $request->product_group ?? '');
+        $showrooms         = explode(',', $request->showroom_ctp ?? '');
+        $product_model     = explode(',', $request->product_model ?? '');
+        $product_category  = explode(',', $request->product_category ?? '');
+        $brand             = explode(',', $request->brand_id ?? '');
+
+        if ($request->order_no) {
+            $query->where('order_no', $request->order_no);
+        } else {
+            if ($request->from_date && $request->to_date) {
+                $query->whereHas('installment', function ($q) use ($from_date, $to_date) {
+                    $q->where('status', 0)
+                        ->whereBetween('loan_start_date', [$from_date, $to_date]);
+                });
+            }
+
+            if ($request->product_model && !empty($product_model[0])) {
+                $query->whereHas('purchase_products', fn($q) => $q->whereIn('product_id', $product_model));
+            }
+            if ($request->store_type !== null && $request->store_type !== '') {
+                $query->where('store_type', $request->store_type);
+            }
+            if ($request->zone_id) {
+                $query->whereHas('show_room', fn($q) => $q->where('zone_id', $request->zone_id));
+            }
+            if ($request->showroom_ctp && !empty($showrooms[0])) {
+                $query->whereIn('showroom_id', $showrooms);
+            }
+            if ($request->product_category && !empty($product_category[0])) {
+                $query->whereHas('purchase_products.product', fn($q) => $q->whereIn('category_id', $product_category));
+            }
+            if ($request->product_group && !empty($product_group_ids[0])) {
+                $query->whereHas('purchase_products', fn($q) => $q->whereIn('product_group_id', $product_group_ids));
+            }
+            if ($request->brand_id && !empty($brand[0])) {
+                $query->whereHas('purchase_products.product', fn($q) => $q->whereIn('brand_id', $brand));
+            }
+        }
+
+        // Role-based filtering (আগের মতোই)
+        if (Auth::user()->role_id == 2) {
+            $query->whereHas('show_room', fn($q) => $q->where('zone_id', Auth::user()->zone_id));
+        } elseif (Auth::user()->role_id == 3) {
+            $query->where('showroom_id', Auth::user()->showroom_id);
+        } elseif (Auth::user()->role_id == 6) {
+            $permission = ZonePermission::where('user_id', Auth::user()->id)
+                ->pluck('zone_id')
+                ->toArray();
+            $query->whereHas('show_room', fn($q) => $q->whereIn('zone_id', $permission));
+        }
+
+        $query->addSelect([
+            DB::raw('COALESCE(DATEDIFF(NOW(), (SELECT MIN(loan_start_date) FROM installments WHERE hire_purchase_id = hire_purchases.id AND status = 0 AND loan_start_date < NOW())), 0) as days_overdue'),
+            DB::raw('(SELECT MAX(updated_at) FROM installments WHERE hire_purchase_id = hire_purchases.id AND status = 1) as last_payment_date')
+        ]);
+
+
+        $query->latest();
+
+        $per_page = $request->per_page ?? 30;
+
+        return $paginate ? $query->paginate($per_page) : $query->get();
+    }
 
     public function IncentiveReport()
     {
@@ -433,71 +679,83 @@ class ExternalReportController extends Controller
         return view('report.incentive_ajax', compact("incentives", "from_date", 'to_date'));
     }
 
+    // public function IncentiveReportExport(Request $request)
+    // {
+    //     $incentives = $this->filterIncentiveReport($request, false);
+
+    //     // Export logic using Maatwebsite/Excel or direct CSV
+    //     $headers = [
+    //         "Content-Type" => "text/csv",
+    //         "Content-Disposition" => "attachment; filename=incentive_report_" . date('Y-m-d') . ".csv"
+    //     ];
+
+    //     $callback = function () use ($incentives) {
+    //         $file = fopen('php://output', 'w');
+    //         fputcsv($file, [
+    //             'SL',
+    //             'Order No',
+    //             'Customer Name',
+    //             'Product Group',
+    //             'Product Model',
+    //             'Incentive Type',
+    //             'Incentive Category',
+    //             'Incentive Amount',
+    //             'Status',
+    //             'Created Date',
+    //             'Showroom',
+    //             'User'
+    //         ]);
+
+    //         foreach ($incentives as $key => $incentive) {
+    //             $customer_name = $incentive->hirePurchase->name ?? '';
+    //             $product_group = $incentive->hirePurchase->purchase_products->product->types->name ?? '';
+    //             $product_model = $incentive->hirePurchase->purchase_products->product->product_model ?? '';
+    //             $incentive_category = '';
+
+    //             if ($incentive->sure_shot_type == 'category') {
+    //                 $incentive_category = $incentive->product_category_name ?? '';
+    //             } elseif ($incentive->sure_shot_type == 'model') {
+    //                 $incentive_category = $incentive->product_model_name ?? '';
+    //             } else {
+    //                 $incentive_category = $incentive->type;
+    //             }
+
+    //             $showroom_name = $incentive->hirePurchase->show_room->name ?? '';
+    //             $user_name = $incentive->hirePurchase->users->name ?? '';
+
+    //             fputcsv($file, [
+    //                 $key + 1,
+    //                 $incentive->hirePurchase->order_no,
+    //                 $customer_name,
+    //                 $product_group,
+    //                 $product_model,
+    //                 ucfirst($incentive->type),
+    //                 $incentive_category,
+    //                 number_format($incentive->incentive_amount, 2),
+    //                 ucfirst($incentive->status),
+    //                 $incentive->created_at->format('d/m/Y H:i:s'),
+    //                 $showroom_name,
+    //                 $user_name
+    //             ]);
+    //         }
+
+    //         fclose($file);
+    //     };
+
+    //     return response()->stream($callback, 200, $headers);
+    // }
+
     public function IncentiveReportExport(Request $request)
     {
         $incentives = $this->filterIncentiveReport($request, false);
 
-        // Export logic using Maatwebsite/Excel or direct CSV
-        $headers = [
-            "Content-Type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=incentive_report_" . date('Y-m-d') . ".csv"
-        ];
-
-        $callback = function () use ($incentives) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, [
-                'SL',
-                'Order No',
-                'Customer Name',
-                'Product Group',
-                'Product Model',
-                'Incentive Type',
-                'Incentive Category',
-                'Incentive Amount',
-                'Status',
-                'Created Date',
-                'Showroom',
-                'User'
-            ]);
-
-            foreach ($incentives as $key => $incentive) {
-                $customer_name = $incentive->hirePurchase->name ?? '';
-                $product_group = $incentive->hirePurchase->purchase_products->product->types->name ?? '';
-                $product_model = $incentive->hirePurchase->purchase_products->product->product_model ?? '';
-                $incentive_category = '';
-
-                if ($incentive->sure_shot_type == 'category') {
-                    $incentive_category = $incentive->product_category_name ?? '';
-                } elseif ($incentive->sure_shot_type == 'model') {
-                    $incentive_category = $incentive->product_model_name ?? '';
-                } else {
-                    $incentive_category = $incentive->type;
-                }
-
-                $showroom_name = $incentive->hirePurchase->show_room->name ?? '';
-                $user_name = $incentive->hirePurchase->users->name ?? '';
-
-                fputcsv($file, [
-                    $key + 1,
-                    $incentive->hirePurchase->order_no,
-                    $customer_name,
-                    $product_group,
-                    $product_model,
-                    ucfirst($incentive->type),
-                    $incentive_category,
-                    number_format($incentive->incentive_amount, 2),
-                    ucfirst($incentive->status),
-                    $incentive->created_at->format('d/m/Y H:i:s'),
-                    $showroom_name,
-                    $user_name
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new IncentiveReportExport($incentives),
+            'Incentive_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx'
+        );
     }
+
+
 
     private function prepareDataForIncentiveReport()
     {
@@ -529,10 +787,6 @@ class ExternalReportController extends Controller
             'hirePurchase.users'
         ])->orderBy('id', 'DESC');
 
-        // Filter by date range
-        // if ($from_date && $to_date) {
-        //     $query->whereBetween('incentives.created_at', [$from_date, $to_date]);
-        // }
 
         // Filter by showroom
         if ($request->showroom_ctp) {
@@ -569,7 +823,8 @@ class ExternalReportController extends Controller
             });
         }
 
-        // // Filter by incentive type
+        $query->where('status', 'approved');
+
         if ($request->incentive_type) {
             $query->where('type', $request->incentive_type);
         }

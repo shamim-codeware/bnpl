@@ -262,7 +262,7 @@ class PaymentCollectionController extends Controller
                         'amount' => $totalCollected,
                         'incentive_rate' => $incentiveRate,
                         'incentive_amount' => $incentiveAmount,
-                        'status' => 'pending',
+                        'status' => 'approved',
                         'payment_date' => null,
                     ]);
                 }

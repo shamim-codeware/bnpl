@@ -77,24 +77,15 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             ? $filter_data->installment->sum('fine_amount')
             : 0.00;
 
-        $isDefaulter = false;
+        $status = 'Regular';
 
-        if ($filter_data->installment) {
-            $today = now()->startOfDay(); // Compare dates without time
+        $lastUnpaidDue = $filter_data->installment
+            ? $filter_data->installment->where('status', 0)->max('loan_start_date')
+            : null;
 
-            // Check if any unpaid installment has a due date before today
-            foreach ($filter_data->installment as $installment) {
-                if ($installment->status == 0) { // unpaid
-                    $dueDate = Carbon::parse($installment->loan_start_date)->startOfDay();
-                    if ($dueDate->lt($today)) {
-                        $isDefaulter = true;
-                        break;
-                    }
-                }
-            }
+        if ($lastUnpaidDue && Carbon::parse($lastUnpaidDue)->lt(now()->subDays(30))) {
+            $status = 'Defaulter';
         }
-
-        $status = $isDefaulter ? 'Defaulter' : 'Regular';
 
 
         return [

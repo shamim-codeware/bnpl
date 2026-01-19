@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\SalesReturn;
 use App\Service\ApiService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,7 @@ use App\Http\Controllers\DueEnquiryController;
 use App\Http\Controllers\EnquiryTypeController;
 use App\Http\Controllers\PackageItemController;
 use App\Http\Controllers\ProductTypeController;
+use App\Http\Controllers\SalesReturnController;
 use App\Http\Controllers\CustomerInfoController;
 use App\Http\Controllers\CustomerTypeController;
 use App\Http\Controllers\HirePurchaseController;
@@ -213,6 +215,27 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('transaction-list', [PaymentCollectionController::class, 'TransactionList']);
     Route::get('transaction-list-show', [PaymentCollectionController::class, 'TransactionListShow']);
 
+    // sales return
+    // Route::get('/sales-return', [SalesReturnController::class, 'index'])->name('sales-return.index');
+    // Route::post('/sales-return/load', [SalesReturnController::class, 'loadSale'])->name('sales-return.load');
+
+    // সেলস রিটার্ন সাবমিট
+    // Route::post('/sales-return/submit', [SalesReturnController::class, 'store'])->name('sales-return.store');
+
+
+    // Sales Return Page
+    Route::get('sales-return', function () {
+        $title = "Sales Return";
+        $description = "Return hire purchase product by order number";
+        return view('pages.sales-return.index', compact('title', 'description'));
+    });
+
+    // Load HP details for return (like LoanDetails)
+    Route::get('return-details/{order_no}', [SalesReturnController::class, 'returnDetails']);
+    // web.php
+    Route::post('sales-return/submit', [SalesReturnController::class, 'submitReturn'])->name('sales.return.submit');
+
+
     //pending Hire purchase List
 
     Route::get('pending-sales', [HirePurchaseController::class, 'PendingSale']);
@@ -266,6 +289,7 @@ Route::group(['middleware' => 'auth'], function () {
             'down-payment-settings' => DownPaymentSettingController::class,
             'interest-rate'       => InterestRateController::class,
             'banks'               => BankController::class,
+            // 'sales-return'         => SalesReturnController::class,
         ]);
 
         //Report Controller
@@ -289,18 +313,24 @@ Route::group(['middleware' => 'auth'], function () {
 
         //all Bnpl
         Route::get('all-bnpl-orders', [ExternalReportController::class, 'AllBnplSale'])->name('all-bnpl-sales');
-        //Defaulter Report
+
+        //Overdue Report
+        Route::get('overdue-customers', [ExternalReportController::class, 'OverdueReport'])->name('overdue-report');
+
+        //defaulter Report
         Route::get('defaulter-customers', [ExternalReportController::class, 'DefaulterReport'])->name('defaulter-report');
     });
 
     Route::get('penalty-notice/{id}', [PenaltyController::class, 'download'])->name('penalty.notice');
     Route::get('penalty-export', [PenaltyController::class, 'export'])->name('penalty.export');
-    Route::get('penalty-status/{id}/{status}',[PenaltyController::class, 'status'])->name('penalty-status');
+    Route::get('penalty-status/{id}/{status}', [PenaltyController::class, 'status'])->name('penalty-status');
 
     Route::get('all-bnpl-sales-action', [ExternalReportController::class, 'AllBnplSaleAction'])->name('all-bnpl-sales-action');
     Route::get('all-bnpl-sales-export', [ExternalReportController::class, 'AllBnplSaleExport'])->name('all-bnpl-sales-export');
 
 
+    Route::get('overdue-report-action', [ExternalReportController::class, 'OverdueReportAction'])->name('overdue-report-action');
+    Route::get('overdue-report-export', [ExternalReportController::class, 'OverdueReportExport'])->name('overdue-report-export');
     Route::get('defaulter-report-action', [ExternalReportController::class, 'DefaulterReportAction'])->name('defaulter-report-action');
     Route::get('defaulter-report-export', [ExternalReportController::class, 'DefaulterReportExport'])->name('defaulter-report-export');
 
@@ -353,8 +383,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('hire-purchase-product-update/{id}', [HirePurchaseController::class, 'Product_update']);
 
     Route::get('product_edit/{id}', [HirePurchaseController::class, 'HirepurchaseEdit']);
+    Route::get('product_edit_after_approval/{id}', [HirePurchaseController::class, 'HirepurchaseEditAfter']);
 
     Route::post('product_update', [HirePurchaseController::class, 'HirepurchaseUpdate']);
+    Route::post('product_update_after', [HirePurchaseController::class, 'HirepurchaseUpdateAfter']);
     //get pr+ice
     Route::post('get-price', [ProductController::class, 'GetPrice']);
     //get zone credit

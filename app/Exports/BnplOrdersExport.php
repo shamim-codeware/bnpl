@@ -55,6 +55,11 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
             "Last Transaction Amount",
             "Last Transaction Date",
             "Next Due Date",
+            "Sales Return Date",
+            "Sales Return Amount",
+            "Collection Refund Amount",
+            "Other Income From Defaulter",
+            "Sales Return Reason",
             "Customer Name",
             "Phone Number",
             "Sales Representative",
@@ -136,6 +141,9 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                 case 4:
                     $status_text = 'Sale Cancel';
                     break;
+                case 5:
+                    $status_text = 'Sale Return';
+                    break;
                 default:
                     $status_text = 'Unknown';
             }
@@ -197,6 +205,15 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
             $dueInstallment = $isRejectedOrCancelled ? '0' : (@$purchase->installment ? $purchase->installment->where('status', 0)->count() : '0');
 
+            // Sales Return data
+            $salesReturn = $purchase->salesReturn ?? null;  // relation থেকে আসবে (eager load করতে হবে)
+
+            $returnDate       = $salesReturn ? \Carbon\Carbon::parse($salesReturn->returned_at)->format('d F Y') : 'N/A';
+            $returnAmount     = $salesReturn ? number_format($salesReturn->return_amount ?? 0, 2) : '0.00';
+            $refundAmount     = $salesReturn ? number_format($salesReturn->refund_amount ?? 0, 2) : '0.00';
+            $otherIncome      = $salesReturn ? number_format($salesReturn->other_income ?? 0, 2) : '0.00';
+            $returnReason     = $salesReturn ? ($salesReturn->reason_text ?? ucfirst($salesReturn->reason)) : 'N/A';
+
             return [
                 $slNo,
                 @$purchase->show_room->name ?? 'N/A',
@@ -221,6 +238,13 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                 (float)($last_paid_amount),
                 $last_payment_date ? \Carbon\Carbon::parse($last_payment_date)->format('d F Y') : 'N/A',
                 $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A',
+
+                $returnDate,
+                $returnAmount,
+                $refundAmount,
+                $otherIncome,
+                $returnReason,
+
                 $purchase->name ?? 'N/A',
                 $purchase->pr_phone ?? 'N/A',
                 @$purchase->show_room_user->name ?? 'N/A',

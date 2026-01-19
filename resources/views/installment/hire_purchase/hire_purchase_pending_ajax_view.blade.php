@@ -134,16 +134,18 @@
                                         target="_blank">
                                         View details
                                     </a>
-                                    {{-- @if ($hire->status == 0 && Auth::user()->role_id == 1)
-                            <a style="white-space: nowrap" class="btn btn-success w-100 d-block btn-sm" href="{{ url('product_edit/'.$hire->id) }}" title="View details" target="_blank">
-                               Edit
-                            </a>
-                            @endif --}}
-                                    @if (Auth::user()->role_id == 1 && $hire->status == 0)
-                                        <a style="white-space: nowrap" class="btn btn-success"
+                                    @if ($hire->status == 0 && Auth::user()->role_id == 1)
+                                        <a style="white-space: nowrap" class="btn btn-success w-100 d-block btn-sm"
+                                            href="{{ url('product_edit/' . $hire->id) }}" title="View details"
+                                            target="_blank">
+                                            Edit
+                                        </a>
+                                    @endif
+                                    {{-- @if (Auth::user()->role_id == 1 && $hire->status == 0) --}}
+                                    {{-- <a style="white-space: nowrap" class="btn btn-success"
                                             href="{{ url('hire-purchase-product-edit/' . $hire->id) }}">Product
                                             Edit</a>
-                                    @endif
+                                    @endif --}}
                                 </li>
                                 {{-- Approve button moved to product details page --}}
                             </ul>

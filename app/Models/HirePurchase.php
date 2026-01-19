@@ -77,7 +77,15 @@ class HirePurchase extends Model
         'approval_date',
         'rejection_note',
         'rejected_by',
-        'rejected_at'
+        'rejected_at',
+        'sale_type',
+        'package_id',
+        'cash_price',
+        'hire_price',
+        'down_payment',
+        'monthly_installment',
+        'installment_month',
+        'total_paid',
     ];
 
 
@@ -143,7 +151,8 @@ class HirePurchase extends Model
             'installment',
             'purchase_products.product_category',
             'purchase_products.product_group',
-            'guaranter_info'
+            'guaranter_info',
+            'salesReturn',
         ]);
 
         if (!is_null($is_paid)) {
@@ -262,6 +271,11 @@ class HirePurchase extends Model
     public function upazilaorg()
     {
         return $this->belongsTo(Upazila::class, 'org_upazila_id');
+    }
+
+    public function salesReturn()
+    {
+        return $this->hasOne(SalesReturn::class, 'hire_purchase_id');
     }
 
 

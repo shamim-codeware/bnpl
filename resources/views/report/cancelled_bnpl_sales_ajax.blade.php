@@ -143,6 +143,9 @@
                                     case 4:
                                         $statusText = 'Sale Cancel';
                                         break;
+                                    case 5:
+                                        $statusText = 'Sale Return';
+                                        break;
                                     default:
                                         $statusText = 'Unknown';
                                 }

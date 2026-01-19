@@ -5,14 +5,14 @@
 @section('content')
     <div class="container-fluid">
         <div class="form-element">
-            <form action="{{ url('product_update') }}" method="post" enctype="multipart/form-data" class="parent-assign">
+            <form action="{{ url('product_update_after') }}" method="post" enctype="multipart/form-data" class="parent-assign">
                 @csrf
 
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card card-default card-md mb-4 purchase_app">
                             <div class="card-header">
-                                <h6>Buy Now Pay Later Form</h6>
+                                <h6>Buy Now Pay Later Form - After Approval</h6>
                             </div>
                             <div class="card-body py-md-30">
                                 <div class="form-group">

@@ -36,6 +36,21 @@
                     <span class="userDatatable-title">Outstanding Balance</span>
                 </th>
                 <th>
+                    <span class="userDatatable-title">Sales Return Date</span>
+                </th>
+                <th>
+                    <span class="userDatatable-title">Return Amount</span>
+                </th>
+                <th>
+                    <span class="userDatatable-title">Refund Amount</span>
+                </th>
+                <th>
+                    <span class="userDatatable-title">Other Income (Defaulter)</span>
+                </th>
+                <th>
+                    <span class="userDatatable-title">Return Reason</span>
+                </th>
+                <th>
                     <span class="userDatatable-title">Phone</span>
                 </th>
                 <th>
@@ -85,8 +100,7 @@
                     // ])
 
                     // $outstanding_balance = $hire_price - $just_installment_paid + $late_fee;
-                   $outstanding_balance = max(0, $hire_price - $just_installment_paid + $late_fee);
-
+                    $outstanding_balance = max(0, $hire_price - $just_installment_paid + $late_fee);
 
                     $next_due_date = null;
                     if ($purchase->installment && count($purchase->installment) > 0) {
@@ -97,6 +111,15 @@
                             }
                         }
                     }
+
+                    // Sales Return data
+                    $return = $purchase->salesReturn;
+                    $return_date = $return ? \Carbon\Carbon::parse($return->returned_at)->format('d M Y') : 'N/A';
+                    $return_amount = $return ? number_format($return->return_amount ?? 0, 2) : '0.00';
+                    $refund_amount = $return ? number_format($return->refund_amount ?? 0, 2) : '0.00';
+                    $other_income = $return ? number_format($return->other_income ?? 0, 2) : '0.00';
+                    $return_reason = $return ? $return->reason_text ?? ucfirst($return->reason) : 'N/A';
+
                 @endphp
                 <tr>
                     <td>
@@ -144,6 +167,13 @@
                     <td>
                         <div class="userDatatable-content">{{ number_format($outstanding_balance, 2) }}</div>
                     </td>
+
+                    <!-- নতুন কলাম -->
+                    <td>{{ $return_date }}</td>
+                    <td>{{ $return_amount }}</td>
+                    <td>{{ $refund_amount }}</td>
+                    <td>{{ $other_income }}</td>
+                    <td>{{ $return_reason }}</td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->pr_phone }}</div>
                     </td>
@@ -170,6 +200,9 @@
                                     case 4:
                                         $statusText = 'Sale Cancel';
                                         break;
+                                    case 5:
+                                        $statusText = 'Sale Return';
+                                        break;
                                     default:
                                         $statusText = 'Unknown';
                                 }
@@ -182,6 +215,13 @@
                             <a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}" target="_blank">
                                 Product Details
                             </a>
+                            @if ($purchase->status == 0 && Auth::user()->role_id == 1)
+                                <a style="white-space: nowrap" class="btn btn-success w-100 d-block btn-sm"
+                                    href="{{ url('product_edit_after_approval/' . $purchase->id) }}"
+                                    title="View details" target="_blank">
+                                    Edit
+                                </a>
+                            @endif
                         </div>
                     </td>
                 </tr>

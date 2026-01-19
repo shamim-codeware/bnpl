@@ -85,7 +85,7 @@
 
                 @endphp
 
-                @php
+                {{-- @php
                     $isDefaulter = false;
                     $today = now()->startOfDay();
 
@@ -103,6 +103,21 @@
                     }
 
                     $status = $isDefaulter ? 'Defaulter' : 'Regular';
+                @endphp --}}
+
+                @php
+                    $status = 'Regular';
+
+                    if ($purchase->installment && $purchase->installment->isNotEmpty()) {
+                        $lastUnpaid = $purchase->installment->where('status', 0)->max('loan_start_date');
+
+                        if ($lastUnpaid) {
+                            $lastDue = \Carbon\Carbon::parse($lastUnpaid);
+                            if ($lastDue->lt(now()->subDays(30))) {
+                                $status = 'Defaulter';
+                            }
+                        }
+                    }
                 @endphp
                 <tr>
                     <td>
@@ -153,7 +168,10 @@
                     <td>
                         <div class="userDatatable-content">{{ number_format($outstanding_balance, 2) }}</div>
                     </td>
-                    <td><div class="userDatatable-content {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}">{{ $status }}</div></td>
+                    <td>
+                        <div class="userDatatable-content {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}">
+                            {{ $status }}</div>
+                    </td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->pr_phone }}</div>
                     </td>
