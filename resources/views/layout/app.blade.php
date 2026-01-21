@@ -240,8 +240,6 @@
                 var Showroom = "{{ request('Showroom') }}";
                 var url = "{{ url('/enquiry-statistics') }}";
 
-                $("#card-box-value-status").html('');
-
                 $.post(url, {
                     _token: '{{ csrf_token() }}',
                     Showroom: Showroom,
@@ -250,6 +248,24 @@
                     to_date: to_date
                 }, function(data) {
                       $(".appned_statistics").html(data);
+                });
+            }
+
+            function EnquiryComparison() {
+                var from_date = $('input[name=from_date]').val();
+                var to_date = $('input[name=to_date]').val();
+                var zone = "{{ request('zone') }}";
+                var Showroom = "{{ request('Showroom') }}";
+                var url = "{{ url('/enquiry-comparison') }}";
+
+                $.post(url, {
+                    _token: '{{ csrf_token() }}',
+                    Showroom: Showroom,
+                    zone: zone,
+                    from_date: from_date,
+                    to_date: to_date
+                }, function(data) {
+                      $(".appned_comparison").html(data);
                 });
             }
 

@@ -768,7 +768,72 @@ class DashboardController extends Controller
         return view('components.dashboard.enquirystatistic', compact('group_name', 'gourp_id', 'selList'));
     }
 
+    public function EnquiryComparison(Request $request)
+    {
+        // Parse the date inputs
+        $startOfMonth = date('Y-m-d 00:00:00', strtotime($request->from_date));
+        $endOfMonth = date('Y-m-d 23:59:59', strtotime($request->to_date));
 
+        $group_name = ProductType::latest()->pluck('name');
+        $gourp_id = ProductType::latest()->pluck('id');
+        $group_name = json_encode($group_name);
+
+        $selList = [];
+        foreach ($gourp_id as $id) {
+            $hirepurchase_sale = HirePurchaseProduct::with(['hire_purchase'])
+                ->whereHas('hire_purchase', function ($hirepurchase) use ($startOfMonth, $endOfMonth) {
+                    $hirepurchase->whereBetween('approval_date', [$startOfMonth, $endOfMonth]);
+                })
+                ->where('product_group_id', $id);
+
+            // Zone filter
+            if ($request->zone) {
+                $zone_id = $request->zone;
+                $hirepurchase_sale->whereHas('hire_purchase', function ($hirepurchase) use ($zone_id) {
+                    $hirepurchase->whereHas('show_room', function ($showroom) use ($zone_id) {
+                        $showroom->where('zone_id', $zone_id);
+                    });
+                });
+            }
+
+            // Showroom filter
+            if ($request->Showroom) {
+                $showroom_id = $request->Showroom;
+                $hirepurchase_sale->whereHas('hire_purchase', function ($hirepurchase) use ($showroom_id) {
+                    $hirepurchase->where('showroom_id', $showroom_id);
+                });
+            }
+
+            // Role-based filters
+            if (Auth::user()->role_id == User::ZONE) {
+                $zone_id = Auth::user()->zone_id;
+                $hirepurchase_sale->whereHas('hire_purchase', function ($hirepurchase) use ($zone_id) {
+                    $hirepurchase->whereHas('show_room', function ($showroom) use ($zone_id) {
+                        $showroom->where('zone_id', $zone_id);
+                    });
+                });
+            } elseif (Auth::user()->role_id == User::MANAGER) {
+                $showroom_id = Auth::user()->showroom_id;
+                $hirepurchase_sale->whereHas('hire_purchase', function ($hirepurchase) use ($showroom_id) {
+                    $hirepurchase->where('showroom_id', $showroom_id);
+                });
+            } elseif (Auth::user()->role_id == User::RETAIL) {
+                $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
+                $hirepurchase_sale->whereHas('hire_purchase', function ($hirepurchase) use ($permission) {
+                    $hirepurchase->whereHas('show_room', function ($showroom) use ($permission) {
+                        $showroom->whereIn('zone_id', $permission);
+                    });
+                });
+            }
+
+            $price = intval($hirepurchase_sale->sum('hire_price'));
+            $selList[] = $price;
+        }
+
+        $selList = json_encode($selList);
+
+        return view('components.dashboard.enquirycomparison', compact('group_name', 'gourp_id', 'selList'));
+    }
 
 
     public function SourceStatistics(Request $request)

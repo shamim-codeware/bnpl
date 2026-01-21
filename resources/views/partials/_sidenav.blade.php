@@ -15,7 +15,7 @@ $menus = \App\Helpers\Helper::menus();
                         class="{{ empty($m['url']) ? 'has-child' : 'no-child' }} @if (!empty($m['url']) && $explode_path == $m['url']) ? active @endif">
                         @if (in_array($m['id'], $user_menu_ids))
                             <a href="{{ $m['url'] ? $p_url : 'javascript:void(0)' }}">
-                                <span class="nav-icon uil {{ $m['icon'] }}"></span>
+                                <span class="nav-icon uil {{ $m['icon'] == null ? 'las la-stream' : $m['icon'] }}"></span>
                                 <span class="menu-text">{{ $m['title'] }}</span>
                                 @if (count($m['children']) > 0)
                                     <span class="toggle-icon"></span>

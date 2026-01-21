@@ -408,6 +408,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('select-showroom',      [DashboardController::class, 'SelectShowroom']);
     Route::post('todays-followup',      [DashboardController::class, 'TodaysfollowUp']);
     Route::any('enquiry-statistics', [DashboardController::class, 'EnquiryStatistics']);
+    Route::any('enquiry-comparison', [DashboardController::class, 'EnquiryComparison']);
     Route::post('source-statistics', [DashboardController::class, 'SourceStatistics']);
     Route::get('collection-chart-data', [DashboardController::class, 'getCollectionChartData']);
 

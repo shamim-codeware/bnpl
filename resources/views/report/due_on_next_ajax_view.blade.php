@@ -1,3 +1,8 @@
+<?php
+$total_amount = 0;
+?>
+
+
 <div class="table-responsive d-block custom-data-table-wrapper2">
     <table class="table mb-0 table-bordered custom-data-table">
         <thead>

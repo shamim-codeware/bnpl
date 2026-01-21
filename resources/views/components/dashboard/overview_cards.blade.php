@@ -387,7 +387,7 @@
                             <div class="col-lg-12">
                                 <div class="card">
                                     <div class="d-flex box-header p-2 justify-content-between align-center">
-                                        <div class="d-flex  gap-3 align-items-center">
+                                        <div class="d-flex gap-3 align-items-center">
                                             <span class="enquiry-icon-1"><i class="fas fa-calendar-check"></i></span>
                                             <p class="m-0 fw-600">Product Sale Statistics</p>
                                         </div>
@@ -418,6 +418,47 @@
                     </div>
                 </div>
             </div>
+
+
+            <div class="col-lg-12 mb-4">
+                <div class="card">
+                    <div class="card-body p-3" dir="ltr">
+                        <div class="row gx-3">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="d-flex box-header p-2 justify-content-between align-center">
+                                        <div class="d-flex  gap-3 align-items-center">
+                                            <span class="enquiry-icon-1"><i class="fas fa-chart-line"></i></span>
+                                            <p class="m-0 fw-600">Comparison</p>
+                                        </div>
+                                        <div class="col-sm-6 month_select-x">
+                                            <form action="" method="GET"
+                                                class="filter-support-order-search__form">
+                                                <div class="select-style2">
+                                                    <div class="d-flex gap-2 dm-select enquiry_status_dm-select">
+                                                        <input onchange="EnquiryComparison()" type="text"
+                                                            name="from_date" autocomplete="off"
+                                                            value="{{ date('1-m-Y') }}"
+                                                            class="form-control w-100 ih-medium ip-gray radius-xs b-light"
+                                                            id="datepicker8">
+                                                        <input type="text" onchange="EnquiryComparison()"
+                                                            name="to_date" autocomplete="off"
+                                                            value="{{ date('t-m-Y') }}"
+                                                            class="form-control w-100 ih-medium ip-gray radius-xs b-light"
+                                                            id="datepicker17">
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="appned_comparison"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -905,7 +946,7 @@
     });
 </script>
 
-//
+
 <script>
     //     // Define these variables globally so they can be accessed anywhere
     //     let barChart = null;
@@ -931,7 +972,7 @@
 
     //             // Make AJAX request
     //             $.ajax({
-    //                 url: '{{ url('collection-chart-data') }}',
+    //                 url: "{{ url('collection-chart-data') }}",
     //                 type: 'GET',
     //                 data: {
     //                     from_date: fromDate,
