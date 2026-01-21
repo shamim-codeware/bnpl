@@ -901,7 +901,7 @@ class HirePurchaseController extends Controller
             $HirePurchase->total_paid = $request->down_payment;
             $HirePurchase->save();
             //Erp Service
-            $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
+            // $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
             //guarantor info
             $GuaranterInfo = new GuaranterInfo;
             foreach ($request->guarater_name as $key => $name) {
@@ -1620,6 +1620,7 @@ class HirePurchaseController extends Controller
     {
         $h_id = $request->hirepurchase_id;
 
+
         // 1. Update Customer (keep your existing logic)
         $customer_data = $request->only([
             'name',
@@ -1722,10 +1723,13 @@ class HirePurchaseController extends Controller
             $officeData['nid_image'] = $imagePath;
         }
 
-        $hirepurchaseInstance->update($officeData);
+        $original = $hirepurchaseInstance->getOriginal();
 
         // 1. Get original values BEFORE update
         $oldValues = $hirepurchaseInstance->getOriginal();
+
+        $hirepurchaseInstance->update($officeData);
+
 
         // 2. Get new values from request
         $newValues = array_intersect_key(
@@ -1800,16 +1804,17 @@ class HirePurchaseController extends Controller
             }
         }
         // ============== 5. Installment Smart Update ==============
-        $old = $hirepurchaseInstance->getOriginal();
-        $hirePriceChanged         = $request->hire_price != $old['hire_price'];
-        $downPaymentChanged       = $request->down_payment != $old['down_payment'];
-        // $downPaymentPercentageChanged = $request->down_payment_parcentage != $old['down_payment_parcentage'];
-        $monthlyInstallmentChanged = $request->monthly_installment != $old['monthly_installment'];
-        $installmentMonthChanged   = $request->installment_month != $old['installment_month'];
 
-        if ($hirePriceChanged || $downPaymentChanged || $monthlyInstallmentChanged || $installmentMonthChanged) {
 
-            // Case: if installment month changed then recreate all installments
+        $hirePriceChanged = (float)($request->hire_price ?? 0) !== (float)($original['hire_price'] ?? 0);
+        $downPaymentChanged = (float)($request->down_payment ?? 0) !== (float)($original['down_payment'] ?? 0);
+        $downPaymentPercentageChanged = (float)($request->down_payment_parcentage ?? 0) !== (float)($original['down_payment_parcentage'] ?? 0);
+        $monthlyInstallmentChanged = (float)($request->monthly_installment ?? 0) !== (float)($original['monthly_installment'] ?? 0);
+        $installmentMonthChanged = (int)($request->installment_month ?? 0) !== (int)($original['installment_month'] ?? 0);
+
+        if ($hirePriceChanged || $downPaymentChanged || $monthlyInstallmentChanged || $installmentMonthChanged || $downPaymentPercentageChanged) {
+
+        // Case: if installment month changed then recreate all installments
             if ($installmentMonthChanged) {
                 Installment::where('hire_purchase_id', $h_id)->delete();
 
@@ -1821,7 +1826,7 @@ class HirePurchaseController extends Controller
                     'status'           => 1,
                 ]);
 
-                for ($i = 1; $i < $request->installment_month; $i++) {
+                for ($i = 1; $i <= ($request->installment_month - 1); $i++) {
                     Installment::create([
                         'hire_purchase_id' => $h_id,
                         'amount'           => $request->monthly_installment,
@@ -2002,6 +2007,7 @@ class HirePurchaseController extends Controller
         // ============== ERP Log Update (Always update existing entry on any change) ==============
 
         $erpLog = ErpLog::where('tracking_number', $h_id)->first();
+        dd($erpLog);
 
         if ($erpLog) {
 
