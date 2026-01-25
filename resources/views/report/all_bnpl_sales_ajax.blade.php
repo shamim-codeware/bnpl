@@ -1,3 +1,14 @@
+<?php
+$total_amount = 0;
+$total_paid_amount = 0;
+$total_late_payment_fee = 0;
+
+$total_outstanding_balance = 0;
+$total_return_amount = 0;
+$total_refund_amount = 0;
+$total_other_fee = 0;
+?>
+
 <div class="table-responsive d-block custom-data-table-wrapper2">
     <table class="table mb-0 table-bordered custom-data-table">
         <thead>
@@ -115,9 +126,9 @@
                     // Sales Return data
                     $return = $purchase->salesReturn;
                     $return_date = $return ? \Carbon\Carbon::parse($return->returned_at)->format('d M Y') : 'N/A';
-                    $return_amount = $return ? number_format($return->return_amount ?? 0, 2) : '0.00';
-                    $refund_amount = $return ? number_format($return->refund_amount ?? 0, 2) : '0.00';
-                    $other_income = $return ? number_format($return->other_income ?? 0, 2) : '0.00';
+                    $return_amount = $return->return_amount ?? 0;
+                    $refund_amount = $return->refund_amount ?? 0;
+                    $other_income = $return->other_income ?? 0;
                     $return_reason = $return ? $return->reason_text ?? ucfirst($return->reason) : 'N/A';
 
                 @endphp
@@ -143,7 +154,13 @@
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->hire_price }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                                $purchase_hire_price = $purchase->hire_price ?? 0;
+                                $total_amount += $purchase_hire_price;
+                            ?>
+                            {{ number_format($purchase_hire_price, 2) }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
@@ -159,20 +176,51 @@
                         <div class="userDatatable-content">{{ @$purchase->purchase_product->total_paid }}</div>
                     </td> --}}
                     <td>
-                        <div class="userDatatable-content">{{ @$total_paid }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                             $total_paid_amount += $total_paid;
+                            ?>
+                            {{ number_format($total_paid, 2) }}
+                        </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ @$purchase->late_fee }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                              $late_fee = $purchase->late_fee ?? 0.00;
+                              $total_late_payment_fee += $late_fee;
+                            ?>
+                            {{ number_format($late_fee, 2) }}
+                        </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ number_format($outstanding_balance, 2) }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                                $total_outstanding_balance += $outstanding_balance;
+                            ?>
+                            {{ number_format($outstanding_balance, 2) }}
+                        </div>
                     </td>
 
                     <!-- নতুন কলাম -->
                     <td>{{ $return_date }}</td>
-                    <td>{{ $return_amount }}</td>
-                    <td>{{ $refund_amount }}</td>
-                    <td>{{ $other_income }}</td>
+                    <td>
+                        <?php
+                            $total_return_amount += $return_amount;
+                        ?>
+                        {{ number_format($return_amount, 2) }}
+                    </td>
+                    <td>
+                        <?php
+                            $total_refund_amount += $refund_amount;
+                        ?>
+                        {{ number_format($refund_amount, 2) }}
+                    </td>
+                    <td>
+                        <?php
+                            $total_other_fee += $other_income;
+                        ?>
+                        {{ number_format($other_income, 2) }}
+                    </td>
                     <td>{{ $return_reason }}</td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->pr_phone }}</div>
@@ -227,6 +275,21 @@
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4"></th>
+                <th>{{ number_format($total_amount, 2) }}</th>
+                <th colspan="2"></th>
+                <th>{{ number_format($total_paid_amount, 2) }}</th>
+                <th>{{ number_format($total_late_payment_fee, 2) }}</th>
+                <th>{{ number_format($total_outstanding_balance, 2) }}</th>
+                <th></th>
+                <th>{{ number_format($total_return_amount, 2) }}</th>
+                <th>{{ number_format($total_refund_amount, 2) }}</th>
+                <th>{{ number_format($total_other_fee, 2) }}</th>
+                <th colspan="5"></th>
+            </tr>
+        </tfoot>
     </table>
     @if (empty($hirepurchase))
         <p class="text-center">Data Not Found</p>

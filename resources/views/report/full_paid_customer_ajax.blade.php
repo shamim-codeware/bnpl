@@ -1,3 +1,8 @@
+<?php
+$total_amount = 0;
+$total_last_paid_amount = 0;
+?>
+
 <div class="table-responsive d-block custom-data-table-wrapper2">
     <table class="table mb-0 table-bordered custom-data-table">
         <thead>
@@ -107,7 +112,12 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->total_paid ? number_format($purchase->total_paid, 2) : '0.00' }}</div>
+                            <?php
+                                $purchase_total =  $purchase->total_paid ?? '0.00';
+                                $total_amount += $purchase_total;
+                            ?>
+                            {{ number_format($purchase_total, 2) }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
@@ -124,7 +134,13 @@
                             {{ $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A' }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ number_format($last_paid_amount, 2) }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                                //$last_paid_amount = $last_paid_amount ?? '0.00';
+                                $total_last_paid_amount += $last_paid_amount;
+                            ?>
+                            {{ number_format($last_paid_amount, 2) }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content"><a class="btn btn-info"
@@ -135,6 +151,15 @@
             @endforeach
 
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6"></th>
+                <th>{{ number_format($total_amount, 2) }}</th>
+                <th colspan="3"></th>
+                <th>{{ number_format($total_last_paid_amount, 2) }}</th>
+                <th></th>
+            </tr>
+        </tfoot>
     </table>
     @if (empty($hirepurchase))
         <p class="text-center">Data Not Found</p>

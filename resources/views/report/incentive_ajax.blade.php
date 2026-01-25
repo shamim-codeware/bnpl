@@ -1,3 +1,6 @@
+<?php
+$total_incentive_amount = 0;
+?>
 <div class="table-responsive d-block custom-data-table-wrapper2">
     <table class="table mb-0 table-bordered custom-data-table">
         <thead>
@@ -106,7 +109,13 @@
                         <div class="userDatatable-content">{{ $incentive_category }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content"><strong>Tk {{ $incentive_amount }}</strong></div>
+                        <div class="userDatatable-content"><strong>Tk 
+                            <?php
+                                $incentive_amount = $incentive->incentive_amount ?? 0;
+                                $total_incentive_amount += $incentive_amount;
+                            ?>
+                            {{ number_format($incentive_amount, 2) }}
+                        </strong></div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ $created_at }}</div>
@@ -120,6 +129,13 @@
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="7"></th>
+                <th>{{ number_format($total_incentive_amount, 2) }}</th>
+                <th colspan="3"></th>
+            </tr>
+        </tfoot>
     </table>
 
     @if (empty($incentives))

@@ -1,3 +1,7 @@
+<?php
+$total_showroom_credit_score = 0;
+?>
+
 @section('title')
 @section('description')
 
@@ -135,7 +139,11 @@
                                             </td>
                                             <td>
                                                 <div class="userDatatable-content--priority">
-                                                    {{ $showroom->credit_score }}
+                                                    <?php
+                                                    $showroom_credit_score = $showroom->credit_score ?? 0;
+                                                    $total_showroom_credit_score += $showroom->credit_score;    
+                                                    ?>
+                                                    {{ $showroom_credit_score }}
                                                 </div>
                                             </td>
                                             <td>
@@ -171,6 +179,13 @@
                                         </tr>
                                     @endforeach
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="2" style="text-align: right">Total</th>
+                                        <th>{{ $total_showroom_credit_score }}</th>
+                                        <th colspan="2"></th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                         <div class="py-5">

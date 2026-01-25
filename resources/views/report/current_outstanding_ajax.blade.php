@@ -1,3 +1,11 @@
+<?php
+$total_amount = 0;
+$total_last_paid_amount = 0;
+$total_late_payment_fee = 0;
+$total_outstanding_amount = 0;
+?>
+
+
 <div class="table-responsive d-block custom-data-table-wrapper2">
     <table class="table mb-0 table-bordered custom-data-table">
         <thead>
@@ -143,7 +151,11 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$purchase->hire_price ? (float) $purchase->hire_price : '0.00' }}
+                            <?php
+                            $purchase_hire_price = $purchase->hire_price ?? 0.00; 
+                            $total_amount += $purchase_hire_price;
+                            ?>
+                            {{ number_format($purchase_hire_price, 2) }}
                         </div>
                     </td>
                     <td>
@@ -160,13 +172,29 @@
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $last_paid_amount }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                            $total_last_paid_amount += $last_paid_amount;
+                            ?>
+                            {{ number_format($last_paid_amount, 2) }}
+                        </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ $purchase->late_fee }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                            $late_fee = $purchase->late_fee ?? 0;
+                            $total_late_payment_fee += $late_fee;
+                            ?>
+                            {{ number_format($late_fee, 2) }}
+                        </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ number_format($outstanding_balance, 2) }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                            $total_outstanding_amount += $outstanding_balance;
+                            ?>
+                            {{ number_format($outstanding_balance, 2) }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}">
@@ -186,6 +214,17 @@
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4"></th>
+                <th>{{ number_format($total_amount, 2) }}</th>
+                <th colspan="3"></th>
+                <th>{{ number_format($total_last_paid_amount, 2) }}</th>
+                <th>{{ number_format($total_late_payment_fee, 2) }}</th>
+                <th>{{ number_format($total_outstanding_amount, 2) }}</th>
+                <th colspan="2"></th>
+            </tr>
+        </tfoot>
     </table>
     @if (empty($hirepurchase))
         <p class="text-center">Data Not Found</p>

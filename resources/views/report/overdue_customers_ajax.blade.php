@@ -1,3 +1,9 @@
+<?php
+$total_amount = 0;
+$total_late_payment_fee = 0;
+$total_outstanding_balance = 0;
+?>
+
 <div class="table-responsive d-block custom-data-table-wrapper2">
     <table class="table mb-0 table-bordered custom-data-table">
         <thead>
@@ -103,14 +109,31 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            {{ @$customer->hire_price ? (float) $customer->hire_price : '0.00' }}
+                            <?php
+                                $customer_hire_price = $customer->hire_price ?? 0;
+                                $total_amount += $customer_hire_price;
+                            ?> 
+                            {{ number_format($customer_hire_price, 2) }}
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ (float) $customer->late_fee }}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                                $late_fee = $customer->late_fee ?? 0;
+                                $total_late_payment_fee += $late_fee;
+                            ?> 
+                            {{ number_format($late_fee, 2) }}
+                        </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">{{ number_format($outstanding_balance, 2)}}</div>
+                        <div class="userDatatable-content">
+                            <?php
+                                $outstanding_balance = $outstanding_balance ?? 0;
+                                $total_outstanding_balance += $outstanding_balance;
+                            ?> 
+                            {{ number_format($outstanding_balance, 2) }}
+
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">
@@ -148,6 +171,15 @@
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="5" style="text-align: right">Total</th>
+                <th>{{ number_format($total_amount, 2) }}</th>
+                <th>{{ number_format($total_late_payment_fee, 2) }}</th>
+                <th>{{ number_format($total_outstanding_balance, 2) }}</th>
+                <th colspan="6"></th>
+            </tr>
+        </tfoot>
     </table>
     @if (empty($customers))
         <p class="text-center">Data Not Found</p>

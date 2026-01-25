@@ -212,12 +212,7 @@ $total_outstanding_amount = 0;
         <tfoot>
             </tr>
                 <tr class="userDatatable-header">
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
+                <th colspan="6"></th>
                 <th>
                     <span class="userDatatable-title">{{ number_format($total_amount, 2) }}</span>
                 </th>
@@ -235,9 +230,7 @@ $total_outstanding_amount = 0;
                 <th>
                     <span class="userDatatable-title">{{ number_format($total_outstanding_amount, 2) }}</span>
                 </th>
-                <th></th>
-                <th></th>
-                <th></th>
+                <th colspan="3"></th>
             </tr>
         </tfoot>
     </table>
