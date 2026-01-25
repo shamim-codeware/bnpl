@@ -3,11 +3,12 @@
 namespace App\Exports;
 
 use App\Models\Incentive;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class IncentiveReportExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
@@ -59,7 +60,7 @@ class IncentiveReportExport implements FromCollection, WithHeadings, WithMapping
         return [
             $this->rowNumber ?? ($this->rowNumber = 1) ? ++$this->rowNumber - 1 : 1, // SL auto increment
             $incentive->hirePurchase->order_no ?? 'N/A',
-            $incentive->hirePurchase->name ?? 'N/A',
+            Str::title($incentive->hirePurchase->name ?? 'N/A'),
             $product_group,
             $product_model,
             ucfirst(str_replace('_', ' ', $incentive->type)),
@@ -68,7 +69,7 @@ class IncentiveReportExport implements FromCollection, WithHeadings, WithMapping
             ucfirst($incentive->status),
             $incentive->created_at?->format('d/m/Y H:i:s') ?? 'N/A',
             $incentive->hirePurchase->show_room->name ?? 'N/A',
-            $incentive->hirePurchase->users->name ?? 'N/A',
+            Str::title($incentive->hirePurchase->users->name ?? 'N/A'),
         ];
     }
 

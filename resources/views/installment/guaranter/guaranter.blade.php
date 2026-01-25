@@ -75,14 +75,14 @@
                                                 <div class="col-md-3 mb-25" id="number_children_show_{{ $key }}">
                                                     <div class="holder">
                                                         <div class="input-holder">
-                                                            <input name="number_of_children[]" id="children_num" value="{{ $gurantor->number_of_children }}" class="input" type="number" placeholder="" />
+                                                            <input name="number_of_children[]" id="children_num" value="{{ $gurantor->number_of_children }}" class="input" required type="number" placeholder="" />
                                                             <div class="placeholder">
                                                                 <p class="m-0">Number of children:<span class="text-danger">*</span></p>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                          
+
                                             <div class="col-md-4 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
@@ -171,7 +171,7 @@
                                             <div class="col-md-3 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
-                                                        <input value="{{ $gurantor->profession_phone }}" required name="profession_phone[]" id="mobile" class="input" type="number" placeholder="Enter 11 digit Mobile Number"/>
+                                                        <input value="{{ $gurantor->profession_phone }}" required name="profession_phone[]" id="mobile" class="input" type="number" required placeholder="Enter 11 digit Mobile Number"/>
                                                         <div class="placeholder" >
                                                             <p class="m-0">Mobile No:<span class="text-danger">*</span></p>
                                                         </div>
@@ -181,7 +181,7 @@
                                             <div class="col-md-3 mb-25">
                                                 <div class="holder">
                                                     <div class="input-holder">
-                                                        <input required name="monthly_income[]" id="month_income" class="input" value="{{ $gurantor->monthly_income }}" type="number" placeholder=" " />
+                                                        <input required name="monthly_income[]" id="month_income" class="input" type="number" placeholder=" " />
                                                         <div class="placeholder">
                                                             <p class="m-0">Monthly Income (BDT):<span class="text-danger">*</span></p>
                                                         </div>
@@ -229,7 +229,7 @@
                                                     <div class="form-control d-flex gap-3 align-items-center">
                                                         <p class="mb-0">If the Hirer/installment receiver does not pay the amount due to the Company on time, then I will be obliged to resolve it through necessary measures and cooperation.</p>
                                                         <div class="d-flex align-items-center flex-nowrap gap-2">
-                                                            <input required name="bought_before" value="1" id="yes_{{ $key }}"  type="checkbox" /> 
+                                                            <input required name="bought_before" value="1" id="yes_{{ $key }}"  type="checkbox" />
                                                             <label class="mt-0">Yes</label>
                                                         </div>
                                                     </div>

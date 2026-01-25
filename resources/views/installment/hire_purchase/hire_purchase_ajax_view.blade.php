@@ -40,6 +40,10 @@
                         <span class="userDatatable-title">Created By</span>
                     </th>
                     <th>
+                        <span class="userDatatable-title">Status</span>
+                    </th>
+
+                    <th>
                         <span class="userDatatable-title">Action</span>
                     </th>
                 </tr>
@@ -50,6 +54,20 @@
 
                 @endphp
                 @foreach ($hirepurchase as $key => $hire)
+                    @php
+                        $status = 'Regular';
+
+                        if ($hire->installment && $hire->installment->isNotEmpty()) {
+                            $lastUnpaid = $hire->installment->where('status', 0)->max('loan_start_date');
+
+                            if ($lastUnpaid) {
+                                $lastDue = \Carbon\Carbon::parse($lastUnpaid);
+                                if ($lastDue->lt(now()->subDays(30))) {
+                                    $status = 'Defaulter';
+                                }
+                            }
+                        }
+                    @endphp
                     @php
                         $total += @$hire->monthly_installment;
                     @endphp
@@ -118,15 +136,25 @@
                                 {{ @$hire->users->name }}
                             </div>
                         </td>
+                        <td>
+                            <div
+                                class="userDatatable-content {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}">
+                                {{ $status }}</div>
+                        </td>
 
                         <td>
-
-                            <a style="white-space: nowrap" class="btn btn-info"
-                                href="{{ url('product_details/' . $hire->id) }}" target="_blank">Product Details</a>
-                            @if (Auth::user()->role_id == 1 && $hire->status != 3 && ($hire->status = 0))
-                                <a style="white-space: nowrap" class="btn btn-success"
-                                    href="{{ url('hire-purchase-product-edit/' . $hire->id) }}">Product Edit</a>
-                            @endif
+                            <ul class="mb-0 d-flex flex-wrap justify-content-center gap-1">
+                                <li class="d-flex align-items-center flex-column gap-1">
+                                    <a style="white-space: nowrap" class="btn btn-info"
+                                        href="{{ url('product_details/' . $hire->id) }}" target="_blank">Product
+                                        Details</a>
+                                    @if (Auth::user()->role_id == 1 && ($hire->status = 3))
+                                        <a style="white-space: nowrap" class="btn btn-success" target="_blank"
+                                            href="{{ url('product_edit_after_approval/' . $hire->id) }}">Product
+                                            Edit</a>
+                                    @endif
+                                </li>
+                            </ul>
                         </td>
                     </tr>
                 @endforeach

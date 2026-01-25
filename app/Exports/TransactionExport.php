@@ -3,11 +3,12 @@
 namespace App\Exports;
 
 use App\Helpers\Helper;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class TransactionExport implements FromCollection, WithHeadings, WithMapping, WithEvents
 {
@@ -48,14 +49,14 @@ class TransactionExport implements FromCollection, WithHeadings, WithMapping, Wi
             $this->rowNumber,
             $transaction->transaction_type ?? 'N/A',
             $transaction->hire_purchase->order_no ?? 'N/A',
-            $transaction->hire_purchase->name ?? 'N/A',
+            Str::title($transaction->hire_purchase->name ?? 'N/A'),
             $transaction->hire_purchase->pr_phone ?? 'N/A',
             $transaction->hire_purchase->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
             $transaction->hire_purchase->show_room->name ?? 'N/A',
             // Helper::formatDateTimeStandard($transaction->created_at),
             \Carbon\Carbon::parse($transaction->created_at)->format('d F Y'),
             ($transaction->amount),
-            $transaction->users->name ?? 'N/A'
+            Str::title($transaction->users->name ?? 'N/A')
         ];
     }
 

@@ -2,12 +2,13 @@
 
 namespace App\Exports;
 
-use App\Helpers\Helper;
-use Maatwebsite\Excel\Concerns\FromCollection;
-
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use DB;
+use App\Helpers\Helper;
+
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class CustomerExport implements FromCollection, WithMapping, WithHeadings
 {
@@ -28,7 +29,7 @@ class CustomerExport implements FromCollection, WithMapping, WithHeadings
         public function map($filter_data): array
     {
         return [
-            $filter_data->name,
+            Str::title($filter_data->name),
             $filter_data->email,
             $filter_data->number,
             $filter_data->alt_number,

@@ -3,11 +3,12 @@
 namespace App\Exports;
 
 use App\Helpers\Helper;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class OverdueCustomersExport implements FromCollection, WithHeadings, WithMapping, WithEvents
 {
@@ -84,7 +85,7 @@ class OverdueCustomersExport implements FromCollection, WithHeadings, WithMappin
         return [
             $this->rowNumber,
             $customer->order_no,
-            $customer->name,
+            Str::title($customer->name),
             $customer->pr_phone,
             $customer->hire_price ? (float)($customer->hire_price) : '0.00',
             (float)($customer->late_fee ?? 0.00),

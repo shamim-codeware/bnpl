@@ -6,6 +6,7 @@ use DB;
 use Carbon\Carbon;
 use App\Models\Installment;
 
+use Illuminate\Support\Str;
 use App\Models\HirePurchase;
 use App\Service\LateFeeService;
 use Maatwebsite\Excel\Events\AfterSheet;
@@ -118,10 +119,10 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             @$next_installment_date?->loan_start_date
                 ? \Carbon\Carbon::parse($next_installment_date->loan_start_date)->format('d F Y')
                 : '',
-            $filter_data->name,
+            Str::title($filter_data->name),
             $filter_data->pr_phone,
-            @$filter_data->show_room_user->name,
-            @$filter_data->users->name,
+            Str::title(@$filter_data->show_room_user->name),
+            Str::title(@$filter_data->users->name),
             @$filter_data->show_room->zone->name,
             $status,
         ];

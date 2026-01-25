@@ -60,6 +60,9 @@
                     <span class="userDatatable-title">Status</span>
                 </th>
                 <th>
+                    <span class="userDatatable-title">Current Status</span>
+                </th>
+                <th>
                     <span class="userDatatable-title">Action</span>
                 </th>
             </tr>
@@ -120,6 +123,43 @@
                     $other_income = $return ? number_format($return->other_income ?? 0, 2) : '0.00';
                     $return_reason = $return ? $return->reason_text ?? ucfirst($return->reason) : 'N/A';
 
+                @endphp
+
+                {{-- @php
+                    $status = 'Regular';
+
+                    if ($purchase->installment && $purchase->installment->isNotEmpty()) {
+                        $lastUnpaid = $purchase->installment->where('status', 0)->max('loan_start_date');
+
+                        if ($lastUnpaid) {
+                            $lastDue = \Carbon\Carbon::parse($lastUnpaid);
+                            if ($lastDue->lt(now()->subDays(30))) {
+                                $status = 'Defaulter';
+                            }
+                        }
+                    }
+                @endphp --}}
+                @php
+                    $status = 'Regular';
+
+                    if ($purchase->installment && $purchase->installment->isNotEmpty()) {
+                        $hasUnpaid = $purchase->installment->contains('status', 0);
+
+                        if (!$hasUnpaid) {
+                            $status = 'Paid';
+                        } else {
+                            $lastUnpaidDate = $purchase->installment->where('status', 0)->max('loan_start_date');
+
+                            if ($lastUnpaidDate) {
+                                $lastDue = \Carbon\Carbon::parse($lastUnpaidDate);
+                                if ($lastDue->lt(now()->subDays(30))) {
+                                    $status = 'Defaulter';
+                                }
+                            }
+                        }
+                    } else {
+                        $status = 'Regular';
+                    }
                 @endphp
                 <tr>
                     <td>
@@ -211,7 +251,17 @@
                         </div>
                     </td>
                     <td>
-                        <div class="userDatatable-content">
+                        <span
+                            class="badge
+        {{ $status === 'Paid' ? 'bg-success text-white' : '' }}
+        {{ $status === 'Defaulter' ? 'bg-danger text-white' : '' }}
+        {{ $status === 'Regular' ? 'bg-warning text-dark' : '' }}">
+
+                            {{ $status }}
+                        </span>
+                    </td>
+                    <td>
+                        {{-- <div class="userDatatable-content">
                             <a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}" target="_blank">
                                 Product Details
                             </a>
@@ -222,7 +272,32 @@
                                     Edit
                                 </a>
                             @endif
-                        </div>
+                            @if (Auth::user()->role_id == 1 && ($purchase->status = 3 && $purchase->status != 0))
+                                <a style="white-space: nowrap" class="btn btn-success" target="_blank"
+                                    href="{{ url('product_edit_after_approval/' . $purchase->id) }}">Product
+                                    Edit</a>
+                            @endif
+                        </div> --}}
+                        <ul class="mb-0 d-flex flex-wrap justify-content-center gap-1">
+                            <li class="d-flex align-items-center flex-column gap-1">
+                                <a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}"
+                                    target="_blank">
+                                    Product Details
+                                </a>
+                                @if ($purchase->status == 0 && Auth::user()->role_id == 1)
+                                    <a style="white-space: nowrap" class="btn btn-success w-100 d-block btn-sm"
+                                        href="{{ url('product_edit/' . $purchase->id) }}" title="View details"
+                                        target="_blank">
+                                        Edit
+                                    </a>
+                                @endif
+                                @if (Auth::user()->role_id == 1 && ($purchase->status = 3 && $purchase->status != 0))
+                                    <a style="white-space: nowrap" class="btn btn-success" target="_blank"
+                                        href="{{ url('product_edit_after_approval/' . $purchase->id) }}">Product
+                                        Edit</a>
+                                @endif
+                            </li>
+                        </ul>
                     </td>
                 </tr>
             @endforeach

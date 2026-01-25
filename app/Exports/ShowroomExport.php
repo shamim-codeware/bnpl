@@ -2,12 +2,13 @@
 
 namespace App\Exports;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Events\AfterSheet;
 use DB;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class ShowroomExport implements FromCollection, WithMapping, WithHeadings , WithEvents
 {
@@ -28,7 +29,7 @@ class ShowroomExport implements FromCollection, WithMapping, WithHeadings , With
         public function map($filter_data): array
     {
         return [
-            $filter_data->name,
+            Str::title($filter_data->name),
             $filter_data->suffix,
             $filter_data->contact_person,
             $filter_data->number,
@@ -36,7 +37,7 @@ class ShowroomExport implements FromCollection, WithMapping, WithHeadings , With
             @$filter_data->district->en_name,
             @$filter_data->upazila->name,
             @$filter_data->zone->name,
-            
+
         ];
     }
 
@@ -48,7 +49,7 @@ class ShowroomExport implements FromCollection, WithMapping, WithHeadings , With
 
         return [
             "Name",
-            "Suffix", 
+            "Suffix",
              "Contact Person Name",
             "Contact Person Number",
             "Contact Person Email",
@@ -74,7 +75,7 @@ class ShowroomExport implements FromCollection, WithMapping, WithHeadings , With
                 $event->sheet->getDelegate()->getColumnDimension('H')->setWidth(15);
                 $event->sheet->getDelegate()->getColumnDimension('I')->setWidth(15);
                 $event->sheet->getDelegate()->getColumnDimension('J')->setWidth(15);
-     
+
             },
         ];
     }

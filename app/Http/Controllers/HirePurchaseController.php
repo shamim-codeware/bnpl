@@ -901,7 +901,7 @@ class HirePurchaseController extends Controller
             $HirePurchase->total_paid = $request->down_payment;
             $HirePurchase->save();
             //Erp Service
-            // $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
+            $erp_order = $ApiService->OrderCreate($request->all(), $showroom, $HirePurchase->order_no, $HirePurchase->id, $delivery_showroom);
             //guarantor info
             $GuaranterInfo = new GuaranterInfo;
             foreach ($request->guarater_name as $key => $name) {
@@ -1814,7 +1814,7 @@ class HirePurchaseController extends Controller
 
         if ($hirePriceChanged || $downPaymentChanged || $monthlyInstallmentChanged || $installmentMonthChanged || $downPaymentPercentageChanged) {
 
-        // Case: if installment month changed then recreate all installments
+            // Case: if installment month changed then recreate all installments
             if ($installmentMonthChanged) {
                 Installment::where('hire_purchase_id', $h_id)->delete();
 
@@ -2007,11 +2007,8 @@ class HirePurchaseController extends Controller
         // ============== ERP Log Update (Always update existing entry on any change) ==============
 
         $erpLog = ErpLog::where('tracking_number', $h_id)->first();
-        dd($erpLog);
 
         if ($erpLog) {
-
-            // সবসময় নতুন ডেটা দিয়ে আপডেট করো (যেকোনো ফিল্ড চেঞ্জ হোক বা না হোক)
 
             $district = District::where('id', $request->pr_district_id)->first()?->en_name ?? '';
             $customerProfession = CustomerProfession::where('id', $request->profession_id)->first()?->name ?? '';
@@ -2085,487 +2082,513 @@ class HirePurchaseController extends Controller
     {
         $h_id = $request->hirepurchase_id;
 
-        // 1. Update Customer (keep your existing logic)
-        $customer_data = $request->only([
-            'name',
-            'email',
-            'age',
-            'nid',
-            'pa_house_no',
-            'pa_road_no'
-        ]);
-        $profession = CustomerProfession::find($request->profession_id);
-        if ($profession) {
-            $customer_data['district_id'] = $request->pa_district_id;
-            $customer_data['upazila_id'] = $request->pa_upazila_id;
-            $customer_data['number'] = $request->pa_phone;
-            $customer_data['profession'] = $profession->name;
+        DB::beginTransaction();
 
-            $hirepurchase_customer = HirePurchase::with('customer')->find($h_id);
-            if ($hirepurchase_customer && $hirepurchase_customer->customer) {
-                $hirepurchase_customer->customer->update($customer_data);
+        try {
+
+
+            // 1. Update Customer (keep your existing logic)
+            $customer_data = $request->only([
+                'name',
+                'email',
+                'age',
+                'nid',
+                'pa_house_no',
+                'pa_road_no'
+            ]);
+            $profession = CustomerProfession::find($request->profession_id);
+            if ($profession) {
+                $customer_data['district_id'] = $request->pa_district_id;
+                $customer_data['upazila_id'] = $request->pa_upazila_id;
+                $customer_data['number'] = $request->pa_phone;
+                $customer_data['profession'] = $profession->name;
+
+                $hirepurchase_customer = HirePurchase::with('customer')->find($h_id);
+                if ($hirepurchase_customer && $hirepurchase_customer->customer) {
+                    $hirepurchase_customer->customer->update($customer_data);
+                }
             }
-        }
 
-        // 2. Update Guarantors (keep your existing logic)
-        if ($request->gaurenter_ids) {
-            foreach ($request->gaurenter_ids as $key => $id) {
-                $guarantor = GuaranterInfo::find($id);
-                if ($guarantor) {
-                    $guarantor_info = [
-                        'guarater_name' => $request->guarater_name[$key],
-                        'guarater_relation' => $request->guarater_relation[$key],
-                        'guarater_relation_name' => $request->guarater_relation_name[$key],
-                        'guarater_address_present' => $request->guarater_address_present[$key],
-                        'guarater_nid' => $request->guarater_nid[$key],
-                        'guarater_phone' => $request->guarater_phone[$key],
-                    ];
+            // 2. Update Guarantors (keep your existing logic)
+            if ($request->gaurenter_ids) {
+                foreach ($request->gaurenter_ids as $key => $id) {
+                    $guarantor = GuaranterInfo::find($id);
+                    if ($guarantor) {
+                        $guarantor_info = [
+                            'guarater_name' => $request->guarater_name[$key],
+                            'guarater_relation' => $request->guarater_relation[$key],
+                            'guarater_relation_name' => $request->guarater_relation_name[$key],
+                            'guarater_address_present' => $request->guarater_address_present[$key],
+                            'guarater_nid' => $request->guarater_nid[$key],
+                            'guarater_phone' => $request->guarater_phone[$key],
+                        ];
 
-                    if ($request->hasFile('guarantor_file') && isset($request->file('guarantor_file')[$key])) {
-                        $image = $request->file('guarantor_file')[$key];
-                        $imageName = time() . $key . '.' . $image->getClientOriginalExtension();
-                        $image->move(public_path('guarantor_nid_image'), $imageName);
-                        $guarantor_info['guarater_nid_image'] = 'guarantor_nid_image/' . $imageName;
+                        if ($request->hasFile('guarantor_file') && isset($request->file('guarantor_file')[$key])) {
+                            $image = $request->file('guarantor_file')[$key];
+                            $imageName = time() . $key . '.' . $image->getClientOriginalExtension();
+                            $image->move(public_path('guarantor_nid_image'), $imageName);
+                            $guarantor_info['guarater_nid_image'] = 'guarantor_nid_image/' . $imageName;
+                        }
+                        $guarantor->update($guarantor_info);
                     }
-                    $guarantor->update($guarantor_info);
                 }
             }
-        }
 
-        // 3. Update Family & NID Image (keep your existing logic)
-        $members = [];
-        if ($request->mem_name) {
-            foreach ($request->mem_name as $key => $name) {
-                $members[] = [
-                    'name' => $name,
-                    'relation' => $request->mem_relation[$key] ?? '',
-                    'age' => $request->mem_age[$key] ?? '',
-                ];
-            }
-        }
-
-        $imagePath = "";
-        if ($request->hasFile('file')) {
-            $image = $request->file('file');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('nid_image'), $imageName);
-            $imagePath = 'nid_image/' . $imageName;
-        }
-
-        // 4. OFFICE USE ONLY: Update hire_purchases table
-        $hirepurchaseInstance = HirePurchase::findOrFail($h_id);
-
-        // Exclude ONLY non-office fields (keep sale_type, hire_price, etc.)
-        $officeData = $request->except([
-            'gaurenter_ids',
-            'guarater_name',
-            'guarater_relation',
-            'guarater_relation_name',
-            'guarater_address_present',
-            'guarater_nid',
-            'guarater_phone',
-            'mem_name',
-            'mem_relation',
-            'mem_age',
-            'file',
-            'guarantor_file',
-            'package_products' // handled separately
-        ]);
-
-        $officeData['name_age_family_member'] = json_encode($members);
-
-        $officeData['sale_type'] = $request->sale_type;
-        $officeData['package_id'] = ($request->sale_type === 'package') ? ($request->package_id ?? null) : null;
-        $officeData['delivery_showroom_id'] = $request->delivery_showroom_id;
-        $officeData['cash_price'] = $request->cash_price;
-        $officeData['hire_price'] = $request->hire_price;
-        $officeData['down_payment'] = $request->down_payment;
-        $officeData['monthly_installment'] = $request->monthly_installment;
-        $officeData['installment_month'] = $request->installment_month;
-
-        if ($imagePath) {
-            $officeData['nid_image'] = $imagePath;
-        }
-
-        $hirepurchaseInstance->update($officeData);
-
-        // 1. Get original values BEFORE update
-        $oldValues = $hirepurchaseInstance->getOriginal();
-
-        // 2. Get new values from request
-        $newValues = array_intersect_key(
-            $officeData,
-            array_flip(['sale_type', 'package_id', 'delivery_showroom_id', 'cash_price', 'hire_price', 'down_payment', 'monthly_installment', 'installment_month', 'product_size_id', 'serial_no', 'down_payment_parcentage'])
-        );
-
-        // 3. Find changed fields
-        $changedFields = [];
-        foreach ($newValues as $key => $value) {
-            if (!isset($oldValues[$key]) || $oldValues[$key] != $value) {
-                $changedFields[$key] = [
-                    'old' => $oldValues[$key] ?? null,
-                    'new' => $value
-                ];
-            }
-        }
-
-        // 4. Save audit log IF any change detected
-        if (!empty($changedFields)) {
-            DB::table('hire_purchase_audits')->insert([
-                'hire_purchase_id' => $h_id,
-                'updated_by'       => Auth::user()->id,
-                'old_values'       => json_encode($oldValues),
-                'new_values'       => json_encode($newValues),
-                'changed_fields'   => json_encode($changedFields),
-                'created_at'       => now(),
-                'updated_at'       => now()
-            ]);
-        }
-
-        // 5.OFFICE USE ONLY: Update hire_purchase_products table
-        HirePurchaseProduct::where('hire_purchase_id', $h_id)->delete();
-
-        if ($request->sale_type === 'single') {
-            $productData = $request->only([
-                'product_group_id',
-                'product_category_id',
-                'product_brand_id',
-                'product_model_id',
-                'product_size_id',
-                'serial_no',
-                'cash_price',
-                'hire_price',
-                'down_payment',
-                'installment_month',
-                'monthly_installment'
-            ]);
-            $productData['hire_purchase_id'] = $h_id;
-            $productData['total_paid'] = $request->down_payment;
-            HirePurchaseProduct::create($productData);
-        } else {
-            foreach ($request->package_products ?? [] as $item) {
-                $product = Product::find($item['product_id']);
-                if ($product) {
-                    HirePurchaseProduct::create([
-                        'hire_purchase_id' => $h_id,
-                        'product_group_id' => $product->type_id,
-                        'product_category_id' => $product->category_id,
-                        'product_brand_id' => $product->brand_id,
-                        'product_model_id' => $product->id,
-                        'product_size_id' => $item['product_size_id'] ?? null,
-                        'serial_no' => $item['serial_no'],
-                        'cash_price' => $product->hire_price,
-                        'hire_price' => 0,
-                        'down_payment' => 0,
-                        'monthly_installment' => 0,
-                        'installment_month' => $request->installment_month,
-                        'total_paid' => 0,
-                    ]);
+            // 3. Update Family & NID Image (keep your existing logic)
+            $members = [];
+            if ($request->mem_name) {
+                foreach ($request->mem_name as $key => $name) {
+                    $members[] = [
+                        'name' => $name,
+                        'relation' => $request->mem_relation[$key] ?? '',
+                        'age' => $request->mem_age[$key] ?? '',
+                    ];
                 }
             }
-        }
-        // ============== 5. Installment Smart Update ==============
-        $old = $hirepurchaseInstance->getOriginal();
-        $hirePriceChanged         = $request->hire_price != $old['hire_price'];
-        $downPaymentChanged       = $request->down_payment != $old['down_payment'];
-        // $downPaymentPercentageChanged = $request->down_payment_parcentage != $old['down_payment_parcentage'];
-        $monthlyInstallmentChanged = $request->monthly_installment != $old['monthly_installment'];
-        $installmentMonthChanged   = $request->installment_month != $old['installment_month'];
 
-        if ($hirePriceChanged || $downPaymentChanged || $monthlyInstallmentChanged || $installmentMonthChanged) {
+            $imagePath = "";
+            if ($request->hasFile('file')) {
+                $image = $request->file('file');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('nid_image'), $imageName);
+                $imagePath = 'nid_image/' . $imageName;
+            }
 
-            // Case: if installment month changed then recreate all installments
-            if ($installmentMonthChanged) {
-                Installment::where('hire_purchase_id', $h_id)->delete();
+            // 4. OFFICE USE ONLY: Update hire_purchases table
+            $hirepurchaseInstance = HirePurchase::findOrFail($h_id);
 
-                Installment::create([
+            // Exclude ONLY non-office fields (keep sale_type, hire_price, etc.)
+            $officeData = $request->except([
+                'gaurenter_ids',
+                'guarater_name',
+                'guarater_relation',
+                'guarater_relation_name',
+                'guarater_address_present',
+                'guarater_nid',
+                'guarater_phone',
+                'mem_name',
+                'mem_relation',
+                'mem_age',
+                'file',
+                'guarantor_file',
+                'package_products' // handled separately
+            ]);
+
+            $officeData['name_age_family_member'] = json_encode($members);
+
+            $officeData['sale_type'] = $request->sale_type;
+            $officeData['package_id'] = ($request->sale_type === 'package') ? ($request->package_id ?? null) : null;
+            $officeData['delivery_showroom_id'] = $request->delivery_showroom_id;
+            $officeData['cash_price'] = $request->cash_price;
+            $officeData['hire_price'] = $request->hire_price;
+            $officeData['down_payment'] = $request->down_payment;
+            $officeData['monthly_installment'] = $request->monthly_installment;
+            $officeData['installment_month'] = $request->installment_month;
+
+            if ($imagePath) {
+                $officeData['nid_image'] = $imagePath;
+            }
+
+            $original = $hirepurchaseInstance->getOriginal();
+
+            // 1. Get original values BEFORE update
+            $oldValues = $hirepurchaseInstance->getOriginal();
+
+            $hirepurchaseInstance->update($officeData);
+
+
+            // 2. Get new values from request
+            $newValues = array_intersect_key(
+                $officeData,
+                array_flip(['sale_type', 'package_id', 'delivery_showroom_id', 'cash_price', 'hire_price', 'down_payment', 'monthly_installment', 'installment_month', 'product_size_id', 'serial_no', 'down_payment_parcentage'])
+            );
+
+            // 3. Find changed fields
+            $changedFields = [];
+            foreach ($newValues as $key => $value) {
+                if (!isset($oldValues[$key]) || $oldValues[$key] != $value) {
+                    $changedFields[$key] = [
+                        'old' => $oldValues[$key] ?? null,
+                        'new' => $value
+                    ];
+                }
+            }
+
+            // 4. Save audit log IF any change detected
+            if (!empty($changedFields)) {
+                DB::table('hire_purchase_audits')->insert([
                     'hire_purchase_id' => $h_id,
-                    'amount'           => $request->down_payment,
-                    'loan_start_date'  => now(),
-                    'loan_end_date'    => now(),
-                    'status'           => 1,
+                    'updated_by'       => Auth::user()->id,
+                    'old_values'       => json_encode($oldValues),
+                    'new_values'       => json_encode($newValues),
+                    'changed_fields'   => json_encode($changedFields),
+                    'created_at'       => now(),
+                    'updated_at'       => now()
                 ]);
-
-                for ($i = 1; $i < $request->installment_month; $i++) {
-                    Installment::create([
-                        'hire_purchase_id' => $h_id,
-                        'amount'           => $request->monthly_installment,
-                        'loan_start_date'  => now()->addMonthsNoOverflow($i),
-                        'loan_end_date'    => now()->addMonthsNoOverflow($i + 1),
-                        'status'           => 0,
-                    ]);
-                }
-            }
-            // Case: if any other relevant field changed, then update amounts only
-            else {
-                $firstInstallment = Installment::where('hire_purchase_id', $h_id)
-                    ->orderBy('loan_start_date')
-                    ->first();
-
-                if ($firstInstallment) {
-                    $firstInstallment->amount = $request->down_payment;
-                    $firstInstallment->save();
-                }
-
-                Installment::where('hire_purchase_id', $h_id)
-                    ->where('id', '!=', $firstInstallment?->id)
-                    ->update(['amount' => $request->monthly_installment]);
             }
 
-            // Down Payment Transaction update
-            $transaction = Transaction::where('hire_purchase_id', $h_id)
-                ->where('transaction_type', 'Down Payment')
-                ->first();
-
-            if ($transaction) {
-                $transaction->amount = $request->down_payment;
-                $transaction->save();
-            }
-        }
-
-        $needsIncentiveRecalculation = false;
-        $recalculationFields = [
-            'down_payment',
-            'down_payment_parcentage',
-            'hire_price',
-            'sale_type',
-            'package_id',
-        ];
-
-        foreach ($recalculationFields as $field) {
-            if ($request->has($field) && $request->filled($field)) {
-                $oldValue = $hirepurchaseInstance->getOriginal($field);
-                if ($request->input($field) != $oldValue) {
-                    $needsIncentiveRecalculation = true;
-                    break;
-                }
-            }
-        }
-
-        // Single product এ প্রোডাক্ট চেঞ্জ হয়েছে কিনা
-        if ($request->sale_type === 'single') {
-            $oldProduct = HirePurchaseProduct::where('hire_purchase_id', $h_id)->first();
-            if (
-                $request->product_model_id != ($oldProduct?->product_model_id) ||
-                $request->product_category_id != ($oldProduct?->product_category_id)
-            ) {
-                $needsIncentiveRecalculation = true;
-            }
-        }
-
-        // Package চেঞ্জ বা প্রোডাক্ট লিস্ট চেঞ্জ
-        if ($request->sale_type === 'package') {
-            if ($request->package_id != $hirepurchaseInstance->getOriginal('package_id')) {
-                $needsIncentiveRecalculation = true;
-            }
-        }
-
-        // শুধু প্রয়োজন হলে Incentive রিজেনারেট করো
-        if ($needsIncentiveRecalculation) {
-
-            // 1. পুরোনো সব incentive ডিলিট করো (pending বা approved না হলে)
-            Incentive::where('hire_purchase_id', $h_id)
-                ->whereIn('status', ['pending']) // approved গুলো রাখো যদি থাকে
-                ->delete();
-
-            $showroom_user = $hirepurchaseInstance->showroom_user_id; // ধরে নিচ্ছি এটা সেভ আছে
-
-            // ========== Down Payment Incentive ==========
-            if ($request->down_payment > 0) {
-                $down_payment_threshold = GeneralIncentiveConfig::getDownPaymentThreshold();
-                $down_payment_incentive_rate = GeneralIncentiveConfig::getDownPaymentIncentiveRate();
-
-                $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
-
-                if ($down_payment_percentage >= $down_payment_threshold) {
-                    $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;
-
-                    Incentive::create([
-                        'hire_purchase_id' => $h_id,
-                        'showroom_user_id' => $showroom_user,
-                        'type' => 'down_payment',
-                        'amount' => $request->down_payment,
-                        'incentive_rate' => $down_payment_incentive_rate,
-                        'incentive_amount' => $down_payment_incentive_amount,
-                        'status' => 'pending'
-                    ]);
-                }
-            }
-
-            // ========== Sure Shot Incentives (Model / Category) ==========
-            $processedIncentives = [];
+            // 5.OFFICE USE ONLY: Update hire_purchase_products table
+            HirePurchaseProduct::where('hire_purchase_id', $h_id)->delete();
 
             if ($request->sale_type === 'single') {
-                $productsForIncentive = [
-                    [
-                        'product_id' => $request->product_model_id,
-                        'category_id' => $request->product_category_id,
-                    ]
-                ];
+                $productData = $request->only([
+                    'product_group_id',
+                    'product_category_id',
+                    'product_brand_id',
+                    'product_model_id',
+                    'product_size_id',
+                    'serial_no',
+                    'cash_price',
+                    'hire_price',
+                    'down_payment',
+                    'installment_month',
+                    'monthly_installment'
+                ]);
+                $productData['hire_purchase_id'] = $h_id;
+                $productData['total_paid'] = $request->down_payment;
+                HirePurchaseProduct::create($productData);
             } else {
-                // Package এর ক্ষেত্রে নতুন করে ক্রিয়েট করা hire_purchase_products থেকে নাও
-                $productsForIncentive = HirePurchaseProduct::where('hire_purchase_id', $h_id)
-                    ->select('product_model_id AS product_id', 'product_category_id AS category_id')
-                    ->get()
-                    ->toArray();
-            }
-
-            foreach ($productsForIncentive as $item) {
-                $productId = $item['product_id'];
-                $categoryId = $item['category_id'];
-
-                $modelKey = 'model_' . $productId;
-                $categoryKey = 'category_' . $categoryId;
-
-                // Model-wise incentive
-                $modelIncentive = IncentiveConfiguration::where('type', 'model')
-                    ->where('reference_id', $productId)
-                    ->where('is_active', true)
-                    ->first();
-
-                if ($modelIncentive && !in_array($modelKey, $processedIncentives)) {
-                    Incentive::create([
-                        'hire_purchase_id' => $h_id,
-                        'showroom_user_id' => $showroom_user,
-                        'type' => 'sure_shot',
-                        'sure_shot_type' => 'model',
-                        'amount' => 0,
-                        'incentive_rate' => 0,
-                        'product_model_id' => $productId,
-                        'product_model_name' => $modelIncentive->name,
-                        'incentive_amount' => $modelIncentive->incentive_amount,
-                        'status' => 'pending'
-                    ]);
-                    $processedIncentives[] = $modelKey;
-                    continue; // Model পেলে category স্কিপ
-                }
-
-                // Category-wise incentive
-                $categoryIncentive = IncentiveConfiguration::where('type', 'category')
-                    ->where('reference_id', $categoryId)
-                    ->where('is_active', true)
-                    ->first();
-
-                if ($categoryIncentive && !in_array($categoryKey, $processedIncentives)) {
-                    Incentive::create([
-                        'hire_purchase_id' => $h_id,
-                        'showroom_user_id' => $showroom_user,
-                        'type' => 'sure_shot',
-                        'sure_shot_type' => 'category',
-                        'category_id' => $categoryId,
-                        'amount' => 0,
-                        'incentive_rate' => 0,
-                        'product_category_name' => $categoryIncentive->name,
-                        'incentive_amount' => $categoryIncentive->incentive_amount,
-                        'status' => 'pending'
-                    ]);
-                    $processedIncentives[] = $categoryKey;
-                }
-            }
-        }
-
-        // ============== ERP Log Update (Always update existing entry on any change) ==============
-
-        $erpLog = ErpLog::where('tracking_number', $h_id)->first();
-
-        if ($erpLog) {
-
-            // সবসময় নতুন ডেটা দিয়ে আপডেট করো (যেকোনো ফিল্ড চেঞ্জ হোক বা না হোক)
-
-            $district = District::where('id', $request->pr_district_id)->first()?->en_name ?? '';
-            $customerProfession = CustomerProfession::where('id', $request->profession_id)->first()?->name ?? '';
-
-            $customerInfo = array_filter([
-                "name" => $request->name,
-                "mobile" => $request->pr_phone,
-                "email" => $request->email ?? '',
-                "address" => $request->shipping_address,
-                "city" => $district,
-                "date_of_birth" => json_decode($erpLog->cus_info)->date_of_birth,
-                "designation" => $request->designation,
-                "profession" => $customerProfession,
-                "org" => $request->organization_name,
-            ]);
-
-            // $delivery_showroom = ShowRoom::find($request->delivery_showroom_id);
-            // $sales_showroom = ShowRoom::find(auth()->user()->showroom_id);
-
-            $orderInfo = array_filter([
-                "eorder_no" => $erpLog->order_info ? json_decode($erpLog->order_info)->eorder_no : '',
-                "entry_date" => $erpLog->order_info ? json_decode($erpLog->order_info)->entry_date : now()->toDateString(),
-                "down_payment" => $request->down_payment,
-                'instalments_rate' => $request->monthly_installment,
-                "no_instalments" => (int)$request->installment_month - 1,
-                "sales_from" => $erpLog->order_info ? json_decode($erpLog->order_info)->sales_from : '',
-                "delivery_from" => $erpLog->order_info ? json_decode($erpLog->order_info)->delivery_from : '',
-                "delivery_fee" => 0,
-                "note" => $request->organization_short_desc ?? '',
-                'payment_ref' => "Cash"
-            ]);
-
-            $orderDetails = [];
-
-            if ($request->sale_type === 'package') {
                 foreach ($request->package_products ?? [] as $item) {
                     $product = Product::find($item['product_id']);
+                    if ($product) {
+                        HirePurchaseProduct::create([
+                            'hire_purchase_id' => $h_id,
+                            'product_group_id' => $product->type_id,
+                            'product_category_id' => $product->category_id,
+                            'product_brand_id' => $product->brand_id,
+                            'product_model_id' => $product->id,
+                            'product_size_id' => $item['product_size_id'] ?? null,
+                            'serial_no' => $item['serial_no'],
+                            'cash_price' => $product->hire_price,
+                            'hire_price' => 0,
+                            'down_payment' => 0,
+                            'monthly_installment' => 0,
+                            'installment_month' => $request->installment_month,
+                            'total_paid' => 0,
+                        ]);
+                    }
+                }
+            }
+            // ============== 5. Installment Smart Update ==============
+
+
+            $hirePriceChanged = (float)($request->hire_price ?? 0) !== (float)($original['hire_price'] ?? 0);
+            $downPaymentChanged = (float)($request->down_payment ?? 0) !== (float)($original['down_payment'] ?? 0);
+            $downPaymentPercentageChanged = (float)($request->down_payment_parcentage ?? 0) !== (float)($original['down_payment_parcentage'] ?? 0);
+            $monthlyInstallmentChanged = (float)($request->monthly_installment ?? 0) !== (float)($original['monthly_installment'] ?? 0);
+            $installmentMonthChanged = (int)($request->installment_month ?? 0) !== (int)($original['installment_month'] ?? 0);
+
+            if ($hirePriceChanged || $downPaymentChanged || $monthlyInstallmentChanged || $installmentMonthChanged || $downPaymentPercentageChanged) {
+
+                // Case: if installment month changed then recreate all installments
+                if ($installmentMonthChanged) {
+                    Installment::where('hire_purchase_id', $h_id)->delete();
+
+                    Installment::create([
+                        'hire_purchase_id' => $h_id,
+                        'amount'           => $request->down_payment,
+                        'loan_start_date'  => now(),
+                        'loan_end_date'    => now(),
+                        'status'           => 1,
+                    ]);
+
+                    for ($i = 1; $i <= ($request->installment_month - 1); $i++) {
+                        Installment::create([
+                            'hire_purchase_id' => $h_id,
+                            'amount'           => $request->monthly_installment,
+                            'loan_start_date'  => now()->addMonthsNoOverflow($i),
+                            'loan_end_date'    => now()->addMonthsNoOverflow($i + 1),
+                            'status'           => 0,
+                        ]);
+                    }
+                }
+                // Case: if any other relevant field changed, then update amounts only
+                else {
+                    $firstInstallment = Installment::where('hire_purchase_id', $h_id)
+                        ->orderBy('loan_start_date')
+                        ->first();
+
+                    if ($firstInstallment) {
+                        $firstInstallment->amount = $request->down_payment;
+                        $firstInstallment->save();
+                    }
+
+                    Installment::where('hire_purchase_id', $h_id)
+                        ->where('id', '!=', $firstInstallment?->id)
+                        ->update(['amount' => $request->monthly_installment]);
+                }
+
+                // Down Payment Transaction update
+                $transaction = Transaction::where('hire_purchase_id', $h_id)
+                    ->where('transaction_type', 'Down Payment')
+                    ->first();
+
+                if ($transaction) {
+                    $transaction->amount = $request->down_payment;
+                    $transaction->save();
+                }
+            }
+
+            $needsIncentiveRecalculation = false;
+            $recalculationFields = [
+                'down_payment',
+                'down_payment_parcentage',
+                'hire_price',
+                'sale_type',
+                'package_id',
+            ];
+
+            foreach ($recalculationFields as $field) {
+                if ($request->has($field) && $request->filled($field)) {
+                    $oldValue = $hirepurchaseInstance->getOriginal($field);
+                    if ($request->input($field) != $oldValue) {
+                        $needsIncentiveRecalculation = true;
+                        break;
+                    }
+                }
+            }
+
+            // Single product এ প্রোডাক্ট চেঞ্জ হয়েছে কিনা
+            if ($request->sale_type === 'single') {
+                $oldProduct = HirePurchaseProduct::where('hire_purchase_id', $h_id)->first();
+                if (
+                    $request->product_model_id != ($oldProduct?->product_model_id) ||
+                    $request->product_category_id != ($oldProduct?->product_category_id)
+                ) {
+                    $needsIncentiveRecalculation = true;
+                }
+            }
+
+            // Package চেঞ্জ বা প্রোডাক্ট লিস্ট চেঞ্জ
+            if ($request->sale_type === 'package') {
+                if ($request->package_id != $hirepurchaseInstance->getOriginal('package_id')) {
+                    $needsIncentiveRecalculation = true;
+                }
+            }
+
+            // শুধু প্রয়োজন হলে Incentive রিজেনারেট করো
+            if ($needsIncentiveRecalculation) {
+
+                // 1. পুরোনো সব incentive ডিলিট করো (pending বা approved না হলে)
+                Incentive::where('hire_purchase_id', $h_id)
+                    ->whereIn('status', ['pending']) // approved গুলো রাখো যদি থাকে
+                    ->delete();
+
+                $showroom_user = $hirepurchaseInstance->showroom_user_id; // ধরে নিচ্ছি এটা সেভ আছে
+
+                // ========== Down Payment Incentive ==========
+                if ($request->down_payment > 0) {
+                    $down_payment_threshold = GeneralIncentiveConfig::getDownPaymentThreshold();
+                    $down_payment_incentive_rate = GeneralIncentiveConfig::getDownPaymentIncentiveRate();
+
+                    $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
+
+                    if ($down_payment_percentage >= $down_payment_threshold) {
+                        $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;
+
+                        Incentive::create([
+                            'hire_purchase_id' => $h_id,
+                            'showroom_user_id' => $showroom_user,
+                            'type' => 'down_payment',
+                            'amount' => $request->down_payment,
+                            'incentive_rate' => $down_payment_incentive_rate,
+                            'incentive_amount' => $down_payment_incentive_amount,
+                            'status' => 'pending'
+                        ]);
+                    }
+                }
+
+                // ========== Sure Shot Incentives (Model / Category) ==========
+                $processedIncentives = [];
+
+                if ($request->sale_type === 'single') {
+                    $productsForIncentive = [
+                        [
+                            'product_id' => $request->product_model_id,
+                            'category_id' => $request->product_category_id,
+                        ]
+                    ];
+                } else {
+                    // Package এর ক্ষেত্রে নতুন করে ক্রিয়েট করা hire_purchase_products থেকে নাও
+                    $productsForIncentive = HirePurchaseProduct::where('hire_purchase_id', $h_id)
+                        ->select('product_model_id AS product_id', 'product_category_id AS category_id')
+                        ->get()
+                        ->toArray();
+                }
+
+                foreach ($productsForIncentive as $item) {
+                    $productId = $item['product_id'];
+                    $categoryId = $item['category_id'];
+
+                    $modelKey = 'model_' . $productId;
+                    $categoryKey = 'category_' . $categoryId;
+
+                    // Model-wise incentive
+                    $modelIncentive = IncentiveConfiguration::where('type', 'model')
+                        ->where('reference_id', $productId)
+                        ->where('is_active', true)
+                        ->first();
+
+                    if ($modelIncentive && !in_array($modelKey, $processedIncentives)) {
+                        Incentive::create([
+                            'hire_purchase_id' => $h_id,
+                            'showroom_user_id' => $showroom_user,
+                            'type' => 'sure_shot',
+                            'sure_shot_type' => 'model',
+                            'amount' => 0,
+                            'incentive_rate' => 0,
+                            'product_model_id' => $productId,
+                            'product_model_name' => $modelIncentive->name,
+                            'incentive_amount' => $modelIncentive->incentive_amount,
+                            'status' => 'pending'
+                        ]);
+                        $processedIncentives[] = $modelKey;
+                        continue; // Model পেলে category স্কিপ
+                    }
+
+                    // Category-wise incentive
+                    $categoryIncentive = IncentiveConfiguration::where('type', 'category')
+                        ->where('reference_id', $categoryId)
+                        ->where('is_active', true)
+                        ->first();
+
+                    if ($categoryIncentive && !in_array($categoryKey, $processedIncentives)) {
+                        Incentive::create([
+                            'hire_purchase_id' => $h_id,
+                            'showroom_user_id' => $showroom_user,
+                            'type' => 'sure_shot',
+                            'sure_shot_type' => 'category',
+                            'category_id' => $categoryId,
+                            'amount' => 0,
+                            'incentive_rate' => 0,
+                            'product_category_name' => $categoryIncentive->name,
+                            'incentive_amount' => $categoryIncentive->incentive_amount,
+                            'status' => 'pending'
+                        ]);
+                        $processedIncentives[] = $categoryKey;
+                    }
+                }
+            }
+
+
+            // ============== ERP Log Update (Always update existing entry on any change) ==============
+
+            $erpLog = ErpLog::where('tracking_number', $h_id)->first();
+
+            if ($erpLog) {
+
+                // সবসময় নতুন ডেটা দিয়ে আপডেট করো (যেকোনো ফিল্ড চেঞ্জ হোক বা না হোক)
+
+                $district = District::where('id', $request->pr_district_id)->first()?->en_name ?? '';
+                $customerProfession = CustomerProfession::where('id', $request->profession_id)->first()?->name ?? '';
+
+                $customerInfo = array_filter([
+                    "name" => $request->name,
+                    "mobile" => $request->pr_phone,
+                    "email" => $request->email ?? '',
+                    "address" => $request->shipping_address,
+                    "city" => $district,
+                    "date_of_birth" => json_decode($erpLog->cus_info)->date_of_birth,
+                    "designation" => $request->designation,
+                    "profession" => $customerProfession,
+                    "org" => $request->organization_name,
+                ]);
+
+                // $delivery_showroom = ShowRoom::find($request->delivery_showroom_id);
+                // $sales_showroom = ShowRoom::find(auth()->user()->showroom_id);
+
+                $orderInfo = array_filter([
+                    "eorder_no" => $erpLog->order_info ? json_decode($erpLog->order_info)->eorder_no : '',
+                    "entry_date" => $erpLog->order_info ? json_decode($erpLog->order_info)->entry_date : now()->toDateString(),
+                    "down_payment" => $request->down_payment,
+                    'instalments_rate' => $request->monthly_installment,
+                    "no_instalments" => (int)$request->installment_month - 1,
+                    "sales_from" => $erpLog->order_info ? json_decode($erpLog->order_info)->sales_from : '',
+                    "delivery_from" => $erpLog->order_info ? json_decode($erpLog->order_info)->delivery_from : '',
+                    "delivery_fee" => 0,
+                    "note" => $request->organization_short_desc ?? '',
+                    'payment_ref' => "Cash"
+                ]);
+
+                $orderDetails = [];
+
+                if ($request->sale_type === 'package') {
+                    foreach ($request->package_products ?? [] as $item) {
+                        $product = Product::find($item['product_id']);
+                        if ($product) {
+                            $orderDetails[] = [
+                                "item_model" => $product->product_model,
+                                "item_qty" => 1,
+                                "unit_rate" => $product->hire_price,
+                                "unit_wise_disc" => 0
+                            ];
+                        }
+                    }
+                } else {
+                    $product = Product::find($request->product_model_id);
                     if ($product) {
                         $orderDetails[] = [
                             "item_model" => $product->product_model,
                             "item_qty" => 1,
-                            "unit_rate" => $product->hire_price,
+                            "unit_rate" => $request->hire_price,
                             "unit_wise_disc" => 0
                         ];
                     }
                 }
-            } else {
-                $product = Product::find($request->product_model_id);
-                if ($product) {
-                    $orderDetails[] = [
-                        "item_model" => $product->product_model,
-                        "item_qty" => 1,
-                        "unit_rate" => $request->hire_price,
-                        "unit_wise_disc" => 0
-                    ];
+
+                $erpLog->update([
+                    'cus_info'      => json_encode($customerInfo),
+                    'order_details' => json_encode($orderDetails),
+                    'order_info'    => json_encode($orderInfo),
+                    'update_flag'   => 1,
+                    'sent'          => 0,        // ← এটা যোগ করো!
+                    'updated_at'    => now(),
+                ]);
+
+                // এখন API-তে update পাঠাও
+                $requestData = [
+                    "update_flag" => 1,
+                    "cancel_flag" => 0,
+                    "cus_info"     => json_decode($erpLog->cus_info, true),
+                    "order_info"   => json_decode($erpLog->order_info, true),
+                    "order_details" => json_decode($erpLog->order_details, true)
+                ];
+
+                $response = $ApiService->SendToErp($requestData);
+
+                Log::info('ERP Update Response (After Approval)', [
+                    'hire_purchase_id' => $h_id,
+                    'response' => $response
+                ]);
+
+                // রেসপন্স অনুযায়ী sent আপডেট করো
+                if (isset($response['error']) && $response['error'] == 1) {
+                    $erpLog->sent = 0; // ফেল হলে আবার চেষ্টা করবে
+                } else {
+                    $erpLog->sent = 1; // সাকসেস হলে 1
                 }
+
+                $erpLog->response = json_encode($response);
+                $erpLog->save();
             }
 
-            $erpLog->update([
-                'cus_info'      => json_encode($customerInfo),
-                'order_details' => json_encode($orderDetails),
-                'order_info'    => json_encode($orderInfo),
-                'update_flag'   => 1,
-                'sent'          => 0,        // ← এটা যোগ করো!
-                'updated_at'    => now(),
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Hire Purchase Updated Successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Hire Purchase Update Failed', [
+                'hire_purchase_id' => $h_id,
+                'error'            => $e->getMessage(),
+                'trace'            => $e->getTraceAsString(),
+                'request'          => $request->except(['guarantor_file', 'file']), // sensitive file বাদ দিয়ে
             ]);
 
-            // এখন API-তে update পাঠাও
-            $requestData = [
-                "update_flag" => 1,
-                "cancel_flag" => 0,
-                "cus_info"     => json_decode($erpLog->cus_info, true),
-                "order_info"   => json_decode($erpLog->order_info, true),
-                "order_details" => json_decode($erpLog->order_details, true)
-            ];
-
-            // $response = $ApiService->SendToErp($requestData);
-
-            // Log::info('ERP Update Response (After Approval)', [
-            //     'hire_purchase_id' => $h_id,
-            //     'response' => $response
-            // ]);
-
-            // // রেসপন্স অনুযায়ী sent আপডেট করো
-            // if (isset($response['error']) && $response['error'] == 1) {
-            //     $erpLog->sent = 0; // ফেল হলে আবার চেষ্টা করবে
-            // } else {
-            //     $erpLog->sent = 1; // সাকসেস হলে 1
-            // }
-
-            // $erpLog->response = json_encode($response);
-            // $erpLog->save();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Update failed! ' . $e->getMessage());
         }
-
-        return redirect()->back()->with('success', 'Hire Purchase Updated Successfully!');
     }
     /**
      * Remove the specified resource from storage.

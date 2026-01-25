@@ -2,17 +2,18 @@
 
 namespace App\Exports;
 
-use App\Models\Enquery;
-use Maatwebsite\Excel\Concerns\FromCollection;
-
-
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
-use Illuminate\Support\Facades\DB;
-use App\Models\FollowUp;
 use App\Helpers\Helper;
+use App\Models\Enquery;
+
+
+use App\Models\FollowUp;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
 class ExportPending implements FromCollection, WithMapping, WithHeadings, WithEvents
 {
@@ -51,7 +52,7 @@ class ExportPending implements FromCollection, WithMapping, WithHeadings, WithEv
 
         return [
             $filter_data->event_code,
-            $filter_data->name,
+            Str::title($filter_data->name),
             $filter_data->number,
             @$filter_data->customer->gender,
             Helper::formatOrdinal(FollowUp::where('enquiry_id', $filter_data->id)->count()),
@@ -63,12 +64,12 @@ class ExportPending implements FromCollection, WithMapping, WithHeadings, WithEv
             date('d/m/Y H:i A', strtotime($filter_data->sales_date)),
             $aspect,
             $formattedString,
-            
+
             date('d/m/Y H:i A', strtotime($filter_data->created_at)),
             date('d/m/Y H:i A', strtotime($filter_data->next_follow_up_date)),
-            @$filter_data->assign_by->name,
-           
-            @$filter_data->users->name
+            Str::title(@$filter_data->assign_by->name),
+
+            Str::title(@$filter_data->users->name)
             // ... and so on for other related columns
         ];
     }
@@ -107,7 +108,7 @@ class ExportPending implements FromCollection, WithMapping, WithHeadings, WithEv
             "Created Date",
             "Next Follow Up Date",
             "Assign To",
-          
+
             "Created By"
         ];
     }

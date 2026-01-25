@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Helpers\Helper;
+use Illuminate\Support\Str;
 use App\Service\LateFeeService;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -81,7 +82,7 @@ class DueOnNextMonthExport implements FromCollection, WithHeadings, WithMapping,
         return [
             $slNo,
             $purchase->order_no ?? 'N/A',
-            $purchase->name ?? 'N/A',
+            Str::title($purchase->name ?? 'N/A'),
             $purchase->pr_phone ?? 'N/A',
             @$purchase->purchase_products->pluck('product_group.name')->implode(', ') ?? 'N/A',
             @$purchase->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',

@@ -100,7 +100,7 @@
                                                     <div class="col-md-7 pe-0">
                                                         <div class="holder">
                                                             <div class="input-holder">
-                                                                <input name="nid" id="nid"
+                                                                <input name="nid" id="nid" required
                                                                     class="input rounded-r-0 @error('nid') is-invalid @enderror"
                                                                     type="number" value="{{ old('nid') }}"
                                                                     placeholder="Enter at least 10 digit National ID Number" />
@@ -745,7 +745,7 @@
                                                         <div class="col-md-7 pe-0">
                                                             <div class="holder">
                                                                 <div class="input-holder">
-                                                                    <input name="guarater_nid[]" id="nid"
+                                                                    <input name="guarater_nid[]" id="nid" required
                                                                         class="input rounded-r-0" type="number"
                                                                         placeholder="Enter at least 10 digit National ID Number" />
                                                                     <div class="placeholder">
@@ -854,7 +854,7 @@
                                                         <div class="col-md-7 pe-0">
                                                             <div class="holder">
                                                                 <div class="input-holder">
-                                                                    <input name="guarater_nid[]" id="nid"
+                                                                    <input name="guarater_nid[]" id="nid" required
                                                                         class="input rounded-r-0" type="number"
                                                                         placeholder="Enter at least 10 digit National ID Number" />
                                                                     <div class="placeholder">
@@ -960,169 +960,6 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="card card-default card-md mb-4 purchase_app">
-                            <div class="card-body py-md-30">
-                                <div class="form-group">
-                                    <fieldset class="">
-                                        <legend>Office Use Only:</legend>
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <select required name="delivery_showroom_id" id="delivery_showroom_id"
-                                                    class="form-control">
-                                                    <option value="">Select Show Room</option>
-                                                    @foreach ($showrooms as $key => $item)
-                                                        <option @if (Auth::user()->showroom_id == $item->id) selected @endif
-                                                            value="{{ $item->id }}">{{ $item->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <div class="col-md-3">
-                                                <select required name="product_group_id" onchange="GetCategory()"
-                                                    id="group" class="form-control">
-                                                    <option value="">Product Group</option>
-                                                    @foreach ($product_type as $key => $type)
-                                                        <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                                    @endforeach
-
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3 mb-25">
-                                                <div class="">
-                                                    <div class="">
-                                                        <select required name="product_category_id" id="Select-Model"
-                                                            class="form-control category">
-                                                        </select>
-                                                        <span style="color: red" id="category-require"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <select required onchange="GetProduct()" name="product_brand_id"
-                                                    id="prod_brand" class="form-control">
-                                                    <option value="">Product Brand</option>
-                                                    @foreach ($brands as $key => $brand)
-                                                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <select required onchange="GetPrice()" name="product_model_id"
-                                                    id="Select-color" class="form-control">
-                                                    <option value="">Product Model:</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3">
-
-                                                <input type="text" name="product_size_id" id="product_size"
-                                                    class="form-control" placeholder="Product Size">
-
-                                            </div>
-
-                                            <div class="col-md-3 mb-25">
-                                                <div class="holder">
-                                                    <div class="input-holder">
-                                                        <input required name="serial_no" id="serial_no" class="input"
-                                                            type="text" placeholder=" " />
-                                                        <div class="placeholder">
-                                                            <p class="m-0">Serial No:<span class="text-danger">*</span>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3 mb-25">
-                                                <div class="holder">
-                                                    <div class="input-holder">
-                                                        <input required name="cash_price" id="cash_price" class="input"
-                                                            readonly type="number" placeholder=" " />
-                                                        <div class="placeholder">
-                                                            <p class="m-0">Cash Price:<span
-                                                                    class="text-danger">*</span></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-3 mb-25">
-                                                <div class="holder">
-                                                    <div class="input-holder">
-                                                        <select required onchange="calculate()"
-                                                            name="down_payment_parcentage" id="down_payment_parcentage"
-                                                            class="form-control">
-                                                            @foreach ($down_payment_parcentage as $key => $item)
-                                                                <option
-                                                                    @if ($item->payment_percentage == 40) @selected(true) @endif
-                                                                    value="{{ $item->payment_percentage }}">
-                                                                    {{ $item->payment_percentage }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-3 mb-25">
-                                                <div class="holder">
-                                                    <div class="input-holder">
-                                                        @foreach ($interestrate as $key => $interest_hid)
-                                                            <input type="hidden"
-                                                                id="interest_rate_{{ $interest_hid->month }}"
-                                                                value="{{ $interest_hid->interest_rate }}">
-                                                        @endforeach
-                                                        <select required onchange="calculate()" name="installment_month"
-                                                            id="installment_month" class="form-control">
-                                                            <option value="">Installment Month</option>
-                                                            @foreach ($interestrate as $key => $interest)
-                                                                <option value="{{ $interest->month }}">
-                                                                    {{ $interest->month }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3 mb-25">
-                                                <div class="holder">
-                                                    <div class="input-holder">
-                                                        <input required name="hire_price" id="hire_price" class="input"
-                                                            readonly type="text" placeholder=" " />
-                                                        <div class="placeholder">
-                                                            <p class="m-0">Hire Price:<span
-                                                                    class="text-danger">*</span></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3 mb-25">
-                                                <div class="holder">
-                                                    <div class="input-holder">
-                                                        <input readonly required name="down_payment" id="down_payment"
-                                                            class="input" type="text" placeholder=" " />
-                                                        <div class="placeholder">
-                                                            <p class="m-0">Down Payment:<span
-                                                                    class="text-danger">*</span></p>
-                                                        </div>
-                                                        <span id="alert_downpayment" class="text-danger"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3 mb-25">
-                                                <div class="holder">
-                                                    <div class="input-holder">
-                                                        <input readonly required name="monthly_installment"
-                                                            id="monthly_inst" class="input" type="text"
-                                                            placeholder=" " />
-                                                        <div class="placeholder">
-                                                            <p class="m-0">Monthly Inst. Tk:<span
-                                                                    class="text-danger">*</span></p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                </div>
-                            </div>
-                        </div> --}}
 
                         <div class="card card-default card-md mb-4 purchase_app">
                             <div class="card-body py-md-30">

@@ -289,7 +289,7 @@ class ExternalReportController extends Controller
         $to_date = $request->to_date ? date('Y-m-d 23:59:59', strtotime($request->to_date)) : null;
 
         $query = HirePurchase::selectEntities()
-            ->whereIn('status', [2, 4]); // 2 means Rejected, 4 means Sale Cancel
+            ->whereIn('status', [2, 4, 5]); // 2 means Rejected, 4 means Sale Cancel
 
         $product_group_ids = explode(',', $request->product_group);
         $showrooms = explode(',', $request->showroom_ctp);

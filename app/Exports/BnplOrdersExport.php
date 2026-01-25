@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use Carbon\Carbon;
 use App\Helpers\Helper;
 use App\Models\Installment;
 use App\Service\LateFeeService;
@@ -65,6 +66,7 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
             "Sales Representative",
             "Created By",
             "Status",
+            "Current Status",
             "Guarantor 1 Name",
             "Guarantor 1 Relation",
             "Guarantor 1 Phone",
@@ -214,6 +216,26 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
             $otherIncome      = $salesReturn ? number_format($salesReturn->other_income ?? 0, 2) : '0.00';
             $returnReason     = $salesReturn ? ($salesReturn->reason_text ?? ucfirst($salesReturn->reason)) : 'N/A';
 
+            $status = 'Regular';
+
+            if ($purchase->installment && $purchase->installment->isNotEmpty()) {
+                $hasUnpaid = $purchase->installment->contains('status', 0);
+
+                if (!$hasUnpaid) {
+                    $status = 'Paid';
+                } else {
+                    $lastUnpaidDate = $purchase->installment
+                        ->where('status', 0)
+                        ->max('loan_start_date');
+
+                    if ($lastUnpaidDate) {
+                        $lastDue = Carbon::parse($lastUnpaidDate);
+                        if ($lastDue->lt(now()->subDays(30))) {
+                            $status = 'Defaulter';
+                        }
+                    }
+                }
+            }
             return [
                 $slNo,
                 @$purchase->show_room->name ?? 'N/A',
@@ -250,6 +272,7 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                 @$purchase->show_room_user->name ?? 'N/A',
                 @$purchase->users->name ?? 'N/A',
                 $status_text,
+                $status,
                 $guarantor1_name,
                 $guarantor1_relation,
                 $guarantor1_phone,
