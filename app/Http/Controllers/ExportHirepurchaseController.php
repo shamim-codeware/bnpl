@@ -83,39 +83,50 @@ class ExportHirepurchaseController extends Controller
         //     $query->whereBetween('created_at', [$from_date, $to_date]);
         // }
 
-        if ($request->over_dues) {
-            $query->whereHas('installment', function ($q) {
-                $q->where('loan_end_date', '<', now())
-                    ->where('status', 0);
-            });
-        } elseif ($request->from_date && $request->to_date) {
-            $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
-            $to_date   = date('Y-m-d 23:59:59', strtotime($request->to_date));
-            $query->whereBetween('created_at', [$from_date, $to_date]);
-        }
+        // if ($request->over_dues) {
+        //     $query->whereHas('installment', function ($q) {
+        //         $q->where('loan_end_date', '<', now())
+        //             ->where('status', 0);
+        //     });
+        // } elseif ($request->from_date && $request->to_date) {
+        //     $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
+        //     $to_date   = date('Y-m-d 23:59:59', strtotime($request->to_date));
+        //     $query->whereBetween('created_at', [$from_date, $to_date]);
+        // }
 
-        if ($request->zone_id) {
-            $zone_id = $request->zone_id;
-            // Zone
-            $query->whereHas('show_room', function ($q) use ($zone_id) {
-                $q->where('zone_id', $zone_id);
-            });
-        }
-        if ($request->showroom_id) {
-            $query->where('showroom_id', $request->showroom_id);
-        }
+        if ($request->order_no) {
+            $query->where('order_no', $request->order_no);
+        } else {
 
-        if ($request->store_type) {
-            $stor_type = $request->store_type;
-            $query->whereHas('show_room', function ($q) use ($stor_type) {
-                $q->where('dealar',  $stor_type);
-            });
-        }
+            if ($request->from_date && $request->to_date) {
+                $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));
+                $to_date   = date('Y-m-d 23:59:59', strtotime($request->to_date));
+                $query->whereBetween('created_at', [$from_date, $to_date]);
+            }
 
-        if ($request->over_dues) {
-            $query->whereHas('installment', function ($q) {
-                $q->where('loan_end_date', '<', now())->where('status', 0);
-            });
+            if ($request->zone_id) {
+                $zone_id = $request->zone_id;
+                // Zone
+                $query->whereHas('show_room', function ($q) use ($zone_id) {
+                    $q->where('zone_id', $zone_id);
+                });
+            }
+            if ($request->showroom_id) {
+                $query->where('showroom_id', $request->showroom_id);
+            }
+
+            if ($request->store_type) {
+                $stor_type = $request->store_type;
+                $query->whereHas('show_room', function ($q) use ($stor_type) {
+                    $q->where('dealar',  $stor_type);
+                });
+            }
+
+            if ($request->over_dues) {
+                $query->whereHas('installment', function ($q) {
+                    $q->where('loan_end_date', '<', now())->where('status', 0);
+                });
+            }
         }
 
         if (Auth::user()->role_id == 2) {

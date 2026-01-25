@@ -58,14 +58,22 @@
                         $status = 'Regular';
 
                         if ($hire->installment && $hire->installment->isNotEmpty()) {
-                            $lastUnpaid = $hire->installment->where('status', 0)->max('loan_start_date');
+                            $hasUnpaid = $hire->installment->contains('status', 0);
 
-                            if ($lastUnpaid) {
-                                $lastDue = \Carbon\Carbon::parse($lastUnpaid);
-                                if ($lastDue->lt(now()->subDays(30))) {
-                                    $status = 'Defaulter';
+                            if (!$hasUnpaid) {
+                                $status = 'Paid';
+                            } else {
+                                $lastUnpaidDate = $hire->installment->where('status', 0)->max('loan_start_date');
+
+                                if ($lastUnpaidDate) {
+                                    $lastDue = \Carbon\Carbon::parse($lastUnpaidDate);
+                                    if ($lastDue->lt(now()->subDays(30))) {
+                                        $status = 'Defaulter';
+                                    }
                                 }
                             }
+                        } else {
+                            $status = 'Regular';
                         }
                     @endphp
                     @php
@@ -138,8 +146,13 @@
                         </td>
                         <td>
                             <div
-                                class="userDatatable-content {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}">
-                                {{ $status }}</div>
+                                class="userDatatable-content
+        {{ $status === 'Paid' ? 'text-success fw-bold' : '' }}
+        {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}
+        {{ $status === 'Regular' ? 'text-warning fw-medium' : '' }}">
+
+                                {{ $status }}
+                            </div>
                         </td>
 
                         <td>

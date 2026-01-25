@@ -109,14 +109,22 @@
                     $status = 'Regular';
 
                     if ($purchase->installment && $purchase->installment->isNotEmpty()) {
-                        $lastUnpaid = $purchase->installment->where('status', 0)->max('loan_start_date');
+                        $hasUnpaid = $purchase->installment->contains('status', 0);
 
-                        if ($lastUnpaid) {
-                            $lastDue = \Carbon\Carbon::parse($lastUnpaid);
-                            if ($lastDue->lt(now()->subDays(30))) {
-                                $status = 'Defaulter';
+                        if (!$hasUnpaid) {
+                            $status = 'Paid';
+                        } else {
+                            $lastUnpaidDate = $purchase->installment->where('status', 0)->max('loan_start_date');
+
+                            if ($lastUnpaidDate) {
+                                $lastDue = \Carbon\Carbon::parse($lastUnpaidDate);
+                                if ($lastDue->lt(now()->subDays(30))) {
+                                    $status = 'Defaulter';
+                                }
                             }
                         }
+                    } else {
+                        $status = 'Regular';
                     }
                 @endphp
                 <tr>
@@ -169,8 +177,14 @@
                         <div class="userDatatable-content">{{ number_format($outstanding_balance, 2) }}</div>
                     </td>
                     <td>
-                        <div class="userDatatable-content {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}">
-                            {{ $status }}</div>
+                        <div
+                            class="userDatatable-content
+        {{ $status === 'Paid' ? 'text-success fw-bold' : '' }}
+        {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}
+        {{ $status === 'Regular' ? 'text-warning fw-medium' : '' }}">
+
+                            {{ $status }}
+                        </div>
                     </td>
                     <td>
                         <div class="userDatatable-content">{{ @$purchase->pr_phone }}</div>

@@ -80,12 +80,23 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
 
         $status = 'Regular';
 
-        $lastUnpaidDue = $filter_data->installment
-            ? $filter_data->installment->where('status', 0)->max('loan_start_date')
-            : null;
+        if ($filter_data->installment && $filter_data->installment->isNotEmpty()) {
+            $hasUnpaid = $filter_data->installment->contains('status', 0);
 
-        if ($lastUnpaidDue && Carbon::parse($lastUnpaidDue)->lt(now()->subDays(30))) {
-            $status = 'Defaulter';
+            if (!$hasUnpaid) {
+                $status = 'Paid';
+            } else {
+                $lastUnpaidDate = $filter_data->installment
+                    ->where('status', 0)
+                    ->max('loan_start_date');
+
+                if ($lastUnpaidDate) {
+                    $lastDue = Carbon::parse($lastUnpaidDate);
+                    if ($lastDue->lt(now()->subDays(30))) {
+                        $status = 'Defaulter';
+                    }
+                }
+            }
         }
 
 
@@ -107,7 +118,7 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             ($late_fee) ?? 0.00,
             ($paid_fine_amount),
             // $outstanding_balance,
-            ($outstanding_balance),
+            (max(0, $outstanding_balance) ?? 0.00),
             @$filter_data->installment->count(),
             @$filter_data->installment->where('status', 1)->count(),
             @$filter_data->installment->where('status', 0)->count(),
