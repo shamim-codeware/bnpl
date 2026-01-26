@@ -170,8 +170,12 @@ class PaymentCollectionController extends Controller
 
                 $response =    $ApiService->CollectionApi($hirepurchase->order_no, $installment_number, $paymentRef);
 
+                logger([
+                    'response' => $response,
+                ]);
 
-                if ($response->error == 1) {
+
+                if ($response['error'] == 1) {
                     $sent = 0;
                 } else {
                     $sent = 1;
@@ -268,7 +272,7 @@ class PaymentCollectionController extends Controller
                 }
             }
 
-            if ($response->error == 1) {
+            if ($response['error'] == 1) {
                 // $erp_log->sent = 0;
                 // echo $response['error'];
             } else {
