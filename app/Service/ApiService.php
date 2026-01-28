@@ -68,17 +68,39 @@ class ApiService
         $orderDetails = [];
 
         if ($data['sale_type'] === 'package') {
-            foreach ($data['package_products'] ?? [] as $item) {
-                $product = Product::find($item['product_id']);
-                if ($product) {
-                    $orderDetails[] = [
-                        "item_model" => $product->product_model,
-                        "item_qty" => 1,
-                        "unit_rate" => $product->hire_price, // base price per item
-                        "unit_wise_disc" => 0
-                    ];
+            // foreach ($data['package_products'] ?? [] as $item) {
+            //     $product = Product::find($item['product_id']);
+            //     if ($product) {
+            //         $orderDetails[] = [
+            //             "item_model" => $product->product_model,
+            //             "item_qty" => 1,
+            //             "unit_rate" => $product->hire_price, // base price per item
+            //             "unit_wise_disc" => 0
+            //         ];
+            //     }
+            // }
+
+            $packageProducts = $data['package_products'] ?? [];
+            $totalItemsInPackage = count($packageProducts);
+
+            if ($totalItemsInPackage > 0) {
+                $totalPackagePrice = $data['hire_price'];
+
+                $perItemPrice = $totalPackagePrice / $totalItemsInPackage;
+
+                foreach ($packageProducts as $item) {
+                    $product = Product::find($item['product_id']);
+                    if ($product) {
+                        $orderDetails[] = [
+                            "item_model"     => $product->product_model,
+                            "item_qty"       => 1,
+                            "unit_rate"      => $perItemPrice,
+                            "unit_wise_disc" => 0
+                        ];
+                    }
                 }
             }
+
         } else {
             // Single product
             $product = Product::find($data['product_model_id']);
@@ -86,7 +108,7 @@ class ApiService
                 $orderDetails[] = [
                     "item_model" => $product->product_model,
                     "item_qty" => 1,
-                    "unit_rate" => $data['hire_price'], // includes interest — your choice
+                    "unit_rate" => $data['hire_price'],
                     "unit_wise_disc" => 0
                 ];
             }

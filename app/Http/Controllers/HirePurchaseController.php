@@ -2043,16 +2043,36 @@ class HirePurchaseController extends Controller
 
             $orderDetails = [];
 
+            // if ($request->sale_type === 'package') {
+            //     foreach ($request->package_products ?? [] as $item) {
+            //         $product = Product::find($item['product_id']);
+            //         if ($product) {
+            //             $orderDetails[] = [
+            //                 "item_model" => $product->product_model,
+            //                 "item_qty" => 1,
+            //                 "unit_rate" => $product->hire_price,
+            //                 "unit_wise_disc" => 0
+            //             ];
+            //         }
+            //     }
             if ($request->sale_type === 'package') {
-                foreach ($request->package_products ?? [] as $item) {
-                    $product = Product::find($item['product_id']);
-                    if ($product) {
-                        $orderDetails[] = [
-                            "item_model" => $product->product_model,
-                            "item_qty" => 1,
-                            "unit_rate" => $product->hire_price,
-                            "unit_wise_disc" => 0
-                        ];
+                $packageProducts = $request->package_products ?? [];
+                $totalItemsInPackage = count($packageProducts);
+
+                if ($totalItemsInPackage > 0) {
+                    $totalPackagePrice = $request->hire_price;
+                    $perItemPrice = $totalPackagePrice / $totalItemsInPackage;
+
+                    foreach ($packageProducts as $item) {
+                        $product = Product::find($item['product_id']);
+                        if ($product) {
+                            $orderDetails[] = [
+                                "item_model"     => $product->product_model,
+                                "item_qty"       => 1,
+                                "unit_rate"      => $perItemPrice,
+                                "unit_wise_disc" => 0
+                            ];
+                        }
                     }
                 }
             } else {
@@ -2512,18 +2532,40 @@ class HirePurchaseController extends Controller
 
                 $orderDetails = [];
 
+                // if ($request->sale_type === 'package') {
+                //     foreach ($request->package_products ?? [] as $item) {
+                //         $product = Product::find($item['product_id']);
+                //         if ($product) {
+                //             $orderDetails[] = [
+                //                 "item_model" => $product->product_model,
+                //                 "item_qty" => 1,
+                //                 "unit_rate" => $product->hire_price,
+                //                 "unit_wise_disc" => 0
+                //             ];
+                //         }
+                //     }
+
                 if ($request->sale_type === 'package') {
-                    foreach ($request->package_products ?? [] as $item) {
-                        $product = Product::find($item['product_id']);
-                        if ($product) {
-                            $orderDetails[] = [
-                                "item_model" => $product->product_model,
-                                "item_qty" => 1,
-                                "unit_rate" => $product->hire_price,
-                                "unit_wise_disc" => 0
-                            ];
+                    $packageProducts = $request->package_products ?? [];
+                    $totalItemsInPackage = count($packageProducts);
+
+                    if ($totalItemsInPackage > 0) {
+                        $totalPackagePrice = $request->hire_price;
+                        $perItemPrice = $totalPackagePrice / $totalItemsInPackage;
+
+                        foreach ($packageProducts as $item) {
+                            $product = Product::find($item['product_id']);
+                            if ($product) {
+                                $orderDetails[] = [
+                                    "item_model"     => $product->product_model,
+                                    "item_qty"       => 1,
+                                    "unit_rate"      => $perItemPrice,
+                                    "unit_wise_disc" => 0
+                                ];
+                            }
                         }
                     }
+
                 } else {
                     $product = Product::find($request->product_model_id);
                     if ($product) {
@@ -2561,7 +2603,7 @@ class HirePurchaseController extends Controller
                     'response' => $response
                 ]);
 
-                // রেসপন্স অনুযায়ী sent আপডেট করো
+               // রেসপন্স অনুযায়ী sent আপডেট করো
                 if (isset($response['error']) && $response['error'] == 1) {
                     $erpLog->sent = 0; // ফেল হলে আবার চেষ্টা করবে
                 } else {
