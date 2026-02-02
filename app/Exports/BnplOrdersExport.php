@@ -5,6 +5,7 @@ namespace App\Exports;
 use Carbon\Carbon;
 use App\Helpers\Helper;
 use App\Models\Installment;
+use Illuminate\Support\Str;
 use App\Service\LateFeeService;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -267,18 +268,18 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                 $otherIncome,
                 $returnReason,
 
-                $purchase->name ?? 'N/A',
+                Str::title($purchase->name ?? 'N/A'),
                 $purchase->pr_phone ?? 'N/A',
-                @$purchase->show_room_user->name ?? 'N/A',
-                @$purchase->users->name ?? 'N/A',
+                Str::title($purchase->show_room_user->name ?? 'N/A'),
+                Str::title($purchase->users->name ?? 'N/A'),
                 $status_text,
                 $status,
-                $guarantor1_name,
-                $guarantor1_relation,
+                Str::title($guarantor1_name ?? 'N/A'),
+                Str::title($guarantor1_relation),
                 $guarantor1_phone,
                 $guarantor1_nid,
-                $guarantor2_name,
-                $guarantor2_relation,
+                Str::title($guarantor2_name),
+                Str::title($guarantor2_relation),
                 $guarantor2_phone,
                 $guarantor2_nid
             ];
