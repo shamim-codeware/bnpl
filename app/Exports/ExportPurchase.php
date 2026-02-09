@@ -2,13 +2,14 @@
 
 namespace App\Exports;
 
-use DB;
 use Carbon\Carbon;
+use App\Helpers\Helper;
 use App\Models\Installment;
 
 use Illuminate\Support\Str;
 use App\Models\HirePurchase;
 use App\Service\LateFeeService;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -70,7 +71,15 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
         $late_fee = $lateFeeService->calculateLateFine($filter_data->id);
 
         // Final outstanding balance
-        $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
+        $outstanding_balanceWithoutLateFee = Helper::normalizeZero(
+            max(0, $hire_price - $installment_paid ?? 0.00)
+        );
+
+        $outstanding_balance = Helper::normalizeZero(
+            max(0, $outstanding_balanceWithoutLateFee + ($late_fee ?? 0.00))
+        );
+
+
 
         $next_installment_date = Installment::where('hire_purchase_id', $filter_data->id)->where('status', 0)->orderby('id', "ASC")->first();
 
@@ -99,42 +108,72 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
             }
         }
 
+        $downPaymentPercent = '0.00%';
+        if ($hire_price > 0) {
+            $percent = round(($filter_data->down_payment / $hire_price) * 100, 0);  // nearest whole number
+            $downPaymentPercent = $percent . ' %';
+        }
+
+        $totalPaymentReceivedWithoutFine = Installment::where('hire_purchase_id', $filter_data->id)
+            ->where('status', 1)
+            ->sum('amount');
+
+        $totalPaymentReceived = Installment::query()
+            ->where('hire_purchase_id', $filter_data->id)
+            ->where('status', 1)
+            ->sum(DB::raw('COALESCE(amount, 0) + COALESCE(fine_amount, 0)'));
+
+        $outstandingWithLateFee = 0.00;
+
+        if ($filter_data->hire_price > 0) {
+            $calculated = (float)$filter_data->hire_price
+                - $totalPaymentReceivedWithoutFine
+                + (float)($filter_data->late_fee ?? 0);
+
+            $outstandingWithLateFee = max(0, round($calculated, 2));
+        }
+
 
         return [
             @$filter_data->show_room->name,
+            @$filter_data->show_room->zone->name,
             $filter_data->order_no,
             // $firstLoanStartDate,
             // $lastLoanEndDate,
             $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : '',
             $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y') : '',
-            @$filter_data->purchase_products->pluck('brand.name')->implode(', ') ?? 'N/A',
             @$filter_data->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
+            @$filter_data->purchase_products->pluck('brand.name')->implode(', ') ?? 'N/A',
             @$filter_data->purchase_products->pluck('product_size_id')->implode(', ') ?? 'N/A',
+            $downPaymentPercent,
             @$filter_data->hire_price ? (float) ($filter_data->hire_price) : '0.00',
             @$filter_data->down_payment,
             @$filter_data->monthly_installment,
-            @$filter_data->total_paid,
-            // @$late_fee ?? 0.00,
-            ($late_fee) ?? 0.00,
-            ($paid_fine_amount),
-            // $outstanding_balance,
-            (max(0, $outstanding_balance) ?? 0.00),
+            @$totalPaymentReceivedWithoutFine,
+
+            Helper::formatNumber((float)($late_fee ?? 0) + $paid_fine_amount),
+            Helper::formatNumber($paid_fine_amount),
+            Helper::formatNumber($late_fee ?? 0),
+            Helper::formatNumber($totalPaymentReceived),
+            Helper::formatNumber(@$filter_data->hire_price ? (float)($filter_data->hire_price) + (float)($late_fee ?? 0) + $paid_fine_amount : '0.00'),
+            // $outstandingBalanceFormatted, // Conditional: 0.00 if rejected/cancelled
+            Helper::formatNumber($outstanding_balanceWithoutLateFee),
+            Helper::formatNumber($outstanding_balance),
             @$filter_data->installment->count(),
             @$filter_data->installment->where('status', 1)->count(),
-            @$filter_data->installment->where('status', 0)->count(),
+            Helper::formatNumber(@$filter_data->installment->where('status', 0)->count()),
             $last_paid_amount,
             // $last_payment,
             // @$next_installment_date->loan_start_date,
             $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : '',
 
-            @$next_installment_date?->loan_start_date
-                ? \Carbon\Carbon::parse($next_installment_date->loan_start_date)->format('d F Y')
-                : '',
-            Str::title($filter_data->name),
-            $filter_data->pr_phone,
+            // @$next_installment_date?->loan_start_date
+            //     ? \Carbon\Carbon::parse($next_installment_date->loan_start_date)->format('d F Y')
+            //     : '',
+            // Str::title($filter_data->name),
+            // $filter_data->pr_phone,
             Str::title(@$filter_data->show_room_user->name),
             Str::title(@$filter_data->users->name),
-            @$filter_data->show_room->zone->name,
             $status,
         ];
     }
@@ -146,30 +185,36 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
 
         return [
             "CTP",
+            "Zone",
             "BNPL Order No ",
             "Loan Start Date",
             "Loan End Date",
-            "Brand",
             "Model",
+            "Brand",
             "Size",
+            "Down Payment %",
             "Total Hire Price",
             "First Installment",
             "Monthly Installment",
-            "Total Payment Received",
+            "Payment Received",
+
             "Late Payment Fee",
-            "Total Paid Late Payment Fee",
+            "Late Payment Received",
+            "Late Payment Outstanding",
+            "Total Payment Received",
+            "Total Hire Price Including Late Payment Fee",
             "Outstanding Balance",
+            "Outstanding Balance Including Late Payment Fee",
             "Total Installment",
             "Paid Installment",
             "Due Installment",
             "Last Transaction Amount",
             "Last Transaction Date",
-            "Next Due Date",
-            "Customer Name ",
-            "Phone Number",
+            // "Next Due Date",
+            // "Customer Name ",
+            // "Phone Number",
             "Sales Representative",
             "Created By	",
-            "Zone",
             "Status",
         ];
     }

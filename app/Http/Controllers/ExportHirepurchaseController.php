@@ -23,7 +23,7 @@ class ExportHirepurchaseController extends Controller
         Artisan::call('config:clear');
         Artisan::call('route:clear');
 
-        $query = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'show_room', 'show_room_user', 'users'])->where('status', 3)->where('is_paid', 1);
+        $query = HirePurchase::with(['purchase_products', 'purchase_products.product_category', 'purchase_products.brand', 'purchase_products.product', 'installment', 'show_room', 'show_room_user', 'users'])->where('status', 3)->where('is_paid', 1);
         if ($request->from_date && $request->to_date) {
             // Date query
             $from_date = date('Y-m-d 00:00:00', strtotime($request->from_date));

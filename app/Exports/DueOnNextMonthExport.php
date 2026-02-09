@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Helpers\Helper;
 use Illuminate\Support\Str;
 use App\Service\LateFeeService;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -29,20 +30,22 @@ class DueOnNextMonthExport implements FromCollection, WithHeadings, WithMapping,
     {
         return [
             "SL No",
+            "CTP",
+            "Zone",
             "Order No",
             "Customer Name",
             "Phone Number",
-            "Group",
             "Model",
-            "Total Amount",
-            "Next Payment Due Date",
+            "Brand",
+            "Total Hire Price",
             "Monthly Installment",
-            "Last Payment Date",
+            "Total Payment Received",
+            // "Next Payment Due Date",
+            // "Last Payment Date",
             "Late Payment Fee",
-            "Last Paid Amount",
-            "Outstanding Amount",
-            "CTP",
-            "Zone"
+            "Total Monthly Installment",
+            // "Last Paid Amount",
+            "Total Outstanding Balance",
         ];
     }
 
@@ -75,27 +78,33 @@ class DueOnNextMonthExport implements FromCollection, WithHeadings, WithMapping,
 
         $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
 
+        $totalPaymentReceived = \App\Models\Installment::query()
+            ->where('hire_purchase_id', $purchase->id)
+            ->where('status', 1)
+            ->sum(DB::raw('amount + COALESCE(fine_amount, 0)'));
 
         static $slNo = 0;
         $slNo++;
 
         return [
             $slNo,
+            @$purchase->show_room->name ?? 'N/A',
+            @$purchase->show_room->zone->name ?? 'N/A',
             $purchase->order_no ?? 'N/A',
             Str::title($purchase->name ?? 'N/A'),
             $purchase->pr_phone ?? 'N/A',
-            @$purchase->purchase_products->pluck('product_group.name')->implode(', ') ?? 'N/A',
             @$purchase->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
+            @$purchase->purchase_products->pluck('brand.name')->implode(', ') ?? 'N/A',
             @$purchase->hire_price ? (float)($purchase->hire_price) : '0.00',
             // $nextDueInstallment ? Helper::formatDateStandard($nextDueInstallment->loan_start_date) : 'N/A',
-            $nextDueInstallment ? \Carbon\Carbon::parse($nextDueInstallment->loan_start_date)->format('d F Y') : 'N/A',
             @$purchase->monthly_installment ? (float) $purchase->monthly_installment : '0.00',
-            $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A',
-            (float) $purchase->late_fee ?? 0.00,
-            (float) $last_paid_amount,
+            $totalPaymentReceived,
+            // $nextDueInstallment ? \Carbon\Carbon::parse($nextDueInstallment->loan_start_date)->format('d F Y') : 'N/A',
+            // $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A',
+            (float)($purchase->late_fee ?? 0),
+            (float) $purchase->monthly_installment + (float)($purchase->late_fee ?? 0),
+            // (float) $last_paid_amount,
             (float) $outstanding_balance,
-            @$purchase->show_room->name ?? 'N/A',
-            @$purchase->show_room->zone->name ?? 'N/A'
         ];
     }
 

@@ -7,6 +7,7 @@ use App\Helpers\Helper;
 use App\Models\Installment;
 use Illuminate\Support\Str;
 use App\Service\LateFeeService;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -44,13 +45,18 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
             "Brand",
             "Model",
             "Size",
+            "Down Payment %",
             "Total Hire Price",
             "First Installment",
             "Monthly Installment",
-            "Total Payment Received",
+            "Payment Received",
             "Late Payment Fee",
-            "Total Paid Late Payment Fee",
+            "Late Payment Received",
+            "Late Payment Outstanding",
+            "Total Payment Received",
+            "Total Hire Price Including Late Payment Fee",
             "Outstanding Balance",
+            "Outstanding Balance Including Late Payment Fee",
             "Total Installment",
             "Paid Installment",
             "Due Installment",
@@ -188,15 +194,25 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
             $firstInstallment = $isRejectedOrCancelled ? '0.00' : (@$purchase->down_payment ? ($purchase->down_payment) : '0.00');
 
             // $totalPaymentReceived = $isRejectedOrCancelled ? '0.00' : (@$purchase->purchase_product ? number_format($purchase->purchase_product->total_paid, 2) : '0.00');
-            $totalPaymentReceived = $isRejectedOrCancelled
-                ? '0.00'
-                : (
-                    $purchase->installment
-                    ->where('status', 1)
-                    ->sum(function ($installment) {
-                        return $installment->amount + $installment->fine_amount;
-                    })
-                );
+            // $totalPaymentReceived = $isRejectedOrCancelled
+            //     ? '0.00'
+            //     : (
+            //         $purchase->installment
+            //         ->where('status', 1)
+            //         ->sum(function ($installment) {
+            //             return $installment->amount + $installment->fine_amount;
+            //         })
+            //     );
+
+            // $totalPaymentReceivedWithoutFine = $isRejectedOrCancelled
+            //     ? '0.00'
+            //     : (
+            //         $purchase->installment
+            //         ->where('status', 1)
+            //         ->sum(function ($installment) {
+            //             return $installment->amount;
+            //         })
+            //     );
             // $outstandingBalanceFormatted = $isRejectedOrCancelled ? '0.00' :
             //     number_format($outstanding_balance, 2);
 
@@ -237,6 +253,49 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                     }
                 }
             }
+
+
+            // Down Payment % calculation
+            $downPaymentPercent = '0.00%';
+            if (!$isRejectedOrCancelled && $hire_price > 0) {
+                $percent = round(($purchase->down_payment / $hire_price) * 100, 0);  // nearest whole number
+                $downPaymentPercent = $percent . ' %';
+            }
+
+            // Installment paid (যদি relation load করা থাকে)
+            $installment_paid = $purchase->installment
+                ? $purchase->installment->where('status', 1)->sum('amount')
+                : 0;
+
+            // Total Payment Received Without Fine (DB query দিয়ে সেফ করা)
+            $totalPaymentReceivedWithoutFine = Installment::where('hire_purchase_id', $purchase->id)
+                ->where('status', 1)
+                ->sum('amount') ?? 0;
+
+            // Total Payment Received (fine সহ)
+            $totalPaymentReceived = Installment::query()
+                ->where('hire_purchase_id', $purchase->id)
+                ->where('status', 1)
+                ->sum(DB::raw('COALESCE(amount, 0) + COALESCE(fine_amount, 0)'));
+
+            // এখানে আগের মতো normalizeZero ব্যবহার করো
+            $outstanding_balanceWithoutLateFee = Helper::normalizeZero(
+                max(0, $hire_price - $totalPaymentReceivedWithoutFine ?? 0.00)
+            );
+
+            $outstanding_balance = Helper::normalizeZero(
+                max(0, $outstanding_balanceWithoutLateFee + ($late_fee ?? 0.00))
+            );
+
+            // Rejected/Cancelled case হ্যান্ডেল
+            if ($isRejectedOrCancelled) {
+                $outstanding_balanceWithoutLateFee = 0.00;
+                $outstanding_balance = 0.00;
+                $totalPaymentReceived = 0.00;
+                $totalPaymentReceivedWithoutFine = 0.00;
+            }
+
+
             return [
                 $slNo,
                 @$purchase->show_room->name ?? 'N/A',
@@ -247,14 +306,24 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                 @$purchase->purchase_products->pluck('brand.name')->implode(', ') ?? 'N/A',
                 @$purchase->purchase_products->pluck('product.product_model')->implode(', ') ?? 'N/A',
                 @$purchase->purchase_products->pluck('product_size_id')->implode(', ') ?? 'N/A',
+                $downPaymentPercent,
                 @$purchase->hire_price ? (float)($purchase->hire_price) : '0.00',
                 $firstInstallment, // Conditional: 0.00 if rejected/cancelled
                 @$purchase->monthly_installment ? (float)($purchase->monthly_installment) : '0.00',
-                $totalPaymentReceived, // Conditional: 0.00 if rejected/cancelled
+                $totalPaymentReceivedWithoutFine, // Conditional: 0.00 if rejected/cancelled
                 // @$purchase->late_fee ?? 0.00,
-                $isRejectedOrCancelled ? '0.00' : ($purchase->late_fee),
-                $isRejectedOrCancelled ? '0.00' : ($paid_fine_amount),
-                $outstandingBalanceFormatted, // Conditional: 0.00 if rejected/cancelled
+                $isRejectedOrCancelled ? '0.00' : Helper::formatNumber((float)($late_fee) + $paid_fine_amount),
+                $isRejectedOrCancelled ? '0.00' : Helper::formatNumber($paid_fine_amount),
+                $isRejectedOrCancelled ? '0.00' : Helper::formatNumber($late_fee),
+                Helper::formatNumber($totalPaymentReceived), // Conditional: 0.00 if rejected/cancelled
+                Helper::formatNumber(@$purchase->hire_price ? (float)($purchase->hire_price) + (float)($late_fee) + $paid_fine_amount : '0.00'),
+                // $outstandingBalanceFormatted, // Conditional: 0.00 if rejected/cancelled
+                // Helper::formatNumber(@$purchase->hire_price ? (float)($purchase->hire_price) - $totalPaymentReceivedWithoutFine : '0.00'),
+                // Helper::formatNumber($late_fee ? (float)($late_fee) + ((float)($purchase->hire_price) - $totalPaymentReceivedWithoutFine) : '0.00'),
+                Helper::formatNumber($outstanding_balanceWithoutLateFee),
+
+                // "Outstanding Balance Including Late Payment Fee"
+                Helper::formatNumber($outstanding_balance),
                 @$purchase->installment ? $purchase->installment->count() : '0',
                 $paidInstallment, // Conditional: 0 if rejected/cancelled
                 $dueInstallment, // Conditional: 0 if rejected/cancelled

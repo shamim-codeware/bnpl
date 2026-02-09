@@ -3,7 +3,9 @@
 namespace App\Exports;
 
 use App\Helpers\Helper;
+use App\Models\Installment;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -29,17 +31,24 @@ class DefaulterCustomersExport implements FromCollection, WithHeadings, WithMapp
     {
         return [
             'SL No',
+            'Showroom',
+            'Zone',
             'Order No',
             'Customer Name',
             'Phone',
-            'Total Amount',
-            'Late Payment Fee',
-            'Outstanding Balance',
+            "Down Payment %",
+            'Total Hire Price',
+            "Payment Received",
+            "Late Payment Fee",
+            "Late Payment Received",
+            "Late Payment Outstanding",
+            "Total Payment Received",
+            "Total Hire Price Including Late Payment Fee",
+            "Outstanding Balance",
+            "Outstanding Balance Including Late Payment Fee",
             'Last Payment Date',
             'Days Overdue',
             'Next Due Date',
-            'Showroom',
-            'Zone'
         ];
     }
 
@@ -74,7 +83,26 @@ class DefaulterCustomersExport implements FromCollection, WithHeadings, WithMapp
         $late_fee = $lateFeeService->calculateLateFine($customer->id);
 
         // Final outstanding balance
-        $outstanding_balance = ($hire_price - $installment_paid) + $late_fee;
+        $outstanding_balanceWithoutLateFee = Helper::normalizeZero(
+            max(0, $hire_price - $installment_paid ?? 0.00)
+        );
+
+        $outstanding_balance = Helper::normalizeZero(
+            max(0, $outstanding_balanceWithoutLateFee + ($late_fee ?? 0.00))
+        );
+
+        $paid_fine_amount = $customer->installment
+            ? $customer->installment->sum('fine_amount')
+            : 0.00;
+
+        $totalPaymentReceivedWithoutFine = Installment::where('hire_purchase_id', $customer->id)
+            ->where('status', 1)
+            ->sum('amount');
+
+        $totalPaymentReceived = Installment::query()
+            ->where('hire_purchase_id', $customer->id)
+            ->where('status', 1)
+            ->sum(DB::raw('COALESCE(amount, 0) + COALESCE(fine_amount, 0)'));
 
         $last_payment = null;
         if ($customer->transaction && count($customer->transaction) > 0) {
@@ -82,19 +110,35 @@ class DefaulterCustomersExport implements FromCollection, WithHeadings, WithMapp
             $last_payment = $last_transaction->created_at;
         }
 
+        $downPaymentPercent = '0.00%';
+        if ($hire_price > 0) {
+            $percent = round(($customer->down_payment / $hire_price) * 100, 0);  // nearest whole number
+            $downPaymentPercent = $percent . ' %';
+        }
+
         return [
             $this->rowNumber,
+            $customer->show_room ? $customer->show_room->name : 'N/A',
+            $customer->show_room && $customer->show_room->zone ? $customer->show_room->zone->name : 'N/A',
             $customer->order_no,
             Str::title($customer->name),
             $customer->pr_phone,
+            $downPaymentPercent,
             $customer->hire_price ? (float)($customer->hire_price) : '0.00',
-            (float)($customer->late_fee ?? 0.00),
-            (float)($outstanding_balance),
+            Helper::formatNumber($totalPaymentReceivedWithoutFine),
+            // (float)($customer->late_fee ?? 0.00),
+            // (float)($outstanding_balance),
+            Helper::formatNumber((float)($late_fee ?? 0) + $paid_fine_amount),
+            Helper::formatNumber($paid_fine_amount),
+            Helper::formatNumber($late_fee ?? 0),
+            Helper::formatNumber($totalPaymentReceived),
+            Helper::formatNumber(@$customer->hire_price ? (float)($customer->hire_price) + (float)($late_fee ?? 0) + $paid_fine_amount : '0.00'),
+            // $outstandingBalanceFormatted, // Conditional: 0.00 if rejected/cancelled
+            Helper::formatNumber($outstanding_balanceWithoutLateFee),
+            Helper::formatNumber($outstanding_balance),
             $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A',
             $customer->days_overdue ?? 0,
             $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A',
-            $customer->show_room ? $customer->show_room->name : 'N/A',
-            $customer->show_room && $customer->show_room->zone ? $customer->show_room->zone->name : 'N/A'
         ];
     }
 

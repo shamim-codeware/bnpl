@@ -115,6 +115,26 @@ class PaymentCollectionController extends Controller
     {
         // dd($request->all());
         date_default_timezone_set('Asia/Dhaka');
+
+        $isManager = Auth::user()->role_id == User::MANAGER;
+
+        if ($isManager) {
+            $alreadyPaidThisMonth = Transaction::where('hire_purchase_id', $request->hire_purchase_id)
+                ->where('created_by', Auth::id())
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->exists();
+
+            if ($alreadyPaidThisMonth) {
+                return redirect()->back()->with('error', 'You have already collected an installment for this order this month. As a Showroom Manager, you can only collect one installment per month for each order.');
+            }
+
+            $number_of_installment = (int) $request->number_of_instllment;
+            if ($number_of_installment > 1 || $number_of_installment === 0) {
+                return redirect()->back()->with('error', 'As a Showroom Manager, you can only collect one installment at a time. Please select exactly 1 installment to collect.');
+            }
+        }
+
         $data = $request->all();
         $data['fine_amount'] = (float) ($request->fine_amount ?? 0);
         $data['fine_remarks'] = $request->fine_remarks;

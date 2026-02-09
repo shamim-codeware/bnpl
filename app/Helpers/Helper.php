@@ -19,10 +19,22 @@ class Helper
             }
         }
 
+    public static function normalizeZero($value, $threshold = 0.09)
+    {
+        return ($value < $threshold) ? 0.00 : round($value, 2);
+    }
+
+    public static function formatNumber($value): string
+    {
+        if (empty($value) || $value == 0) {
+            return '0.00';
+        }
+
+        return number_format((float)$value, 2, '.', '');
+    }
 
 
-
-   public static function formatOrdinal($number) {
+    public static function formatOrdinal($number) {
         $lastDigit = $number % 10;
         $lastTwoDigits = $number % 100;
 
