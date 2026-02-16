@@ -1752,7 +1752,7 @@ class HirePurchaseController extends Controller
         if (!empty($changedFields)) {
             DB::table('hire_purchase_audits')->insert([
                 'hire_purchase_id' => $h_id,
-                'updated_by'       => Auth::user()->id,
+                'updated_by'       => auth()->id() ?? null,
                 'old_values'       => json_encode($oldValues),
                 'new_values'       => json_encode($newValues),
                 'changed_fields'   => json_encode($changedFields),
@@ -2096,7 +2096,8 @@ class HirePurchaseController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Hire Purchase Updated Successfully!');
+        // return redirect()->back()->with('success', 'Hire Purchase Updated Successfully!');
+        return redirect('guarantor/' . $h_id)->with('success', 'Success!');
     }
     public function HirepurchaseUpdateAfter(Request $request, HirePurchase $hirePurchase, ApiService $ApiService)
     {
@@ -2238,7 +2239,7 @@ class HirePurchaseController extends Controller
             if (!empty($changedFields)) {
                 DB::table('hire_purchase_audits')->insert([
                     'hire_purchase_id' => $h_id,
-                    'updated_by'       => Auth::user()->id,
+                    'updated_by'       => auth()->id() ?? null,
                     'old_values'       => json_encode($oldValues),
                     'new_values'       => json_encode($newValues),
                     'changed_fields'   => json_encode($changedFields),
