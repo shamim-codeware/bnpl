@@ -75,7 +75,7 @@
                                                 <div class="col-md-3 mb-25" id="number_children_show_{{ $key }}">
                                                     <div class="holder">
                                                         <div class="input-holder">
-                                                            <input name="number_of_children[]" id="children_num" value="{{ $gurantor->number_of_children }}" class="input" required type="number" placeholder="" />
+                                                            <input name="number_of_children[]" id="children_num" value="{{ $gurantor->number_of_children }}" class="input" type="number" placeholder="" />
                                                             <div class="placeholder">
                                                                 <p class="m-0">Number of children:<span class="text-danger">*</span></p>
                                                             </div>
