@@ -148,11 +148,16 @@
                         if (!$hasUnpaid) {
                             $status = 'Paid';
                         } else {
-                            $lastUnpaidDate = $purchase->installment->where('status', 0)->max('loan_start_date');
+                            $oldestDueUnpaidDate = $purchase->installment
+                                ->where('status', 0)
+                                ->filter(function ($installment) {
+                                    return \Carbon\Carbon::parse($installment->loan_start_date)->lt(now());
+                                })
+                                ->min('loan_start_date');
 
-                            if ($lastUnpaidDate) {
-                                $lastDue = \Carbon\Carbon::parse($lastUnpaidDate);
-                                if ($lastDue->lt(now()->subDays(30))) {
+                            if ($oldestDueUnpaidDate) {
+                                $oldestDue = \Carbon\Carbon::parse($oldestDueUnpaidDate);
+                                if ($oldestDue->lt(now()->subDays(30))) {
                                     $status = 'Defaulter';
                                 }
                             }
