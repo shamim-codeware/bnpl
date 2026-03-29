@@ -235,7 +235,9 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
             $status = 'Regular';
 
-            if ($purchase->installment && $purchase->installment->isNotEmpty()) {
+            if ($purchase->salesReturn) {
+                $status = 'Sale Return';
+            } elseif ($purchase->installment && $purchase->installment->isNotEmpty()) {
                 $hasUnpaid = $purchase->installment->contains('status', 0);
 
                 if (!$hasUnpaid) {

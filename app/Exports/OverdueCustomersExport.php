@@ -139,8 +139,6 @@ class OverdueCustomersExport implements FromCollection, WithHeadings, WithMappin
             $last_payment ? \Carbon\Carbon::parse($last_payment)->format('d F Y') : 'N/A',
             $customer->days_overdue ?? 0,
             $next_due_date ? \Carbon\Carbon::parse($next_due_date)->format('d F Y') : 'N/A',
-            $customer->show_room ? $customer->show_room->name : 'N/A',
-            $customer->show_room && $customer->show_room->zone ? $customer->show_room->zone->name : 'N/A'
         ];
     }
 

@@ -142,7 +142,9 @@
                 @php
                     $status = 'Regular';
 
-                    if ($purchase->installment && $purchase->installment->isNotEmpty()) {
+                    if ($purchase->salesReturn) {
+                        $status = 'Sale Return';
+                    } elseif ($purchase->installment && $purchase->installment->isNotEmpty()) {
                         $hasUnpaid = $purchase->installment->contains('status', 0);
 
                         if (!$hasUnpaid) {
@@ -260,7 +262,8 @@
                             class="badge
         {{ $status === 'Paid' ? 'bg-success text-white' : '' }}
         {{ $status === 'Defaulter' ? 'bg-danger text-white' : '' }}
-        {{ $status === 'Regular' ? 'bg-warning text-dark' : '' }}">
+        {{ $status === 'Regular' ? 'bg-warning text-dark' : '' }}
+        {{ $status === 'Sale Return' ? 'bg-secondary text-white' : '' }}">
 
                             {{ $status }}
                         </span>
