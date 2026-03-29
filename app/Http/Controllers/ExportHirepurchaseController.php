@@ -143,15 +143,6 @@ class ExportHirepurchaseController extends Controller
             });
         }
 
-
-        logger([
-            'request' => $request->all(),
-            'query' => $query->toSql(),
-            'bindings' => $query->getBindings(),
-            'total' => $query->count(),
-            'total' => $query->get()->toArray(),
-        ]);
-
         $hirepurchase = $query->latest()->get();
 
         $filename = 'All-bnpl-purchase-list-report-' . date('m-d-y-H-i-s') . '.xlsx';

@@ -129,6 +129,8 @@ class calculatePenalties extends Command
     public function handle()
     {
         try {
+            Log::channel('scheduler')->info('calculatePenalties started');
+
             $installments = Installment::whereHas('hire_purchase', function ($q) {
                 $q->where('is_paid', 0);
             })
@@ -188,8 +190,13 @@ class calculatePenalties extends Command
                     }
                 }
             }
+
+            Log::channel('scheduler')->info('calculatePenalties completed');
         } catch (\Exception $e) {
             logger($e->getMessage());
+            Log::channel('scheduler')->error('calculatePenalties failed', [
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

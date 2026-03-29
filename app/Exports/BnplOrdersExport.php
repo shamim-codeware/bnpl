@@ -20,10 +20,6 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
     public function __construct($data)
     {
-        logger([
-            'BnplOrdersExport' => $data->count(),
-            'user_id' => auth()->user()->id,
-        ]);
 
         $this->data = $data;
     }
