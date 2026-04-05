@@ -571,11 +571,10 @@ class ExternalReportController extends Controller
         $query->whereHas('installment', function ($q) {
             $q->where('status', 0)
                 ->whereRaw('loan_start_date = (
-              SELECT MIN(loan_start_date)
+              SELECT MAX(loan_start_date)
               FROM installments i2
               WHERE i2.hire_purchase_id = installments.hire_purchase_id
                 AND i2.status = 0
-                AND i2.loan_start_date < NOW()
           )')
                 ->whereRaw('loan_start_date < DATE_SUB(NOW(), INTERVAL 30 DAY)');
         });

@@ -239,16 +239,13 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                 if (!$hasUnpaid) {
                     $status = 'Paid';
                 } else {
-                    $oldestDueUnpaidDate = $purchase->installment
+                    $latestUnpaidDate = $purchase->installment
                         ->where('status', 0)
-                        ->filter(function ($installment) {
-                            return Carbon::parse($installment->loan_start_date)->lt(now());
-                        })
-                        ->min('loan_start_date');
+                        ->max('loan_start_date');
 
-                    if ($oldestDueUnpaidDate) {
-                        $oldestDue = Carbon::parse($oldestDueUnpaidDate);
-                        if ($oldestDue->lt(now()->subDays(30))) {
+                    if ($latestUnpaidDate) {
+                        $latestDue = Carbon::parse($latestUnpaidDate);
+                        if ($latestDue->lt(now()->subDays(30))) {
                             $status = 'Defaulter';
                         }
                     }

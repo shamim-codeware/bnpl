@@ -139,7 +139,7 @@
                         }
                     }
                 @endphp --}}
-                @php
+                {{-- @php
                     $status = 'Regular';
 
                     if ($purchase->salesReturn) {
@@ -155,7 +155,7 @@
                                 ->filter(function ($installment) {
                                     return \Carbon\Carbon::parse($installment->loan_start_date)->lt(now());
                                 })
-                                ->min('loan_start_date');
+                                ->max('loan_start_date');
 
                             if ($oldestDueUnpaidDate) {
                                 $oldestDue = \Carbon\Carbon::parse($oldestDueUnpaidDate);
@@ -166,6 +166,29 @@
                         }
                     } else {
                         $status = 'Regular';
+                    }
+                @endphp --}}
+
+                @php
+                    $status = 'Regular';
+
+                    if ($purchase->salesReturn) {
+                        $status = 'Sale Return';
+                    } elseif ($purchase->installment && $purchase->installment->isNotEmpty()) {
+                        $hasUnpaid = $purchase->installment->contains('status', 0);
+
+                        if (!$hasUnpaid) {
+                            $status = 'Paid';
+                        } else {
+                            $latestUnpaidDate = $purchase->installment->where('status', 0)->max('loan_start_date');
+
+                            if ($latestUnpaidDate) {
+                                $latestDue = \Carbon\Carbon::parse($latestUnpaidDate);
+                                if ($latestDue->lt(now()->subDays(30))) {
+                                    $status = 'Defaulter';
+                                }
+                            }
+                        }
                     }
                 @endphp
                 <tr>

@@ -851,15 +851,14 @@ class HirePurchaseController extends Controller
             }
 
             $personal_info['customer_id'] = $customer_id;
-            $last = HirePurchase::orderBy('id', 'DESC')->first();
-            if (empty($last)) {
-                $next_id = 1;
-            } else {
-                $next_id = $last->id + 1;
-            }
-            $event_code = 'BNPLR00' . $next_id;
-
-            $personal_info['order_no'] = $event_code;
+            // Lock and generate the next order_no to avoid race conditions and missing numbers
+            $lastOrderNo = HirePurchase::whereNotNull('order_no')
+                ->where('order_no', 'like', 'BNPLR%')
+                ->lockForUpdate()
+                ->orderByRaw('CAST(SUBSTRING(order_no, 6) AS UNSIGNED) DESC')
+                ->value('order_no');
+            $lastNumber = $lastOrderNo ? (int) preg_replace('/\D+/', '', $lastOrderNo) : 0;
+            $personal_info['order_no'] = 'BNPLR00' . ($lastNumber + 1);
 
             $data = [];
             for ($i = 0; $i < count($names); $i++) {
