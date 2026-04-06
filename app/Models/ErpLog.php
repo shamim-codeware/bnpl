@@ -10,7 +10,15 @@ class ErpLog extends Model
     use HasFactory;
     protected $table = "erp_logs";
     protected $fillable = [
-        'tracking_number', 'update_flag', 'cancel_flag', 'cus_info', 'order_info', 'order_details', 'response', 'sent', 'retry'
+        'tracking_number',
+        'update_flag',
+        'cancel_flag',
+        'cus_info',
+        'order_info',
+        'order_details',
+        'response',
+        'sent',
+        'retry',
     ];
 
 

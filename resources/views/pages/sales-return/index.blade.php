@@ -84,7 +84,7 @@
             <div class="col-lg-12">
                 <div class="card card-default card-md mb-4 grntr_card">
                     <div class="card-header">
-                        <h6>Sales Return</h6>
+                        <h6>Sales Return or Cancel</h6>
                     </div>
                     <div class="card-body py-md-30">
                         <div class="form-group">
@@ -122,6 +122,25 @@
 </div>
 
 <script>
+function toggleReturnCancelFields() {
+    var actionType = document.getElementById('action_type');
+    if (!actionType) return;
+    var isCancel = actionType.value === 'cancel';
+    var returnFields = document.getElementById('return_fields');
+    var returnRefFields = document.getElementById('return_ref_fields');
+    var cancelFields = document.getElementById('cancel_fields');
+    if (returnFields) returnFields.style.display = (isCancel || !actionType.value) ? 'none' : '';
+    if (returnRefFields) returnRefFields.style.display = (isCancel || !actionType.value) ? 'none' : '';
+    if (cancelFields) cancelFields.style.display = isCancel ? '' : 'none';
+
+    var returnReason = document.getElementById('return_reason');
+    var referenceNumber = document.getElementById('reference_number');
+    var cancelNarration = document.getElementById('cancel_narration');
+    if (returnReason) returnReason.required = (!isCancel && actionType.value === 'return');
+    if (referenceNumber) referenceNumber.required = (!isCancel && actionType.value === 'return');
+    if (cancelNarration) cancelNarration.required = isCancel;
+}
+
 function loadReturnDetails() {
     var order_no = $("#order_no").val();
     if (!order_no) {
@@ -148,10 +167,26 @@ function loadReturnDetails() {
             }
         }
         $("#data-assign").empty().html(data);
+        toggleReturnCancelFields();
     })
     .fail(function() {
         toastr.error('An error occurred while searching. Please try again.');
     });
 }
+
+$(document).on('change', '#action_type', function () {
+    toggleReturnCancelFields();
+});
 </script>
+@endsection
+
+@section('custom_js')
+    <script>
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                toastr.error(@json($error));
+            @endforeach
+        @endif
+
+    </script>
 @endsection

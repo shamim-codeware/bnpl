@@ -1,92 +1,3 @@
-{{-- <div class="col-md-5">
-    <form action="{{ route('sales.return.submit') }}" method="POST" class="parent-assign">
-        @csrf
-        <input type="hidden" name="hire_purchase_id" value="{{ $hirepurchase->id }}">
-        <fieldset class="">
-            <legend>Return Information</legend>
-            <div class="row">
-                <div class="col-md-12 mb-25">
-                    <label class="form-label">Return Reason <span class="text-danger">*</span></label>
-                    <select name="return_reason" class="form-control" required>
-                        <option value="">-- Select Reason --</option>
-                        <option value="cash_purchase_change">Changed to Cash Purchase</option>
-                        <option value="technical_issue">Technical Problem - Sales Return</option>
-                        <option value="upgrade_model">Product Upgrade & Model Change</option>
-                        <option value="defaulter_return">Defaulter Customer - Product Return</option>
-                        <option value="others">Others</option>
-                    </select>
-                </div>
-
-                <div class="col-md-12 mb-25">
-                    <button type="submit" class="btn btn-lg btn-danger customr-btn">Submit Sales Return</button>
-                </div>
-            </div>
-        </fieldset>
-    </form>
-</div>
-
-<div class="col-md-7">
-    <fieldset>
-        <legend>
-            {{ $hirepurchase->purchase_products->pluck('brand.name')->implode(', ') }}
-            {{ $hirepurchase->purchase_products->pluck('product.product_model')->implode(', ') }}
-        </legend>
-        <div class="row">
-            <div class="col-md-7 mb-15 text-end">
-                <span class="fw-medium">Product's Price:</span>
-            </div>
-            <div class="col-md-5 mb-15">
-                <span>{{ $hirepurchase->hire_price }} TK</span>
-            </div>
-
-            <div class="col-md-7 mb-15 text-end">
-                <span class="fw-medium">Down Payment Paid:</span>
-            </div>
-            <div class="col-md-5 mb-15">
-                <span>{{ $hirepurchase->down_payment }} TK</span>
-            </div>
-
-            <div class="col-md-7 mb-15 text-end">
-                <span class="fw-medium">Total Paid in Installments:</span>
-            </div>
-            <div class="col-md-5 mb-15">
-                <span>{{ $totalPaid }} TK</span>
-            </div>
-
-            <div class="col-md-7 mb-15 text-end">
-                <span class="fw-medium">Remaining Installments:</span>
-            </div>
-            <div class="col-md-5 mb-15">
-                <span>
-                    {{ $hirepurchase->installment()->where('status', 0)->count() }}
-                </span>
-            </div>
-
-            <div class="col-md-7 mb-15 text-end">
-                <span class="fw-medium">Monthly Installment:</span>
-            </div>
-            <div class="col-md-5 mb-15">
-                <span>{{ $hirepurchase->monthly_installment }} TK</span>
-            </div>
-
-            <div class="col-md-7 mb-15 text-end">
-                <span class="fw-medium">Customer:</span>
-            </div>
-            <div class="col-md-5 mb-15">
-                <span>{{ optional($hirepurchase->customer)->name ?? 'N/A' }}</span>
-            </div>
-
-            <div class="col-md-7 mb-15 text-end">
-                <span class="fw-medium">Order No:</span>
-            </div>
-            <div class="col-md-5 mb-15">
-                <span>{{ $hirepurchase->order_no }}</span>
-            </div>
-        </div>
-    </fieldset>
-</div> --}}
-
-
 <div class="col-md-5">
     @php
         $installment_due_check = $hirepurchase->installment->where('status', 0)->count();
@@ -98,10 +9,17 @@
                 @csrf
                 <input type="hidden" name="hire_purchase_id" value="{{ $hirepurchase->id }}">
                 <fieldset class="">
-                    <legend>Return Information</legend>
+                    <legend>Return or Cancel</legend>
                     <div class="row">
                         <div class="col-md-12 mb-25">
-                            <select name="return_reason" class="form-control" required>
+                            <select name="action_type" id="action_type" class="form-control" required>
+                                {{-- <option value="" {{ old('action_type') ? '' : 'selected' }}>Select Action</option> --}}
+                                <option value="cancel" {{ old('action_type') === 'cancel' ? 'selected' : '' }}>Sales Cancel</option>
+                                <option value="return" {{ old('action_type') === 'return' ? 'selected' : '' }}>Sales Return</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-25" id="return_fields">
+                            <select name="return_reason" id="return_reason" class="form-control" required>
                                 <option value="">-- Select Return Reason --</option>
                                 <option value="cash_purchase_change">Changed to Cash Purchase</option>
                                 <option value="technical_issue">Technical Problem - Sales Return</option>
@@ -109,10 +27,25 @@
                                 <option value="defaulter_return">Defaulter Customer - Product Return</option>
                                 <option value="others">Others</option>
                             </select>
+                            @error('return_reason')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-12 mb-25" id="return_ref_fields">
+                            <label for="reference_number">Reference Number<span class="text-danger">*</span></label>
+                            <input name="reference_number" id="reference_number" class="input" type="text" placeholder=" " />
+                            @error('reference_number')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-12 mb-25" id="cancel_fields" style="display: none;">
+                            <textarea name="cancel_narration" id="cancel_narration" class="form-control" rows="3" placeholder="Cancel narration"></textarea>
+                            @error('cancel_narration')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="col-md-12 mb-25">
-                            <button type="submit" class="btn btn-lg btn-danger customr-btn">Submit Sales
-                                Return</button>
+                            <button type="submit" class="btn btn-lg btn-danger customr-btn">Submit</button>
                         </div>
                     </div>
                 </fieldset>
@@ -120,6 +53,10 @@
         @elseif ($hirepurchase->status == 5)
             <h4>
                 This {{ @$hirepurchase->order_no }} Sales has already been returned
+            </h4>
+        @elseif ($hirepurchase->status == 4)
+            <h4>
+                This {{ @$hirepurchase->order_no }} Sales has already been cancelled
             </h4>
         @else
             <h4>
@@ -219,3 +156,34 @@
             </div>
         </div>
     </div>
+
+    <script>
+        (function () {
+            function toggleReturnCancelFields() {
+                var actionType = document.getElementById('action_type');
+                if (!actionType) return;
+                var isCancel = actionType.value === 'cancel';
+                var returnFields = document.getElementById('return_fields');
+                var returnRefFields = document.getElementById('return_ref_fields');
+                var cancelFields = document.getElementById('cancel_fields');
+                if (returnFields) returnFields.style.display = (isCancel || !actionType.value) ? 'none' : '';
+                if (returnRefFields) returnRefFields.style.display = (isCancel || !actionType.value) ? 'none' : '';
+                if (cancelFields) cancelFields.style.display = isCancel ? '' : 'none';
+
+                var returnReason = document.getElementById('return_reason');
+                var referenceNumber = document.getElementById('reference_number');
+                var cancelNarration = document.getElementById('cancel_narration');
+                if (returnReason) returnReason.required = (!isCancel && actionType.value === 'return');
+                if (referenceNumber) referenceNumber.required = (!isCancel && actionType.value === 'return');
+                if (cancelNarration) cancelNarration.required = isCancel;
+            }
+
+            document.addEventListener('change', function (e) {
+                if (e.target && e.target.id === 'action_type') {
+                    toggleReturnCancelFields();
+                }
+            });
+
+            toggleReturnCancelFields();
+        })();
+    </script>

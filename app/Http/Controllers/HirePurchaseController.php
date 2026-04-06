@@ -997,7 +997,7 @@ class HirePurchaseController extends Controller
                 $down_payment_incentive_rate = GeneralIncentiveConfig::getDownPaymentIncentiveRate();
 
                 // Calculate down payment percentage
-                $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
+                $down_payment_percentage = round((($request->down_payment / $request->hire_price) * 100), 2);
 
                 if ($down_payment_percentage >= $down_payment_threshold) {
                     $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;
@@ -1914,7 +1914,7 @@ class HirePurchaseController extends Controller
                 $down_payment_threshold = GeneralIncentiveConfig::getDownPaymentThreshold();
                 $down_payment_incentive_rate = GeneralIncentiveConfig::getDownPaymentIncentiveRate();
 
-                $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
+                $down_payment_percentage = round((($request->down_payment / $request->hire_price) * 100), 2);
 
                 if ($down_payment_percentage >= $down_payment_threshold) {
                     $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;
@@ -2401,7 +2401,7 @@ class HirePurchaseController extends Controller
                     $down_payment_threshold = GeneralIncentiveConfig::getDownPaymentThreshold();
                     $down_payment_incentive_rate = GeneralIncentiveConfig::getDownPaymentIncentiveRate();
 
-                    $down_payment_percentage = ($request->down_payment / $request->hire_price) * 100;
+                    $down_payment_percentage = round((($request->down_payment / $request->hire_price) * 100), 2);
 
                     if ($down_payment_percentage >= $down_payment_threshold) {
                         $down_payment_incentive_amount = ($request->down_payment * $down_payment_incentive_rate) / 100;

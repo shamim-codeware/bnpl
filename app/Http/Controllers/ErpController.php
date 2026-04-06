@@ -131,6 +131,10 @@ class ErpController extends Controller
 
     public function CancelAction(Request $request,$id,ApiService $ApiService)
     {
+        $request->validate([
+            'cancel_narration' => 'required|string|max:500',
+        ]);
+
         $erp_log = ErpLog::findOrFail($id);
         $requestData = [
             "update_flag" => 0,
@@ -139,8 +143,6 @@ class ErpController extends Controller
             "order_info" => json_decode($erp_log->order_info, true),
             "order_details" => json_decode($erp_log->order_details, true)
         ];
-        $erp_log->cancel_flag = 1;
-
         $response = $ApiService->SendToErp($requestData);
         Log::info('ERP Response', ['response' => $response]);
 
@@ -152,11 +154,19 @@ class ErpController extends Controller
 
         $erp_log->response = $response;
 
+        if (@$response['error'] == 1) {
+            $erp_log->save();
+            $msg = $response['msg'] ?? $response['message'] ?? 'Erp Order Cancel Failed !';
+            return redirect()->back()->with('error', $msg);
+        }
+
+        $erp_log->cancel_flag = 1;
         $erp_log->save();
 
         $hirePurchase = HirePurchase::where('id',$erp_log->tracking_number)->first();
         if ($hirePurchase) {
             $hirePurchase->status = 4; // Assuming 4 is the status for cancelled
+            $hirePurchase->cancel_narration = $request->cancel_narration;
             $hirePurchase->save();
         }
         return redirect()->back()->with('success', 'Erp Order Cancel Successfull !');

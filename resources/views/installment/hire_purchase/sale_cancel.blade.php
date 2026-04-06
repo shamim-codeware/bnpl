@@ -20,6 +20,20 @@
                             </div>
                             <div class="card-body py-md-30">
                                 <div class="form-group">
+                                    <fieldset class="py-2">
+                                        <div class="row">
+                                            <div class="col-md-12 mb-25">
+                                                <div class="holder">
+                                                    <div class="input-holder">
+                                                        <textarea required name="cancel_narration" id="cancel_narration" class="input" rows="3" placeholder=" "></textarea>
+                                                        <div class="placeholder">
+                                                            <p class="m-0">Cancel Narration<span class="text-danger">*</span></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
 {{--                                    <fieldset class="py-4">--}}
 {{--                                        <div class="row">--}}
 {{--                                            <div class="col-md-6">--}}
