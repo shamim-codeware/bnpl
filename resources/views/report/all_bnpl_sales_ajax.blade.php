@@ -172,7 +172,11 @@
                 @php
                     $status = 'Regular';
 
-                    if ($purchase->salesReturn) {
+                    if ($purchase->status == 2) {
+                        $status = 'Rejected';
+                    } elseif ($purchase->status == 4) {
+                        $status = 'Sale Cancel';
+                    } elseif ($purchase->salesReturn) {
                         $status = 'Sale Return';
                     } elseif ($purchase->installment && $purchase->installment->isNotEmpty()) {
                         $hasUnpaid = $purchase->installment->contains('status', 0);
@@ -286,7 +290,9 @@
         {{ $status === 'Paid' ? 'bg-success text-white' : '' }}
         {{ $status === 'Defaulter' ? 'bg-danger text-white' : '' }}
         {{ $status === 'Regular' ? 'bg-warning text-dark' : '' }}
-        {{ $status === 'Sale Return' ? 'bg-secondary text-white' : '' }}">
+        {{ $status === 'Sale Return' ? 'bg-secondary text-white' : '' }}
+        {{ $status === 'Rejected' ? 'bg-danger text-white' : '' }}
+        {{ $status === 'Sale Cancel' ? 'bg-danger text-white' : '' }}">
 
                             {{ $status }}
                         </span>
