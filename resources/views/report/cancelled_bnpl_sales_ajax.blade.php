@@ -157,7 +157,7 @@
                         <div class="userDatatable-content">
                             <a class="action-icon action-icon--info" href="{{ url('product_details', $purchase->id) }}"
                                 target="_blank" title="Details" aria-label="Details">
-                                <i class="fas fa-eye"></i>
+                                <i class="uil uil-eye"></i>
                             </a>
                         </div>
                     </td>
