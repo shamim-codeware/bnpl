@@ -185,12 +185,22 @@
                             $status = 'Paid';
                         } else {
                             $latestUnpaidDate = $purchase->installment->where('status', 0)->max('loan_start_date');
+                            $hasOverdueUnpaid = $purchase->installment
+                                ->where('status', 0)
+                                ->filter(function ($inst) {
+                                    return \Carbon\Carbon::parse($inst->loan_start_date)->lt(now());
+                                })
+                                ->isNotEmpty();
 
                             if ($latestUnpaidDate) {
                                 $latestDue = \Carbon\Carbon::parse($latestUnpaidDate);
                                 if ($latestDue->lt(now()->subDays(30))) {
                                     $status = 'Defaulter';
+                                } elseif ($hasOverdueUnpaid) {
+                                    $status = 'Overdue';
                                 }
+                            } elseif ($hasOverdueUnpaid) {
+                                $status = 'Overdue';
                             }
                         }
                     }
@@ -289,6 +299,7 @@
                             class="badge
         {{ $status === 'Paid' ? 'bg-success text-white' : '' }}
         {{ $status === 'Defaulter' ? 'bg-danger text-white' : '' }}
+        {{ $status === 'Overdue' ? 'bg-info text-dark' : '' }}
         {{ $status === 'Regular' ? 'bg-warning text-dark' : '' }}
         {{ $status === 'Sale Return' ? 'bg-secondary text-white' : '' }}
         {{ $status === 'Rejected' ? 'bg-danger text-white' : '' }}
@@ -315,23 +326,26 @@
                                     Edit</a>
                             @endif
                         </div> --}}
-                        <ul class="mb-0 d-flex flex-wrap justify-content-center gap-1">
-                            <li class="d-flex align-items-center flex-column gap-1">
-                                <a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}"
-                                    target="_blank">
-                                    Product Details
+                        <ul class="mb-0 d-flex justify-content-center gap-2">
+                            <li class="d-flex align-items-center gap-2">
+                                <a class="action-icon action-icon--info"
+                                    href="{{ url('product_details', $purchase->id) }}" target="_blank" title="Details"
+                                    aria-label="Details">
+                                    <i class="fas fa-eye"></i>
                                 </a>
                                 @if ($purchase->status == 0 && Auth::user()->role_id == 1)
-                                    <a style="white-space: nowrap" class="btn btn-success w-100 d-block btn-sm"
-                                        href="{{ url('product_edit/' . $purchase->id) }}" title="View details"
-                                        target="_blank">
-                                        Edit
+                                    <a class="action-icon action-icon--success"
+                                        href="{{ url('product_edit/' . $purchase->id) }}" title="Edit"
+                                        target="_blank" aria-label="Edit">
+                                        <i class="uil uil-edit"></i>
                                     </a>
                                 @endif
                                 @if (Auth::user()->role_id == 1 && ($purchase->status = 3 && $purchase->status != 0))
-                                    <a style="white-space: nowrap" class="btn btn-success" target="_blank"
-                                        href="{{ url('product_edit_after_approval/' . $purchase->id) }}">Product
-                                        Edit</a>
+                                    <a class="action-icon action-icon--primary" target="_blank"
+                                        href="{{ url('product_edit_after_approval/' . $purchase->id) }}"
+                                        title="Product Edit" aria-label="Product Edit">
+                                        <i class="uil uil-edit"></i>
+                                    </a>
                                 @endif
                             </li>
                         </ul>
@@ -348,6 +362,38 @@
 <div class="pt-2">
     {{ $hirepurchase->links() }}
 </div>
+<style>
+    .action-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: #f1f3f5;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .action-icon:hover {
+        background: #e9ecef;
+        color: #212529;
+        text-decoration: none;
+    }
+
+    .action-icon--info {
+        color: #0d6efd;
+    }
+
+    .action-icon--success {
+        color: #198754;
+    }
+
+    .action-icon--primary {
+        color: #0b5ed7;
+    }
+</style>
 <script>
     $(document).ready(function() {
         // Create the outer div for the table top scrollbar

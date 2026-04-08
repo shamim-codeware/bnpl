@@ -91,7 +91,8 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
             if ($purchase->installment && count($purchase->installment) > 0) {
                 $firstLoanStartDate = $purchase->installment[0]->loan_start_date;
-                $lastLoanEndDate = $purchase->installment[count($purchase->installment) - 1]->loan_end_date;
+                $sortedInstallments = $purchase->installment->sortBy('loan_start_date');
+                $lastLoanEndDate = optional($sortedInstallments->last())->loan_start_date;
 
                 // Find next due date
                 $next_installment = Installment::where('hire_purchase_id', $purchase->id)
@@ -246,12 +247,22 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                     $latestUnpaidDate = $purchase->installment
                         ->where('status', 0)
                         ->max('loan_start_date');
+                    $hasOverdueUnpaid = $purchase->installment
+                        ->where('status', 0)
+                        ->filter(function ($inst) {
+                            return Carbon::parse($inst->loan_start_date)->lt(now());
+                        })
+                        ->isNotEmpty();
 
                     if ($latestUnpaidDate) {
                         $latestDue = Carbon::parse($latestUnpaidDate);
                         if ($latestDue->lt(now()->subDays(30))) {
                             $status = 'Defaulter';
+                        } elseif ($hasOverdueUnpaid) {
+                            $status = 'Overdue';
                         }
+                    } elseif ($hasOverdueUnpaid) {
+                        $status = 'Overdue';
                     }
                 }
             }
