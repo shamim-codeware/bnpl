@@ -166,8 +166,11 @@
                     </td>
                     <td>
                         <div class="userDatatable-content">
-                            <a class="btn btn-info" href="{{ url('product_details', $purchase->id) }}"
-                                target="_blank">Product Details</a>
+                            <a class="action-icon action-icon--info"
+                                href="{{ url('product_details', $purchase->id) }}" target="_blank"
+                                title="Details" aria-label="Details">
+                                 <i class="uil uil-eye"></i>
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -181,6 +184,27 @@
         {{ $hirepurchase->links() }}
     </div>
 </div>
+<style>
+    .action-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #f1f3f5;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+    }
+    .action-icon:hover {
+        background: #e9ecef;
+        color: #212529;
+        text-decoration: none;
+    }
+    .action-icon--info { color: #0d6efd; }
+    .action-icon i { font-size: 18px; }
+</style>
 <script>
     $(document).ready(function() {
         // Create the outer div for the table top scrollbar
