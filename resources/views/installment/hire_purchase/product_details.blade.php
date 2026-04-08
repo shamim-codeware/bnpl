@@ -58,55 +58,35 @@
                                                 </div>
                                             </fieldset>
                                             <br>
-                                            <div class="row gy-2">
-                                                <div class="col-xxl-5 col-md-5">
-                                                    <a style="white-space: nowrap;" target="_blank" href="{{ url('view-customer-info/'.$product_details->id) }}" class="btn btn-info">Customer Information</a>
-                                                </div>
-                                                <div class="col-xxl-5 col-md-4 ps-0">
-                                                    <a style="white-space: nowrap;" target="_blank" href="{{ url('view-guarantor-info/'.$product_details->id) }}" class="btn btn-info">Guarantor Information</a>
-                                                </div>
-                                                <div class="col-xxl-5 col-md-4">
-                                                    <a style="white-space: nowrap;" target="_blank" href="{{ url('installment-list/'.$product_details->id) }}" class="btn btn-info">Installment List</a>
-                                                </div>
+                                            <div class="action-grid">
+                                                <a target="_blank" href="{{ url('view-customer-info/'.$product_details->id) }}"
+                                                    class="btn btn-primary action-btn">Customer Information</a>
+                                                <a target="_blank" href="{{ url('view-guarantor-info/'.$product_details->id) }}"
+                                                    class="btn btn-primary action-btn">Guarantor Information</a>
+                                                <a target="_blank" href="{{ url('installment-list/'.$product_details->id) }}"
+                                                    class="btn btn-outline-primary action-btn">Installment List</a>
 
                                                 {{-- Approve/Reject buttons for pending sales --}}
                                                 @if(($product_details->status == 0) && ((Auth::user()->id == 248) || (Auth::user()->id == 217) || (Auth::user()->id == 267)))
-                                                <div class="col-xxl-6 col-md-6">
-                                                    <button type="button" class="btn btn-success" onclick="showApproveModal({{ $product_details->id }})">
+                                                    <button type="button" class="btn btn-success action-btn" onclick="showApproveModal({{ $product_details->id }})">
                                                         <i class="fas fa-check"></i> Approve Sale
                                                     </button>
-                                                </div>
-                                                <div class="col-xxl-6 col-md-6">
-                                                    <button type="button" class="btn btn-danger" onclick="showRejectModal({{ $product_details->id }})">
+                                                    <button type="button" class="btn btn-danger action-btn" onclick="showRejectModal({{ $product_details->id }})">
                                                         <i class="fas fa-times"></i> Reject Sale
                                                     </button>
-                                                </div>
                                                 @endif
-                                             @if(App\Models\User::ADMIN == Auth::user()->role_id)
-                                                @if(isset($product_details->erplog))
-                                                {{-- @if($product_details->erplog->sent == 0) --}}
-                                                    {{-- <div class="col-xxl-4 col-md-4">
-                                                        <a style="white-space: nowrap;" target="_blank" href="{{ url('erp-view/'.$product_details->erplog->id) }}" class="btn btn-info">Send Erp</a>
-                                                    </div> --}}
-                                                             <div class="col-xxl-4 col-md-4">
-                                                                <a style="white-space: nowrap;"
-                                                                target="_blank"
-                                                                href="{{ url('erp-view/'.$product_details->erplog->id) }}"
-                                                                class="btn btn-info erp-send-btn"
-                                                                onclick="disableButton(this)">
-                                                                Send Erp
-                                                                </a>
-                                                            </div>
-                                                    {{-- @else
-                                                    <a href="#" class="btn btn-info">Send Erp Successfully</a>
-
-                                               {{--  @endif --}}
-
-                                                    <div class="col-xxl-4 col-md-4">
-                                                        <a style="white-space: nowrap;"  href="{{ url('sale-cancel/'.$product_details->id) }}" class="btn btn-info">Sale Cancel </a>
-                                                    </div>
+                                                @if(App\Models\User::ADMIN == Auth::user()->role_id)
+                                                    @if(isset($product_details->erplog))
+                                                        <a target="_blank" href="{{ url('erp-view/'.$product_details->erplog->id) }}"
+                                                            class="btn btn-outline-primary action-btn erp-send-btn"
+                                                            onclick="disableButton(this)">
+                                                            Send Erp
+                                                        </a>
+                                                        <a href="{{ url('sale-cancel/'.$product_details->id) }}"
+                                                            class="btn btn-danger action-btn">Sale Cancel</a>
+                                                    @endif
                                                 @endif
-                                                 @endif                                            </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-7">
                                             <fieldset>
@@ -405,6 +385,24 @@
         </div>
     </div>
 
+    <style>
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            align-items: center;
+            margin-top: 6px;
+        }
+        .action-btn {
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+    </style>
     <script>
             function disableButton(button) {
                 // Disable button immediately
@@ -478,4 +476,3 @@
     </script>
 
     @endsection
-
