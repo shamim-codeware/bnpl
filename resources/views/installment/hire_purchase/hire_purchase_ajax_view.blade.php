@@ -64,16 +64,24 @@
                                 $status = 'Paid';
                             } else {
                                 $lastUnpaidDate = $hire->installment->where('status', 0)->max('loan_start_date');
+                                $hasOverdueUnpaid = $hire->installment
+                                    ->where('status', 0)
+                                    ->filter(function ($inst) {
+                                        return \Carbon\Carbon::parse($inst->loan_start_date)->lt(now());
+                                    })
+                                    ->isNotEmpty();
 
                                 if ($lastUnpaidDate) {
                                     $lastDue = \Carbon\Carbon::parse($lastUnpaidDate);
                                     if ($lastDue->lt(now()->subDays(30))) {
                                         $status = 'Defaulter';
+                                    } elseif ($hasOverdueUnpaid) {
+                                        $status = 'Overdue';
                                     }
+                                } elseif ($hasOverdueUnpaid) {
+                                    $status = 'Overdue';
                                 }
                             }
-                        } else {
-                            $status = 'Regular';
                         }
                     @endphp
                     @php
@@ -149,6 +157,7 @@
                                 class="userDatatable-content
         {{ $status === 'Paid' ? 'text-success fw-bold' : '' }}
         {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}
+        {{ $status === 'Overdue' ? 'text-warning fw-bold' : '' }}
         {{ $status === 'Regular' ? 'text-warning fw-medium' : '' }}">
 
                                 {{ $status }}
@@ -156,15 +165,19 @@
                         </td>
 
                         <td>
-                            <ul class="mb-0 d-flex flex-wrap justify-content-center gap-1">
-                                <li class="d-flex align-items-center flex-column gap-1">
-                                    <a style="white-space: nowrap" class="btn btn-info"
-                                        href="{{ url('product_details/' . $hire->id) }}" target="_blank">Product
-                                        Details</a>
+                            <ul class="mb-0 d-flex justify-content-center gap-2">
+                                <li class="d-flex align-items-center gap-2">
+                                    <a class="action-icon action-icon--info"
+                                        href="{{ url('product_details/' . $hire->id) }}" target="_blank"
+                                        title="Product Details" aria-label="Product Details">
+                                         <i class="uil uil-eye"></i>
+                                    </a>
                                     @if (Auth::user()->role_id == 1 && ($hire->status = 3))
-                                        <a style="white-space: nowrap" class="btn btn-success" target="_blank"
-                                            href="{{ url('product_edit_after_approval/' . $hire->id) }}">Product
-                                            Edit</a>
+                                        <a class="action-icon action-icon--success" target="_blank"
+                                            href="{{ url('product_edit_after_approval/' . $hire->id) }}"
+                                            title="Product Edit" aria-label="Product Edit">
+                                            <i class="uil uil-edit"></i>
+                                        </a>
                                     @endif
                                 </li>
                             </ul>
@@ -213,3 +226,25 @@
         $('.custom-data-table-top-scrollbar').css('width', customDataTableWidth + 'px');
     });
 </script>
+<style>
+    .action-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #f1f3f5;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.15s ease-in-out;
+    }
+    .action-icon:hover {
+        background: #e9ecef;
+        color: #212529;
+        text-decoration: none;
+    }
+    .action-icon--info { color: #0d6efd; }
+    .action-icon--success { color: #198754; }
+    .action-icon i { font-size: 18px; }
+</style>
