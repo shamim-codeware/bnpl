@@ -300,8 +300,8 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
             return [
                 $slNo,
-                @$purchase->show_room->name ?? 'N/A',
-                @$purchase->show_room->zone->name ?? 'N/A',
+                data_get($purchase, 'show_room.name', 'N/A'),
+                data_get($purchase, 'show_room.zone.name', 'N/A'),
                 $purchase->order_no,
                 $firstLoanStartDate ? \Carbon\Carbon::parse($firstLoanStartDate)->format('d F Y') : 'N/A',
                 $lastLoanEndDate ? \Carbon\Carbon::parse($lastLoanEndDate)->format('d F Y')  : 'N/A',
@@ -341,8 +341,8 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
 
                 Str::title($purchase->name ?? 'N/A'),
                 $purchase->pr_phone ?? 'N/A',
-                Str::title($purchase->show_room_user->name ?? 'N/A'),
-                Str::title($purchase->users->name ?? 'N/A'),
+                Str::title(data_get($purchase, 'show_room_user.name', 'N/A')),
+                Str::title(data_get($purchase, 'users.name', 'N/A')),
                 $status_text,
                 $status,
                 Str::title($guarantor1_name ?? 'N/A'),
@@ -355,8 +355,7 @@ class BnplOrdersExport implements FromCollection, WithHeadings, WithMapping, Wit
                 $guarantor2_nid
             ];
         } catch (\Exception $e) {
-
-            logger()->error('BnplOrdersExport error: ' . $e->getMessage());
+            logger()->error('BnplOrdersExport error (hire_purchase_id=' . ($purchase->id ?? 'N/A') . '): ' . $e->getMessage());
             return [];
         }
     }
