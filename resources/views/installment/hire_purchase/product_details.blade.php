@@ -116,19 +116,19 @@
                                                         <span class="fw-medium">Loan Agreement Date:</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15">
-                                                        <span>{{    date('d/m/Y H:i A', strtotime($product_details->created_at)), }}</span>
+                                                        <span>{{ date('d F Y H:i A', strtotime($product_details->created_at)) }}</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Loan Start Date:</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15">
-                                                        <span>{{    date('d/m/Y H:i A', strtotime($product_details->created_at)), }}</span>
+                                                        <span>{{ date('d F Y H:i A', strtotime($product_details->created_at)) }}</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Loan End Date:</span>
                                                     </div>
                                                     <div class="col-md-5 mb-15">
-                                                        <span> {{    date('d/m/Y H:i A', strtotime($installment_date->loan_start_date)), }} </span>
+                                                        <span>{{ date('d F Y H:i A', strtotime($installment_date->loan_start_date)) }}</span>
                                                     </div>
                                                     <div class="col-md-7 mb-15 text-end">
                                                         <span class="fw-medium">Down Payment:</span>
@@ -319,7 +319,7 @@
                                             <div class="d-flex justify-content-center">
                                                 <div class="userDatatable-inline-title">
                                                     <a href="#" class="text-dark fw-500">
-                                                        <h6>{{  date('d/m/Y h:i A', strtotime($item->created_at))  }}</h6>
+                                                        <h6>{{ date('d F Y h:i A', strtotime($item->created_at)) }}</h6>
                                                     </a>
                                                 </div>
                                             </div>
@@ -478,5 +478,4 @@
     </script>
 
     @endsection
-
 

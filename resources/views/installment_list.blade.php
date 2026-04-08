@@ -196,7 +196,7 @@
                             <tr>
                                 <td style="border:1px solid #000; padding:6px; background: #e6e7e9; font-weight:500;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">Approval date:</td>
                                 <td style="border:1px solid #000; padding:6px; background: #e6e7e9;font-family: 'Jost', sans-serif;font-size:12px;padding: 1px !important;">
-                                    {{ date('d/m/Y', strtotime($hirepurchase->created_at)) }}
+                                    {{ date('d F Y', strtotime($hirepurchase->created_at)) }}
                                 </td>
                             </tr>
                             </table>
@@ -284,7 +284,7 @@
                                 </td>
                                  <td>
                                     <div class="userDatatable-content">
-                                       {{ $item->status == 1 ? $item->updated_at->format('d/m/Y') : "" }}
+                                       {{ $item->status == 1 ? $item->updated_at->format('d F Y') : "" }}
                                     </div>
                                 </td>
                                 <td>
@@ -319,7 +319,7 @@
                                     </td>
                                 <td>
                                     <div class="userDatatable-content">
-                                        {{    date('d/m/Y', strtotime($item->loan_start_date)), }}
+                                        {{ date('d F Y', strtotime($item->loan_start_date)) }}
                                     </div>
                                 </td>
                                 <td>
