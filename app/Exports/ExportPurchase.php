@@ -44,10 +44,13 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
         //     $lastLoanEndDate = $filter_data->installment[count($filter_data->installment) - 1]->loan_end_date;
         // }
         if ($filter_data->installment && count($filter_data->installment) > 0) {
-            // earliest due date = loan start date
-            $firstLoanStartDate = $filter_data->installment->min('loan_start_date');
-            // latest due date = loan end date
-            $lastLoanEndDate = $filter_data->installment->max('loan_start_date');
+            // // earliest due date = loan start date
+            // $firstLoanStartDate = $filter_data->installment->min('loan_start_date');
+            // // latest due date = loan end date
+            // $lastLoanEndDate = $filter_data->installment->max('loan_start_date');
+            $firstLoanStartDate = $filter_data->installment[0]->loan_start_date;
+            $sortedInstallments = $filter_data->installment->sortBy('loan_start_date');
+            $lastLoanEndDate = optional($sortedInstallments->last())->loan_start_date;
         }
 
         // Safely get transaction details
@@ -90,21 +93,25 @@ class ExportPurchase implements FromCollection, WithMapping, WithHeadings, WithE
         $status = 'Regular';
 
         if ($filter_data->installment && $filter_data->installment->isNotEmpty()) {
-            $hasUnpaid = $filter_data->installment->contains('status', 0);
+            $lastUnpaidDate = $filter_data->installment
+                ->where('status', 0)
+                ->max('loan_start_date');
+            $hasOverdueUnpaid = $filter_data->installment
+                ->where('status', 0)
+                ->filter(function ($inst) {
+                    return Carbon::parse($inst->loan_start_date)->lt(now());
+                })
+                ->isNotEmpty();
 
-            if (!$hasUnpaid) {
-                $status = 'Paid';
-            } else {
-                $lastUnpaidDate = $filter_data->installment
-                    ->where('status', 0)
-                    ->max('loan_start_date');
-
-                if ($lastUnpaidDate) {
-                    $lastDue = Carbon::parse($lastUnpaidDate);
-                    if ($lastDue->lt(now()->subDays(30))) {
-                        $status = 'Defaulter';
-                    }
+            if ($lastUnpaidDate) {
+                $lastDue = Carbon::parse($lastUnpaidDate);
+                if ($lastDue->lt(now()->subDays(30))) {
+                    $status = 'Defaulter';
+                } elseif ($hasOverdueUnpaid) {
+                    $status = 'Overdue';
                 }
+            } elseif ($hasOverdueUnpaid) {
+                $status = 'Overdue';
             }
         }
 

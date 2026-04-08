@@ -61,7 +61,8 @@
                     // Safely get first and last installment dates
                     if ($purchase->installment && count($purchase->installment) > 0) {
                         $firstLoanStartDate = $purchase->installment[0]->loan_start_date;
-                        $lastLoanEndDate = $purchase->installment[count($purchase->installment) - 1]->loan_end_date;
+                        $sortedInstallments = $purchase->installment->sortBy('loan_start_date');
+                        $lastLoanEndDate = optional($sortedInstallments->last())->loan_start_date;
                     }
 
                     // Safely get last transaction details
@@ -109,22 +110,24 @@
                     $status = 'Regular';
 
                     if ($purchase->installment && $purchase->installment->isNotEmpty()) {
-                        $hasUnpaid = $purchase->installment->contains('status', 0);
+                        $lastUnpaidDate = $purchase->installment->where('status', 0)->max('loan_start_date');
+                        $hasOverdueUnpaid = $purchase->installment
+                            ->where('status', 0)
+                            ->filter(function ($inst) {
+                                return \Carbon\Carbon::parse($inst->loan_start_date)->lt(now());
+                            })
+                            ->isNotEmpty();
 
-                        if (!$hasUnpaid) {
-                            $status = 'Paid';
-                        } else {
-                            $lastUnpaidDate = $purchase->installment->where('status', 0)->max('loan_start_date');
-
-                            if ($lastUnpaidDate) {
-                                $lastDue = \Carbon\Carbon::parse($lastUnpaidDate);
-                                if ($lastDue->lt(now()->subDays(30))) {
-                                    $status = 'Defaulter';
-                                }
+                        if ($lastUnpaidDate) {
+                            $lastDue = \Carbon\Carbon::parse($lastUnpaidDate);
+                            if ($lastDue->lt(now()->subDays(30))) {
+                                $status = 'Defaulter';
+                            } elseif ($hasOverdueUnpaid) {
+                                $status = 'Overdue';
                             }
+                        } elseif ($hasOverdueUnpaid) {
+                            $status = 'Overdue';
                         }
-                    } else {
-                        $status = 'Regular';
                     }
                 @endphp
                 <tr>
@@ -179,8 +182,8 @@
                     <td>
                         <div
                             class="userDatatable-content
-        {{ $status === 'Paid' ? 'text-success fw-bold' : '' }}
         {{ $status === 'Defaulter' ? 'text-danger fw-bold' : '' }}
+        {{ $status === 'Overdue' ? 'text-warning fw-bold' : '' }}
         {{ $status === 'Regular' ? 'text-warning fw-medium' : '' }}">
 
                             {{ $status }}
