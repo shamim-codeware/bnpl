@@ -2565,7 +2565,6 @@ class HirePurchaseController extends Controller
                             }
                         }
                     }
-
                 } else {
                     $product = Product::find($request->product_model_id);
                     if ($product) {
@@ -2603,7 +2602,7 @@ class HirePurchaseController extends Controller
                     'response' => $response
                 ]);
 
-               // রেসপন্স অনুযায়ী sent আপডেট করো
+                // রেসপন্স অনুযায়ী sent আপডেট করো
                 if (isset($response['error']) && $response['error'] == 1) {
                     $erpLog->sent = 0; // ফেল হলে আবার চেষ্টা করবে
                 } else {
@@ -2612,10 +2611,20 @@ class HirePurchaseController extends Controller
 
                 $erpLog->response = json_encode($response);
                 $erpLog->save();
+
+                // Check ERP response before committing
+                if (isset($response['error']) && $response['error'] == 1) {
+                    DB::rollBack();
+                    $msg = $response['msg'] ?? $response['message'] ?? 'ERP Order Update Failed! Please try again.';
+                    return redirect()->back()->with('error', $msg);
+                }
+
+                DB::commit();
+
+                return redirect()->back()->with('success', 'Hire Purchase Updated Successfully!');
             }
 
             DB::commit();
-
             return redirect()->back()->with('success', 'Hire Purchase Updated Successfully!');
         } catch (\Exception $e) {
             DB::rollBack();

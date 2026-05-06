@@ -20,6 +20,62 @@
 .search-btn-btn {
     border-radius: 0px 5px 5px 0px;
 }
+.product-filter-panel {
+    background: #f8f9fb;
+    border: 1px solid #e7eaf0;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(31, 41, 55, 0.04);
+}
+.product-filter-panel .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #5f6877;
+    margin-bottom: 6px;
+}
+.product-filter-panel .form-control {
+    height: 44px;
+    border-radius: 10px;
+    border-color: #d9dee8;
+}
+.product-filter-panel .support-order-search {
+    position: relative;
+}
+.product-filter-actions {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+.product-filter-actions .btn {
+    height: 44px;
+    border-radius: 10px;
+    min-width: 110px;
+}
+.product-filter-actions .btn-primary {
+    box-shadow: 0 10px 20px rgba(13, 110, 253, 0.18);
+}
+.product-filter-actions .btn-success {
+    box-shadow: 0 10px 20px rgba(25, 135, 84, 0.18);
+}
+.product-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.product-header-actions .excel-btn {
+    margin: 0 !important;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid #0b6d67;
+    background: #fff;
+    color: #0b6d67;
+}
+.product-header-actions .btn-primary {
+    border-radius: 999px;
+    padding-left: 18px;
+    padding-right: 18px;
+}
 </style>
 
 <div class="container-fluid">
@@ -33,12 +89,14 @@
                             <div class="card-header">
                                 <div class="d-flex align-items-center flex-wrap">
                                     <h6>Product </h6>
-                                    {{-- <a class="mx-2 fw-bold excel-btn" href="{{ url('/showroom-export') }}">Export</a> --}}
 
                                 </div>
-                                @if (Auth::user()->user_action(1))
-                                <a class="btn btn-primary" href="{{ route('product.create') }}">Add Product</a>
-                            @endif
+                                <div class="product-header-actions">
+                                    <a class="mx-2 fw-bold excel-btn" href="{{ route('product.export', request()->query()) }}">Export</a>
+                                    @if (Auth::user()->user_action(1))
+                                        <a class="btn btn-primary" href="{{ route('product.create') }}">Add Product</a>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -50,47 +108,54 @@
             <div class="col-12 mb-30">
                 <div class="support-ticket-system support-ticket-system--search">
                     <div class="support-form datatable-support-form d-flex justify-content-xxl-end justify-content-center align-items-center flex-wrap">
-                        <div class="row row-cols-3 w-100 align-items-center">
-                                <div class="col">
-                                   <form action="{{ url('/product') }}" method="GET" class="filter-support-order-search__form">
-                                    <div class=" select-style2">
-                                        <div class="dm-select select_district_2">
-                                            <select onchange="Filter()" name="category_id" id="select-category-filter" class="form-control category-control " required>
-                                                <option value="">Select Category</option>
-                                                @foreach($category as $key=>$item)
-                                                <option  @if($item->id == request('category_id') ) selected @endif value="{{ $item->id }}">{{ $item->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    </form>
-                               </div>
-
-                            <div class="col">
-                                <form action="{{ url('/product') }}" method="GET" class="filter-support-order-search__form_gourp">
-                                    <div class=" select-style2">
-                                        <div class="dm-select select_district_2">
-                                            <select onchange="FilterGroup()" name="type_id" id="select-type-filter" class="form-control type-control " required>
-                                                <option value="">Select Product Group</option>
-                                                @foreach($types as $key=>$item)
-                                                <option @if($item->id == request('type_id') ) selected @endif value="{{ $item->id }}">{{ $item->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col d-flex justify-content-end "> <div class="support-form__search">
-                                <div class="support-order-search">
-                                    <form action="{{ url('/product') }}" method="GET" class="support-order-search__form">
-                                        <img src="{{ asset('assets/img/svg/search.svg') }}" alt="search" class="svg">
-                                        <input type="search" name="keyword" value="{{ Request::get('keyword') }}" class="form-control border-0 box-shadow-none" placeholder="Search" aria-label="Search">
-                                        <input class="search-btn-btn" type="submit" value="Search">
-                                    </form>
+                        <form action="{{ url('/product') }}" method="GET" class="support-order-search__form w-100">
+                            <div class="product-filter-panel">
+                                <div class="row g-3 align-items-end">
+                                <div class="col-xl-2 col-lg-3 col-md-6">
+                                    <label class="form-label mb-1">Product Group</label>
+                                    <select name="type_id" id="select-type-filter" class="form-control type-control">
+                                        <option value="">All Groups</option>
+                                        @foreach($types as $key => $item)
+                                            <option {{ request('type_id') == $item->id ? 'selected' : '' }} value="{{ $item->id }}">{{ $item->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                            </div></div>
-                        </div>
 
+                                <div class="col-xl-2 col-lg-3 col-md-6">
+                                    <label class="form-label mb-1">Category</label>
+                                    <select name="category_id" id="select-category-filter" class="form-control category-control">
+                                        <option value="">All Categories</option>
+                                        @foreach($category as $key => $item)
+                                            <option {{ request('category_id') == $item->id ? 'selected' : '' }} value="{{ $item->id }}">{{ $item->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-xl-2 col-lg-3 col-md-6">
+                                    <label class="form-label mb-1">From Date</label>
+                                    <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                                </div>
+
+                                <div class="col-xl-2 col-lg-3 col-md-6">
+                                    <label class="form-label mb-1">To Date</label>
+                                    <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                                </div>
+
+                                <div class="col-xl-3 col-lg-6 col-md-8">
+                                    <label class="form-label mb-1">Search</label>
+                                    <div class="support-order-search">
+                                        <input type="search" name="keyword" value="{{ request('keyword') }}" class="form-control border-0 box-shadow-none" placeholder="Search product model" aria-label="Search">
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-1 col-lg-6 col-md-4">
+                                    <div class="product-filter-actions">
+                                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     <div class="userDatatable userDatatable--ticket userDatatable--ticket--2 mt-1">
                         <div class="table-responsive custom-data-table-wrapper2">
@@ -194,16 +259,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    function Filter(){
-
-        $(".filter-support-order-search__form").submit();
-    }
-
-    function FilterGroup(){
-
-        $(".filter-support-order-search__form_gourp").submit();
-    }
-</script>
 @endsection

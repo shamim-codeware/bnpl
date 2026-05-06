@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Auth;
+use Carbon\Carbon;
 use App\Models\ProductType;
 use App\Models\Brand;
 use App\Models\ProductCategory;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductExport;
 
 class ProductController extends Controller
 {
@@ -19,7 +22,7 @@ class ProductController extends Controller
         $title = "Product ";
         $description = "Some description for the page";
 
-         $category = ProductCategory::orderBy('id', 'DESC')->get();
+        $category = ProductCategory::orderBy('id', 'DESC')->get();
         $types = ProductType::orderBy('id', 'DESC')->get();
         $query = Product::with(['users', 'categories', 'types'])->orderBy('id','DESC');
 
@@ -32,15 +35,60 @@ class ProductController extends Controller
             return $q->where('category_id', $request->category_id);
         });
 
-        // Keyword
-        if ($request->keyword) {
-            $query->where('name', 'like', "%$request->keyword%")
-            ->orWhere('product_model', 'like', "%$request->keyword%");
-        }
+        // Date range
+        $query->when($request->filled('from_date'), function ($q) use ($request) {
+            $q->whereDate('created_at', '>=', Carbon::parse($request->from_date)->format('Y-m-d'));
+        });
+        $query->when($request->filled('to_date'), function ($q) use ($request) {
+            $q->whereDate('created_at', '<=', Carbon::parse($request->to_date)->format('Y-m-d'));
+        });
 
-        $products = $query->paginate(50);
+        // Keyword
+        $query->when($request->filled('keyword'), function ($q) use ($request) {
+            $keyword = $request->keyword;
+            $q->where(function ($subQuery) use ($keyword) {
+                $subQuery->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('product_model', 'like', "%{$keyword}%");
+            });
+        });
+
+        $products = $query->paginate(50)->appends($request->query());
 
         return view('pages.settings.product.index', compact('title', 'description', 'products','category','types'));
+    }
+
+    public function export(Request $request)
+    {
+        $query = Product::with(['users', 'categories', 'types'])->orderBy('id', 'DESC');
+
+        $query->when($request->filled('type_id'), function ($q) use ($request) {
+            $q->where('type_id', $request->type_id);
+        });
+
+        $query->when($request->filled('category_id'), function ($q) use ($request) {
+            $q->where('category_id', $request->category_id);
+        });
+
+        $query->when($request->filled('from_date'), function ($q) use ($request) {
+            $q->whereDate('created_at', '>=', Carbon::parse($request->from_date)->format('Y-m-d'));
+        });
+
+        $query->when($request->filled('to_date'), function ($q) use ($request) {
+            $q->whereDate('created_at', '<=', Carbon::parse($request->to_date)->format('Y-m-d'));
+        });
+
+        $query->when($request->filled('keyword'), function ($q) use ($request) {
+            $keyword = $request->keyword;
+            $q->where(function ($subQuery) use ($keyword) {
+                $subQuery->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('product_model', 'like', "%{$keyword}%");
+            });
+        });
+
+        $products = $query->get();
+        $filename = 'product-report-' . now()->format('Y-m-d_His') . '.xlsx';
+
+        return Excel::download(new ProductExport($products), $filename);
     }
 
     public function GetPrice(Request $request){

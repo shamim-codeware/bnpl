@@ -189,6 +189,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('showroom-export', [ShowRoomController::class, 'ShowroomExport']);
     Route::get('enquiry-export', [EnqueryController::class, 'export'])->name('enquiry.export');
     Route::get('pending-enquiries-export', [EnqueryController::class, 'PendingEnquiryExport']);
+    Route::get('product-export', [ProductController::class, 'export'])->name('product.export');
 
     //erp Api View
 
