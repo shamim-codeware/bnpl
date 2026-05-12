@@ -10,6 +10,8 @@ class NotificationSeen extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['user_id', 'notification_id'];
+
     public function notification(){
         return $this->belongsTo(Notification::class, 'notification_id', 'id');
     }

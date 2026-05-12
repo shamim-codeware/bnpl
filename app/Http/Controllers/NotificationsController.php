@@ -36,7 +36,7 @@ class NotificationsController extends Controller
                 ->get();
         } elseif (Auth::user()->role_id == 6) {
             $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
-       
+
             $notifications = Notification::with(['showroom', 'notificationSeen', 'hirepurchase'])
                 ->where('retail', 1) // Filter by retail flag
                 ->whereDoesntHave('notificationSeen', function ($query) use ($userId) {
@@ -184,19 +184,40 @@ class NotificationsController extends Controller
 
     public function ClearAll()
     {
+        $userId = Auth::user()->id;
 
-
-        if (Auth::user()->role_id == 1) {
-            DB::table('notifications')->update(['admin_seen' => 1]);
-        } elseif (Auth::user()->role_id == 2) {
-            DB::table('notifications')->update(['ex_seen' => 1]);
-
-        } elseif (Auth::user()->role_id == 3) {
-            DB::table('notifications')->update(['man_seen' => 1]);
+        // Get all unseen notifications for the current user based on their role
+        if (Auth::user()->role_id == 3) { // manager
+            $notifications = Notification::where('manager', 1)
+                ->where('showroom_id', Auth::user()->showroom_id)
+                ->whereDoesntHave('notificationSeen', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->get();
+        } elseif (Auth::user()->role_id == 6) { // Zone Retail
+            $permission = ZonePermission::where('user_id', Auth::user()->id)->pluck('zone_id')->toArray();
+            $notifications = Notification::where('retail', 1)
+                ->whereDoesntHave('notificationSeen', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->whereHas('showroom', function ($q) use ($permission) {
+                    $q->whereIn('zone_id', $permission);
+                })
+                ->get();
+        } else {
+            $notifications = Notification::whereDoesntHave('notificationSeen', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->get();
         }
 
-        return redirect()->back()->with('success', 'Success! Notifications Clear');
+        // Mark all notifications as seen by creating NotificationSeen entries
+        foreach ($notifications as $notification) {
+            NotificationSeen::firstOrCreate([
+                'user_id' => $userId,
+                'notification_id' => $notification->id
+            ]);
+        }
 
-
+        return redirect()->back()->with('success', 'Success! Notifications Cleared');
     }
 }
