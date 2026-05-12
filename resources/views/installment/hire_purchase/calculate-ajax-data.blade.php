@@ -3,8 +3,24 @@
     <div class="card-body">
         <div class="row mb-3">
             <div class="col-md-6">
-                <h5>Model: <strong>{{ $product->product_model }}</strong></h5>
+                <h5>
+                    @if(isset($type) && $type === 'package')
+                        Package: <strong>{{ $product->product_model }}</strong>
+                    @else
+                        Model: <strong>{{ $product->product_model }}</strong>
+                    @endif
+                </h5>
                 <p>Cash Price: <strong>{{ number_format($product->hire_price, 2) }} BDT</strong></p>
+                @if(isset($type) && $type === 'package' && $package && $package->items->count())
+                    <p class="mb-0"><strong>Package Items:</strong></p>
+                    <ul class="mb-0 pl-3">
+                        @foreach($package->items as $item)
+                            @if($item->product)
+                                <li>{{ $item->product->product_model }} - {{ number_format($item->product->hire_price ?? 0, 2) }} BDT</li>
+                            @endif
+                        @endforeach
+                    </ul>
+                @endif
             </div>
             <div class="col-md-6">
                 <div class="alert alert-success mb-0">
@@ -39,15 +55,15 @@
                             <span class="userDatatable-title">EMI</span>
                         </th>
                     </tr>
-                    @php 
-                    
+                    @php
+
                         $sell_price = $product->hire_price + (($product->hire_price * $item->interest_rate)/100);
                         $down_payment_total = ($sell_price *  floatval($down_payment)) / 100;
                         $after_downpayment = $sell_price - $down_payment_total;
                         $emi = $after_downpayment / ($item->month - 1);
-                    @endphp 
+                    @endphp
                     <tr>
-                        <td style="padding:5px;">  
+                        <td style="padding:5px;">
                             <input type="hidden" id="hire_price_{{ $item->id }}" value="{{  $sell_price  }}">
                             <span id="sell_price_display_{{ $item->id }}">{{ number_format($sell_price, 2) }}</span>
                         </td>
@@ -67,7 +83,7 @@
                 </table>
             </td>
             @endforeach
-        
+
         </tr>
     </tbody>
 </table>
@@ -95,23 +111,23 @@ function calculation(id) {
 
     var minimum_percentage = {{ floatval($down_payment) }};
     var minimum_payment = (hire_price * minimum_percentage / 100);
-    
+
     var monthly_install = (hire_price - down_payment) / (installment_month-1);
     monthly_install = monthly_install.toFixed(2);
-    
+
     if(minimum_payment > down_payment){
         var alert_message = `You must pay at least ${minimum_percentage}% (${formatNumber(minimum_payment)} BDT)`;
         $("#down_alert_"+id).html(alert_message);
     } else {
         $("#down_alert_"+id).html('');
     }
-    
+
     if(monthly_install < 3000){
         $("#emi_alert_"+id).html("Minimum monthly installment is 3,000 BDT");
     } else {
         $("#emi_alert_"+id).html("");
     }
-    
+
     $("#emi_"+id).val(formatNumber(monthly_install));
 }
 
