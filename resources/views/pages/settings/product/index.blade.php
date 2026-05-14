@@ -186,6 +186,9 @@
                                             <span class="userDatatable-title">Created Date</span>
                                         </th>
                                       <th>
+                                            <span class="userDatatable-title">Last Updated By</span>
+                                        </th>
+                                        <th>
                                             <span class="userDatatable-title">Status</span>
                                         </th>
                                         <th class="actions">
@@ -213,6 +216,11 @@
                                         <td>
                                             <div class="userDatatable-content--priority">
                                                 {{ date('d/m/Y', strtotime($product->created_at)) }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="userDatatable-content--priority">
+                                                {{ $product->updater ? $product->updater->name : 'N/A' }}
                                             </div>
                                         </td>
 

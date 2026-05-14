@@ -11,18 +11,38 @@ class Product extends Model
 
     protected $table = "products";
     protected $fillable = [
-        'name', 'type_id', 'category_id','brand_id','product_model','hire_price','product_code','created_by','product_desc','size'
+        'name',
+        'type_id',
+        'category_id',
+        'brand_id',
+        'product_model',
+        'hire_price',
+        'product_code',
+        'created_by',
+        'updated_by',
+        'product_desc',
+        'size',
+        'status',
     ];
-
 
     public function users()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     public function types()
     {
         return $this->belongsTo(ProductType::class, 'type_id');
+    }
+
+    public function audits()
+    {
+        return $this->hasMany(ProductAudit::class, 'product_id');
     }
 
     public function categories()

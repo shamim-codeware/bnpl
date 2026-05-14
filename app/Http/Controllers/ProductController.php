@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\ProductType;
 use App\Models\Brand;
@@ -24,7 +24,7 @@ class ProductController extends Controller
 
         $category = ProductCategory::orderBy('id', 'DESC')->get();
         $types = ProductType::orderBy('id', 'DESC')->get();
-        $query = Product::with(['users', 'categories', 'types'])->orderBy('id','DESC');
+        $query = Product::with(['users', 'categories', 'types', 'updater'])->orderBy('id','DESC');
 
         // Filter by type
         $query->when($request->type_id, function ($q) use ($request) {
@@ -59,7 +59,7 @@ class ProductController extends Controller
 
     public function export(Request $request)
     {
-        $query = Product::with(['users', 'categories', 'types'])->orderBy('id', 'DESC');
+        $query = Product::with(['users', 'categories', 'types', 'updater'])->orderBy('id', 'DESC');
 
         $query->when($request->filled('type_id'), function ($q) use ($request) {
             $q->where('type_id', $request->type_id);
@@ -124,6 +124,7 @@ class ProductController extends Controller
         $productcategory = new Product();
         $data = $request->all();
         $data['created_by'] = Auth::user()->id;
+        $data['updated_by'] = Auth::user()->id;
         $productcategory->fill($data)->save();
         return  redirect()->back()->with('success', 'Success! Create Product');
     }
@@ -158,7 +159,46 @@ class ProductController extends Controller
     public function update(Request $request,$id)
     {
         $product = Product::findOrFail($id);
-        $product->fill($request->all())->save();
+
+        // Capture previous data
+        $previousData = $product->toArray();
+
+        // Update the product
+        $product->fill($request->all());
+        $product->updated_by = Auth::id();
+        $product->save();
+
+        // Capture current data
+        $currentData = $product->fresh()->toArray();
+
+        // Determine changed fields, ignore automatic timestamp changes
+        $ignoreFields = ['created_at', 'updated_at'];
+        $changedFields = [];
+        foreach ($currentData as $key => $value) {
+            if (in_array($key, $ignoreFields, true)) {
+                continue;
+            }
+
+            if (array_key_exists($key, $previousData) && $previousData[$key] != $value) {
+                $changedFields[$key] = [
+                    'old' => $previousData[$key],
+                    'new' => $value
+                ];
+            }
+        }
+
+        // Log the audit if there were changes
+        if (!empty($changedFields)) {
+            \App\Models\ProductAudit::create([
+                'product_id' => $product->id,
+                'updated_by' => Auth::id(),
+                'previous_data' => $previousData,
+                'current_data' => $currentData,
+                'changed_fields' => $changedFields,
+                'updated_at' => now(),
+            ]);
+        }
+
         return  redirect('product')->with('success', 'Success! Update Product');
     }
 
@@ -177,6 +217,7 @@ class ProductController extends Controller
         } else {
             $product->status = "publish";
         }
+        $product->updated_by = Auth::id();
         $product->save();
         return redirect()->back()->with('success', 'Success! Update Product');
     }
