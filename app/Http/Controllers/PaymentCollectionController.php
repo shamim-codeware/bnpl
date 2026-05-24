@@ -28,33 +28,30 @@ class PaymentCollectionController extends Controller
 {
     public function calculateAmountBiaAjax(Request $request)
     {
-        $monthlyInstallment = $request->input('monthly_installment');
-        $numberOfInstallments = $request->input('number_of_instllment');
+        $monthlyInstallment = (float) $request->input('monthly_installment');
+        $numberOfInstallments = (int) $request->input('number_of_instllment');
         $hire_purchase_id     = $request->input('hire_purchase_id');
 
-        $lateFinePerMonth = 500; // Fixed fine amount
+        $lateFinePerMonth = 500;
         $totalFine = 0;
-        // Fetch the selected number of installments
+        $currentDate = Carbon::now();
+
         $selectedInstallments = Installment::where('status', 0)
-            ->orderBy('loan_start_date') // Ensure oldest installments are considered first
+            ->orderBy('loan_start_date')
             ->take($numberOfInstallments)
             ->where('hire_purchase_id', $hire_purchase_id)
             ->get();
 
         foreach ($selectedInstallments as $installment) {
-            $loanStartDate = Carbon::parse($installment->loan_start_date);
-            $currentDate = Carbon::now();
-            // Only calculate fine if the start date has passed
-            if ($currentDate->greaterThan($loanStartDate)) {
-                $monthsOverdue = $loanStartDate->diffInMonths($currentDate);
+            $dueDate = Carbon::parse($installment->loan_start_date);
+            $penaltyStartAnchor = $dueDate->copy()->addMonth()->addDay();
 
-                // Add fine only if overdue by more than 1 month
-                if ($monthsOverdue > 1) {
-                    $totalFine += ($monthsOverdue - 1) * $lateFinePerMonth;
-                }
+            if ($currentDate->greaterThanOrEqualTo($penaltyStartAnchor)) {
+                $monthsWithPenalty = $penaltyStartAnchor->diffInMonths($currentDate) + 1;
+                $totalFine += $monthsWithPenalty * $lateFinePerMonth;
             }
         }
-        // Calculate the total amount (monthly installment + fine)
+
         $totalAmount = ($monthlyInstallment * $numberOfInstallments) + $totalFine;
 
         return response()->json([
@@ -66,26 +63,24 @@ class PaymentCollectionController extends Controller
     {
         $monthlyInstallment = (float) $request->input('monthly_installment');
         $numberOfInstallments = (int) $request->input('number_of_instllment');
-        $lateFinePerMonth = 500; // Fixed fine amount
-        // Fetch total fine directly using sum() to optimize performance
-        $totalFine = Installment::where('status', 0)
-            ->where('due_date', '<', Carbon::now()->startOfDay())
-            ->get()
-            ->sum(function ($installment) use ($lateFinePerMonth) {
-                return Carbon::parse($installment->due_date)->diffInMonths(Carbon::now()) * $lateFinePerMonth;
-            });
+        $hire_purchase_id = $request->input('hire_purchase_id');
 
-        // Calculate total amount
+        // Use the same LateFeeService/trait logic as reports/other calculations.
+        $lateFeeService = app(\App\Service\LateFeeService::class);
+        $totalFine = $hire_purchase_id ? (float) $lateFeeService->calculateLateFine($hire_purchase_id) : 0.0;
+
         $totalAmount = ($monthlyInstallment * $numberOfInstallments) + $totalFine;
 
         return response()->json([
             'monthly_installment' => $monthlyInstallment,
             'number_of_installments' => $numberOfInstallments,
-            'fine_per_month' => $lateFinePerMonth,
+            'fine_per_month' => 500,
             'total_fine' => $totalFine,
+            'fine' => $totalFine, // backward compatible with JS expecting response.fine
             'total_amount' => $totalAmount,
         ]);
     }
+
     public function LoanDetails($id)
     {
         $hirepurchase = HirePurchase::with(['purchase_products', 'purchase_products.brand', 'purchase_products.product', 'show_room'])->where('order_no', $id)->first();
