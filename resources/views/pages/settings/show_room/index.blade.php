@@ -100,6 +100,9 @@
                                             <span class="userDatatable-title">Remaining Credit  </span>
                                         </th>
                                         <th>
+                                            <span class="userDatatable-title">Updated By</span>
+                                        </th>
+                                        <th>
                                             <span class="userDatatable-title">Store Type</span>
                                         </th>
                                         <th>
@@ -145,6 +148,12 @@
                                             <td>{{ $showroom->credit_score }}</td>
                                             <td>{{ $showroom->remaining_credit }}</td>
                                             <td>
+                                                <span style="font-size: 12px;">
+                                                    {{ $showroom->updatedByUser ? ($showroom->updatedByUser->name ?? '') : 'N/A' }}
+                                                </span>
+                                            </td>
+                                            <td>
+
 
                                                 <div class="d-flex justify-content-center">
                                                     <div class="userDatatable-inline-title">

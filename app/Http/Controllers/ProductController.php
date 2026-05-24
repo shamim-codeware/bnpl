@@ -154,6 +154,19 @@ class ProductController extends Controller
     }
 
     /**
+     * Show audit history for the specified product.
+     */
+    public function history($id)
+    {
+        $product = Product::with(['types', 'categories', 'brands', 'audits.user'])
+            ->findOrFail($id);
+
+        $audits = $product->audits()->with('user')->orderBy('updated_at', 'desc')->get();
+
+        return view('pages.settings.product.history', compact('product', 'audits'));
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request,$id)

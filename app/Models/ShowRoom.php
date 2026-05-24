@@ -11,7 +11,8 @@ class ShowRoom extends Model
 
     protected $table = "show_rooms";
     protected $fillable = [
-        'name','ctp_name','number','contact_person','email','district_id','upazila_id','zone_id','post_code','street_address','status', 'created_by','updated_by','suffix','dealar','credit_score','remaining_credit'
+        'name','ctp_name','number','contact_person','email','district_id','upazila_id','zone_id','post_code','street_address','status', 'created_by','updated_by','suffix','dealar','credit_score','remaining_credit',
+        'credit_update_history',
     ];
 
 
@@ -34,6 +35,10 @@ class ShowRoom extends Model
     public function users()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function updatedByUser()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     public function district()

@@ -119,13 +119,55 @@ class ShowRoomController extends Controller
     public function update(Request $request, ShowRoom $showRoom)
     {
         $data = $request->all();
+
         if($request->dealar){
-        $data['dealar'] = 1;
-            }else{
-                $data['dealar'] = 0;
+            $data['dealar'] = 1;
+        }else{
+            $data['dealar'] = 0;
+        }
+
+        $oldCredit = $showRoom->credit_score;
+        $newCredit = $request->input('credit_score');
+
+        if ($newCredit !== null && (string)$newCredit !== (string)$oldCredit) {
+            $data['credit_score'] = $newCredit;
+
+            // Correct remaining_credit calculation (keep already-used credit):
+            // remaining_new = new_limit - (old_limit - old_remaining)
+            $oldRemaining = (float) $showRoom->remaining_credit;
+            $newRemaining = (float) $newCredit - ((float) $oldCredit - $oldRemaining);
+            $data['remaining_credit'] = $newRemaining;
+
+
+            // Track credit update history into show_rooms.credit_update_history (JSON)
+            $history = [];
+            if (!empty($showRoom->credit_update_history)) {
+                $decoded = json_decode($showRoom->credit_update_history, true);
+                if (is_array($decoded)) {
+                    $history = $decoded;
+                }
             }
+
+            $updatedBy = Auth::user()->id;
+            $updatedAt = now()->toDateTimeString();
+
+            $history[] = [
+                'updated_by'  => $updatedBy,
+                'updated_at'  => $updatedAt,
+                'from_credit' => (float) $oldCredit,
+                'to_credit'   => (float) $newCredit,
+                'delta'        => (float) $newCredit - (float) $oldCredit,
+            ];
+
+            // Also update standard updated_by / updated_at so you can show the latest updater from DB columns.
+            $data['updated_by'] = $updatedBy;
+
+            $data['credit_update_history'] = json_encode($history);
+
+        }
+
         $showRoom->fill($data)->save();
-        return  redirect('show-rooms')->with('success', 'Success! Update Show Room');
+        return redirect('show-rooms')->with('success', 'Success! Update Show Room');
     }
 
     public function ShowroomExport(){

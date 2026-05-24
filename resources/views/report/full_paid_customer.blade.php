@@ -98,7 +98,7 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                   
+
                                     <div class="col-md-4 mb-25">
                                         <select name="product_id[]" id="product_id" class="form-control">
                                              <option value="">All Model</option>
@@ -150,8 +150,13 @@
 
 
     <script>
-       
+
         $(document).ready(function() {
+            // Initialize Select2 for searchable dropdowns
+            $("#brand_id, #product_id").select2({
+                placeholder: "All Model",
+                allowClear: true
+            });
             getData(1, 0);
         });
         $(document).on('click', '.pagination a', function(event) {
@@ -160,7 +165,7 @@
             event.preventDefault();
             var myurl = $(this).attr('href');
             var page = $(this).attr('href').split('page=')[1];
-            // Get data 
+            // Get data
             getData(page, 0);
         });
         $('#filter_date').on('click', function() {
@@ -180,16 +185,16 @@
                 from_date: $('input[name=from_date]').val(),
                 to_date: $('input[name=to_date]').val(),
             };
-            
+
 
             var paramStrings = [];
             for (var key in params) {
                 paramStrings.push(key + '=' + encodeURIComponent(params[key]));
             }
-         
 
 
-            // Field validation 
+
+            // Field validation
             // if (event == 1 && params.from_date == "") {
             //     toastr.error('From date field is required');
             //     return false;
@@ -206,14 +211,14 @@
                 .attr('href', custome)
                 .text('Export');
             $("#export").html(anchor);
-            // Call 
+            // Call
             $.ajax({
                     url: "{{ url('full-paid-customer-details?page=') }}" + page + "&" + paramStrings.join('&'),
                     type: "get",
                     datatype: "html",
                 })
                 .done(function(data) {
-                   
+
                     $("#data-assign").empty().html(data);
                     $('.btn-submit').prop('disabled', false);
                 })

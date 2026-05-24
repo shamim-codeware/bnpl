@@ -56,7 +56,8 @@
                                             <div class="col-md-3 mb-25">
                                                 <div class="with-icon">
                                                     {{-- <span class="lar la-envelope color-light"></span> --}}
-                                                    <input readonly type="text" value="{{ $showroom->credit_score }}" name="credit_score" class="form-control  ih-medium ip-lightradius-xs b-light" id="credit_score" placeholder="Credit Score  ">
+<input type="number" value="{{ $showroom->credit_score }}" name="credit_score" class="form-control  ih-medium ip-lightradius-xs b-light" id="credit_score" placeholder="Credit Score" min="0" step="0.01">
+                                                    <input type="hidden" name="old_credit_score" value="{{ $showroom->credit_score }}">
                                                 </div>
                                             </div>
                                         </div>

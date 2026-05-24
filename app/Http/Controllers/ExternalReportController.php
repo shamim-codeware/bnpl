@@ -203,7 +203,7 @@ class ExternalReportController extends Controller
         $product_group_ids = explode(',', $request->product_group);
         $showrooms = explode(',', $request->showroom_ctp);
         // Support both legacy `product_model` and UI `product_id`
-        $product_model = explode(',', $request->product_model ?? $request->product_id);
+        $product_model = array_values(array_filter(explode(',', $request->product_model ?? $request->product_id), fn($value) => $value !== null && $value !== ''));
         $product_category = explode(',', $request->product_category);
         $brand = explode(',', $request->brand_id);
 
@@ -215,9 +215,9 @@ class ExternalReportController extends Controller
                 // Use approval_date if available; otherwise fallback to rejected_at or created_at
                 $query->whereBetween(DB::raw('COALESCE(approval_date, rejected_at, created_at)'), [$from_date, $to_date]);
             }
-            if ($request->product_model || $request->product_id) {
+            if (!empty($product_model)) {
                 $query->whereHas('purchase_products', function ($q) use ($product_model) {
-                    $q->whereIn('product_id', $product_model);
+                    $q->whereIn('product_model_id', $product_model);
                 });
             }
             if ($request->store_type !== null && $request->store_type !== '') {
@@ -280,7 +280,7 @@ class ExternalReportController extends Controller
         $product_group_ids = explode(',', $request->product_group);
         $showrooms = explode(',', $request->showroom_ctp);
         // Support both legacy `product_model` and UI `product_id`
-        $product_model = explode(',', $request->product_model ?? $request->product_id);
+        $product_model = array_values(array_filter(explode(',', $request->product_model ?? $request->product_id), fn($value) => $value !== null && $value !== ''));
         $product_category = explode(',', $request->product_category);
         $brand = explode(',', $request->brand_id);
 
@@ -291,9 +291,9 @@ class ExternalReportController extends Controller
                 // Use approval_date if available; otherwise fallback to rejected_at or created_at
                 $query->whereBetween(DB::raw('COALESCE(approval_date, rejected_at, created_at)'), [$from_date, $to_date]);
             }
-            if ($request->product_model || $request->product_id) {
+            if (!empty($product_model)) {
                 $query->whereHas('purchase_products', function ($q) use ($product_model) {
-                    $q->whereIn('product_id', $product_model);
+                    $q->whereIn('product_model_id', $product_model);
                 });
             }
             if ($request->store_type !== null && $request->store_type !== '') {
@@ -374,7 +374,7 @@ class ExternalReportController extends Controller
 
         $product_group_ids = explode(',', $request->product_group);
         $showrooms = explode(',', $request->showroom_ctp);
-        $product_model = explode(',', $request->product_model);
+        $product_model = array_values(array_filter(explode(',', $request->product_model), fn($value) => $value !== null && $value !== ''));
         $product_category = explode(',', $request->product_category);
         $brand = explode(',', $request->brand_id);
 
@@ -388,9 +388,9 @@ class ExternalReportController extends Controller
                         ->whereBetween('loan_start_date', [$from_date, $to_date]);
                 });
             }
-            if ($request->product_model) {
+            if (!empty($product_model)) {
                 $query->whereHas('purchase_products', function ($q) use ($product_model) {
-                    $q->whereIn('product_id', $product_model);
+                    $q->whereIn('product_model_id', $product_model);
                 });
             }
             if ($request->store_type !== null && $request->store_type !== '') {
@@ -585,7 +585,7 @@ class ExternalReportController extends Controller
 
         $product_group_ids = explode(',', $request->product_group ?? '');
         $showrooms         = explode(',', $request->showroom_ctp ?? '');
-        $product_model     = explode(',', $request->product_model ?? '');
+        $product_model     = array_values(array_filter(explode(',', $request->product_model ?? ''), fn($value) => $value !== null && $value !== ''));
         $product_category  = explode(',', $request->product_category ?? '');
         $brand             = explode(',', $request->brand_id ?? '');
 
@@ -599,8 +599,8 @@ class ExternalReportController extends Controller
                 });
             }
 
-            if ($request->product_model && !empty($product_model[0])) {
-                $query->whereHas('purchase_products', fn($q) => $q->whereIn('product_id', $product_model));
+            if (!empty($product_model)) {
+                $query->whereHas('purchase_products', fn($q) => $q->whereIn('product_model_id', $product_model));
             }
             if ($request->store_type !== null && $request->store_type !== '') {
                 $query->where('store_type', $request->store_type);

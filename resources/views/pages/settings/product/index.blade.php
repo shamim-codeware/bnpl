@@ -250,6 +250,11 @@
                                                     </a>
                                                 </li>
                                                 @endif
+                                                <li>
+                                                    <a href="{{ route('product.history', $product->id) }}" class="view" title="History">
+                                                        <i class="uil uil-list-ul"></i>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </td>
                                     </tr>

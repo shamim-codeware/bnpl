@@ -146,6 +146,11 @@
 
     <script>
         $(document).ready(function() {
+            // Initialize Select2 for searchable dropdowns
+            $("#brand_id, #product_id").select2({
+                placeholder: "All Model",
+                allowClear: true
+            });
             getData(1, 0);
         });
         $(document).on('click', '.pagination a', function(event) {
