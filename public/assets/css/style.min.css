@@ -4287,7 +4287,7 @@ body.top-menu .navbar-left .customizer-trigger+.top-menu {
 
 .navbar-left .navbar-brand img,
 .navbar-left .navbar-brand svg {
-    max-width: 160px;
+    max-width: 230px;
     min-width: 160px;
 }
 
@@ -26366,7 +26366,7 @@ table.table-rounded tbody tr td:last-child {
     transform: translate(-50%, -50%)
 }
 .loader-overlay img{
-    width: 200px;
+    width: 230px;
 }
 
 body.loaded:after,
@@ -40445,9 +40445,9 @@ label[for="et_pb_contact_brand_file_request_0"] {
     /* height: 90%; */
 }
 .login_logo {
-    left: 6%;
+    left: 12px;
     bottom: 40px;
-    width: 168px;
+    /* width: 168px; */
 }
 .rounded_10{
     border-radius: 10px;

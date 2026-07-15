@@ -18,7 +18,7 @@
                 <span class="spin-dot badge-dot dot-primary"></span>
                 <span class="spin-dot badge-dot dot-primary"></span>
                 <span class="spin-dot badge-dot dot-primary"></span>
-                {{-- <img id="pulse" src="{{ asset('assets/img/rangs-logo-1.png') }}" alt="rangs-logo"> --}}
+                {{-- <img id="pulse" src="{{ asset('assets/img/new-logo.png') }}" alt="rangs-logo"> --}}
             </div>
         </div>
     </div>

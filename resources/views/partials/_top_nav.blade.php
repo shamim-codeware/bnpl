@@ -2,8 +2,8 @@
     <div class="navbar-left">
         <div class="logo-area">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <img class="dark" src="{{ asset('assets/img/rangs-logo-1.png') }}" alt="svg">
-                {{-- <img class="dark" src="{{ asset('assets/img/rangs-logo-1.png') }}" alt="svg"> --}}
+                <img class="dark" src="{{ asset('assets/img/rangs_logo.svg') }}" alt="svg">
+                {{-- <img class="dark" src="{{ asset('assets/img/new-logo.png') }}" alt="svg"> --}}
                 {{-- <img class="light" src="{{ asset('assets/img/tvs-logo.png') }}" alt="img"> --}}
             </a>
             <a href="#" class="sidebar-toggle">
@@ -34,7 +34,7 @@
         <h1> Buy Now Pay later</h1>
     </div>
     {{-- <div class="navbar-middle top-heading d-lg-block d-none">
-        Healine 
+        Healine
         <div class="container-fluid">
             <div class="row">
                 <div class="dashboard_marque">
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-          Healine 
+          Healine
     </div> --}}
     <div class="dashboard_marque">
         <marquee id="marque-text_st" behavior="scroll" direction="left">

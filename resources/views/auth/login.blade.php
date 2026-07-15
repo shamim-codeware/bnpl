@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/plugin.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/style.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/style.min.css?v=0.1') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/variables.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v3.0.0/css/line.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/css/toastr.css" rel="stylesheet" />
@@ -25,7 +25,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6 d-flex align-items-center justify-content-center position-relative">
                         <img class="img-fluid login_img" src="{{ asset('assets/img/login_bg.png') }}" alt="img">
-                        <img class="position-absolute end-0 login_logo" src="{{ asset('assets/img/rangs-logo-1.png') }}" alt="rangs-logo">
+                        <img class="position-absolute end-0 login_logo" src="{{ asset('assets/img/rangs_logo.svg') }}" alt="rangs-logo">
                     </div>
                     <div class="col-md-6">
                         <div class="row align-items-center justify-content-center">
@@ -107,7 +107,7 @@
                 <span class="spin-dot badge-dot dot-primary"></span>
                 <span class="spin-dot badge-dot dot-primary"></span>
                 <span class="spin-dot badge-dot dot-primary"></span> --}}
-                <img id="pulse" src="{{ asset('assets/img/rangs-logo-1.png') }}" alt="rangs-logo">
+                <img id="pulse" src="{{ asset('assets/img/new-logo.png') }}" alt="rangs-logo">
             </div>
         </div>
     </div>
