@@ -278,4 +278,17 @@
         }
     }
     $("#amount").on("input", calculateMinimuninstallment);
+
+    // Prevent double/rapid re-submission of the payment collection form (the
+    // ERP call it triggers can take a few seconds, and clicking again before
+    // the page redirects was creating duplicate transactions and duplicate
+    // Fine/Penalty postings to ERP).
+    $(document).on("submit", "form.parent-assign", function() {
+        var $form = $(this);
+        if ($form.data("submitted")) {
+            return false;
+        }
+        $form.data("submitted", true);
+        $form.find(".btn-submit").prop("disabled", true).text("Processing...");
+    });
 </script>

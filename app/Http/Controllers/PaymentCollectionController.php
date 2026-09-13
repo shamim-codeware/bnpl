@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\GeneralIncentiveConfig;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 
 
@@ -130,6 +131,15 @@ class PaymentCollectionController extends Controller
             }
         }
 
+        // Guard against duplicate submissions for the same order (double-click, page
+        // resubmission, or two near-simultaneous requests) — without this, each
+        // duplicate request re-runs the whole collection, including a fresh ERP post.
+        $lock = Cache::lock("payment-collection-hp-{$request->hire_purchase_id}", 30);
+
+        if (!$lock->get()) {
+            return redirect()->back()->with('error', 'This payment is already being processed. Please wait a moment, then check the transaction list before submitting again.');
+        }
+
         $data = $request->all();
         $data['fine_amount'] = (float) ($request->fine_amount ?? 0);
         $data['fine_remarks'] = $request->fine_remarks;
@@ -175,7 +185,13 @@ class PaymentCollectionController extends Controller
             $HirePurchaseProduct->save();
             $Installment = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 0)->orderby('id', "ASC")->take($number_of_installment)->get();
 
-
+            // The fine/penalty applies once to this whole collection (it's the
+            // leftover amount after paying off full installments), so we only
+            // need the installment reference from the first installment in the
+            // batch to report it against — captured inside the loop below.
+            $fineInstallmentNumber = null;
+            $finePaymentRef = null;
+            $fineInstallmentId = null;
 
             foreach ($Installment as $key => $install) {
                 $installment_number = Installment::where('hire_purchase_id', $request->hire_purchase_id)->where('status', 1)->count();
@@ -195,20 +211,27 @@ class PaymentCollectionController extends Controller
                 } else {
                     $sent = 1;
                 }
-                if ($advance_payment > 0) {
-                    $data =  $ApiService->FineApi($hirepurchase->order_no, $advance_payment, $installment_number, $paymentRef);
-                    // return $data;
+
+                if ($key == 0) {
+                    $fineInstallmentNumber = $installment_number;
+                    $finePaymentRef = $paymentRef;
+                    $fineInstallmentId = $install->id;
                 }
-                $data = [
-                    'tracking_id' => $hirepurchase->order_no,
-                    'ins_no' => $installment_number,
-                    'payment_ref' => "Cash",
-                    'response' => $response,
-                    'erp_status' => $sent,
+
+                PaymentErpHistory::create([
+                    'tracking_id' => $hirepurchase->id,
                     'transaction_id' => $transaction_id,
                     'installment_id' => $install->id,
-                ];
-                //PaymentErpHistory::create($data);
+                    'erp_data' => [
+                        'type' => 'collection',
+                        'eorder_no' => $hirepurchase->order_no,
+                        'ins_no' => $installment_number,
+                        'payment_ref' => $paymentRef,
+                    ],
+                    'erp_status' => $sent,
+                    'response' => json_encode($response),
+                ]);
+
                 $ins = Installment::findOrFail($install->id);
                 $ins->status = 1;
 
@@ -218,6 +241,29 @@ class PaymentCollectionController extends Controller
                 }
 
                 $ins->save();
+            }
+
+            // Send the fine/penalty exactly once per payment collection, not once
+            // per installment covered by it — previously this sat inside the loop
+            // above and posted the same penalty_amt to ERP once per installment,
+            // producing exact duplicate Fine/Delay Charge rows in ERP.
+            if ($advance_payment > 0 && $fineInstallmentNumber !== null) {
+                $fineResponse = $ApiService->FineApi($hirepurchase->order_no, $advance_payment, $fineInstallmentNumber, $finePaymentRef);
+
+                PaymentErpHistory::create([
+                    'tracking_id' => $hirepurchase->id,
+                    'transaction_id' => $transaction_id,
+                    'installment_id' => $fineInstallmentId,
+                    'erp_data' => [
+                        'type' => 'fine',
+                        'eorder_no' => $hirepurchase->order_no,
+                        'penalty_amt' => $advance_payment,
+                        'ins_no' => $fineInstallmentNumber,
+                        'payment_ref' => $finePaymentRef,
+                    ],
+                    'erp_status' => (isset($fineResponse['error']) && $fineResponse['error'] == 1) ? 0 : 1,
+                    'response' => json_encode($fineResponse),
+                ]);
             }
 
             //if fine  then execute this code
@@ -298,6 +344,8 @@ class PaymentCollectionController extends Controller
         } catch (Exception $e) {
             DB::rollback();
             return redirect('')->with('error', $e->getMessage());
+        } finally {
+            $lock->release();
         }
     }
     public function TransactionList()
