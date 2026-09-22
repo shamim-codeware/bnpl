@@ -597,6 +597,7 @@ class HirePurchaseController extends Controller
             $ShowRoom = ShowRoom::where('id', $HirePurchase->showroom_id)->first();
             $ShowRoom->remaining_credit = $ShowRoom->remaining_credit - $remaining_amount;
             $ShowRoom->save();
+            $HirePurchase->save();
 
             $erp_log = ErpLog::where('tracking_number', $id)->first();
 
@@ -637,6 +638,7 @@ class HirePurchaseController extends Controller
             $ShowRoom = ShowRoom::where('id', $HirePurchase->showroom_id)->first();
             $ShowRoom->remaining_credit = $ShowRoom->remaining_credit - $remaining_amount;
             $ShowRoom->save();
+            $HirePurchase->save();
 
             $erp_log = ErpLog::where('tracking_number', $id)->first();
 
@@ -659,7 +661,6 @@ class HirePurchaseController extends Controller
                 $erp_log->save();
             }
         }
-        $HirePurchase->save();
         return redirect()->back()->with('success', 'Approve Successfully ');
     }
     public function ProductDetails($id)
